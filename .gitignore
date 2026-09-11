@@ -1,0 +1,21 @@
+# IDE
+.idea/
+*.iml
+
+# Build output
+**/target/
+**/node_modules/
+**/dist/
+**/build/
+
+# Logs
+*.log
+logs/
+derby.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Package files
+*.zip
