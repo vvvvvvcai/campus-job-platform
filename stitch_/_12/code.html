@@ -1,458 +1,588 @@
-<!DOCTYPE html><html lang="zh-CN" style="width: 1280px; height: 2381px; overflow: hidden; position: relative;"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><title>校园就业综合服务平台</title><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-tint": "#2151da", "on-error": "#ffffff", "on-tertiary-fixed": "#2a1700", "surface-container-high": "#e2e7ff", "on-secondary-fixed": "#001e2f", "on-secondary-fixed-variant": "#004c6e", "on-surface": "#131b2e", "outline-variant": "#c4c5d7", "on-tertiary-container": "#ffcb8f", "error": "#ba1a1a", "on-primary-container": "#cad3ff", "secondary-fixed": "#c9e6ff", "tertiary-fixed-dim": "#ffb95f", "surface-container": "#eaedff", "inverse-on-surface": "#eef0ff", "on-secondary": "#ffffff", "error-container": "#ffdad6", "on-background": "#131b2e", "on-primary-fixed-variant": "#0039b5", "secondary": "#006591", "outline": "#747686", "background": "#faf8ff", "secondary-container": "#39b8fd", "primary-fixed": "#dce1ff", "primary-container": "#1d4ed8", "secondary-fixed-dim": "#89ceff", "surface-container-low": "#f2f3ff", "on-primary": "#ffffff", "surface-variant": "#dae2fd", "inverse-surface": "#283044", "on-tertiary-fixed-variant": "#653e00", "surface": "#faf8ff", "tertiary-fixed": "#ffddb8", "surface-container-highest": "#dae2fd", "tertiary-container": "#825100", "on-error-container": "#93000a", "surface-dim": "#d2d9f4", "on-secondary-container": "#004666", "primary-fixed-dim": "#b7c4ff", "on-surface-variant": "#434655", "surface-bright": "#faf8ff", "inverse-primary": "#b7c4ff", "on-primary-fixed": "#001551", "primary": "#0037b0", "tertiary": "#623c00", "on-tertiary": "#ffffff", "surface-container-lowest": "#ffffff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-md": "1rem", "gutter-desktop": "1.5rem", "margin-mobile": "1rem", "margin-tablet": "1.5rem", "space-sm": "0.75rem", "gutter-mobile": "0.75rem", "margin-desktop": "2.5rem", "space-lg": "1.5rem", "space-2xs": "0.25rem", "space-xl": "2rem", "space-xs": "0.5rem", "gutter-tablet": "1rem", "space-2xl": "3rem", "space-3xl": "4rem" }, "fontFamily": { "display-hero-mobile": ["Inter"], "label-lg": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "headline-xl-mobile": ["Inter"], "headline-sm": ["Inter"], "headline-md": ["Inter"], "headline-xl": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"], "display-hero": ["Inter"], "body-sm": ["Inter"] }, "fontSize": { "display-hero-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-xl-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "display-hero": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.025em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }] } } } };</script></head><body class="bg-background font-body-md text-on-surface antialiased min-h-screen flex flex-col"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest border-b border-surface-container shadow-sm"><div class="max-w-7xl mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop h-16 flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm shrink-0"><img alt="平台Logo - 校园就业综合服务平台" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UrgMPhmJmXd__lbs_Npnrem8vxaSNnbOGZrQHvk-xFcyw7X1vTUH7-Ect9uqWMtj_CO_Vgqd-o91wJG0OSQnUCufDB3463flscqaQeg_RKuoGxwG9odFSlpYQgdkRCl5Br2Q3B5hjCyZ_DOGDp8ng_eoyVdl3X7akrZi3NO_a2uaYAEc1u-EZ149sC1N34QOrq2XNqNTYUx5SnGNq7o-989smJORejura3pXtxtdmv5A-GLYXGXaNObSA"><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold leading-tight">校园就业综合服务平台</span><span class="font-label-sm text-label-sm text-on-surface-variant hidden sm:inline-block leading-tight">智慧校招与实习育人服务系统</span></div></div><nav class="hidden lg:flex items-center gap-space-lg h-full" data-active-classes="text-primary font-headline-sm border-b-2 border-primary"><a aria-current="page" class="h-full flex items-center px-space-2xs transition-colors text-primary font-headline-sm border-b-2 border-primary" data-path="home" href="#">首页</a><a class="h-full flex items-center px-space-2xs text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors border-b-2 border-transparent" data-path="job-search" href="#">职位搜索</a><a class="h-full flex items-center px-space-2xs text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors border-b-2 border-transparent" data-path="campus-recruitment" href="#">校园宣讲会</a><a class="h-full flex items-center px-space-2xs text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors border-b-2 border-transparent" data-path="career-guidance" href="#">求职指导</a></nav><div class="flex items-center gap-space-md shrink-0"><button aria-label="通知消息" class="relative p-space-xs text-on-surface-variant hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors" type="button"><span class="material-symbols-outlined">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full ring-2 ring-surface-container-lowest"></span></button><div class="relative group"><button class="flex items-center gap-space-xs p-space-2xs rounded-lg hover:bg-surface-container-low transition-colors" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7Ry2UvxlSzjb_kFjfIwAeuT1Xk3X2Hv-H9n-oqChnJGTwdIBZ34b3YB2-Va_zbSePu5OdcuwI_0tI4_ngnaK9qQBKO69TWQQiSiRCsG7DF7BSsUbXAAswG2Qs9WQ5CXsmt5MSxxJomf7neGvQgBhX4pw7bvLf_5xBK59zr93S2WrTI-VRXDtwisMYJdjFYWO8ROSO5ONgLZ7UlwHj0p-J3xuhZUnu4dYp5m3CLvI6J3aWq4seds7UKg"><div class="hidden md:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-medium leading-none">林晨</span><span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 leading-none">计算机系 · 2025届</span></div><span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface transition-transform duration-200 group-hover:rotate-180 text-[18px]">expand_more</span></button><div class="absolute right-0 top-full mt-2 w-56 bg-surface-container-lowest rounded-xl shadow-lg border border-surface-container py-space-xs opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 z-50"><div class="px-space-md py-space-xs border-b border-surface-container md:hidden"><p class="font-label-md text-label-md text-on-surface font-semibold">林晨</p><p class="font-label-sm text-label-sm text-on-surface-variant">计算机系 · 2025届</p></div><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="profile-center" href="#"><span class="material-symbols-outlined text-[20px]">account_circle</span><span class="">个人中心</span></a><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="my-applications" href="#"><span class="material-symbols-outlined text-[20px]">send</span><span class="">我的投递</span></a><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="online-resume" href="#"><span class="material-symbols-outlined text-[20px]">description</span><span class="">在线简历</span></a><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="application-progress" href="#"><span class="material-symbols-outlined text-[20px]">timeline</span><span class="">求职进度</span></a><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="account-settings" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span class="">账号设置</span></a><div class="h-px bg-surface-container my-space-2xs"></div><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-error hover:bg-error-container/20 transition-colors" data-path="login" href="#"><span class="material-symbols-outlined text-[20px]">logout</span><span class="">退出登录</span></a></div></div><button aria-label="切换菜单" class="lg:hidden p-space-xs text-on-surface-variant hover:text-primary rounded-lg transition-colors" type="button"><span class="material-symbols-outlined">menu</span></button></div></div></header><main class="w-full pt-16 bg-surface flex-1"><div class="flex flex-col w-full">
-<!-- Subtle decorative ambient glow contained in wrapper -->
-<div class="relative w-full max-w-7xl mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop py-space-xl">
-<div class="absolute top-10 left-1/3 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
-<div class="absolute top-48 right-10 w-80 h-80 bg-secondary-container/10 rounded-full blur-2xl pointer-events-none -z-10"></div>
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>校园就业综合服务平台</title><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-tint": "#2151da", "on-error": "#ffffff", "on-tertiary-fixed": "#2a1700", "surface-container-high": "#e2e7ff", "on-secondary-fixed": "#001e2f", "on-secondary-fixed-variant": "#004c6e", "on-surface": "#131b2e", "outline-variant": "#c4c5d7", "on-tertiary-container": "#ffcb8f", "error": "#ba1a1a", "on-primary-container": "#cad3ff", "secondary-fixed": "#c9e6ff", "tertiary-fixed-dim": "#ffb95f", "surface-container": "#eaedff", "inverse-on-surface": "#eef0ff", "on-secondary": "#ffffff", "error-container": "#ffdad6", "on-background": "#131b2e", "on-primary-fixed-variant": "#0039b5", "secondary": "#006591", "outline": "#747686", "background": "#faf8ff", "secondary-container": "#39b8fd", "primary-fixed": "#dce1ff", "primary-container": "#1d4ed8", "secondary-fixed-dim": "#89ceff", "surface-container-low": "#f2f3ff", "on-primary": "#ffffff", "surface-variant": "#dae2fd", "inverse-surface": "#283044", "on-tertiary-fixed-variant": "#653e00", "surface": "#faf8ff", "tertiary-fixed": "#ffddb8", "surface-container-highest": "#dae2fd", "tertiary-container": "#825100", "on-error-container": "#93000a", "surface-dim": "#d2d9f4", "on-secondary-container": "#004666", "primary-fixed-dim": "#b7c4ff", "on-surface-variant": "#434655", "surface-bright": "#faf8ff", "inverse-primary": "#b7c4ff", "on-primary-fixed": "#001551", "primary": "#0037b0", "tertiary": "#623c00", "on-tertiary": "#ffffff", "surface-container-lowest": "#ffffff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-md": "1rem", "gutter-desktop": "1.5rem", "margin-mobile": "1rem", "margin-tablet": "1.5rem", "space-sm": "0.75rem", "gutter-mobile": "0.75rem", "margin-desktop": "2.5rem", "space-lg": "1.5rem", "space-2xs": "0.25rem", "space-xl": "2rem", "space-xs": "0.5rem", "gutter-tablet": "1rem", "space-2xl": "3rem", "space-3xl": "4rem" }, "fontFamily": { "display-hero-mobile": ["Inter"], "label-lg": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "headline-xl-mobile": ["Inter"], "headline-sm": ["Inter"], "headline-md": ["Inter"], "headline-xl": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"], "display-hero": ["Inter"], "body-sm": ["Inter"] }, "fontSize": { "display-hero-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-xl-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "display-hero": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.025em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }] } } } };</script></head><body class="bg-background font-body-md text-on-surface antialiased min-h-screen flex flex-col"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest border-b border-surface-container shadow-sm"><div class="max-w-7xl mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop h-16 flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm shrink-0"><img alt="平台Logo - 校园就业综合服务平台" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UrgMPhmJmXd__lbs_Npnrem8vxaSNnbOGZrQHvk-xFcyw7X1vTUH7-Ect9uqWMtj_CO_Vgqd-o91wJG0OSQnUCufDB3463flscqaQeg_RKuoGxwG9odFSlpYQgdkRCl5Br2Q3B5hjCyZ_DOGDp8ng_eoyVdl3X7akrZi3NO_a2uaYAEc1u-EZ149sC1N34QOrq2XNqNTYUx5SnGNq7o-989smJORejura3pXtxtdmv5A-GLYXGXaNObSA"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold leading-tight">校园就业综合服务平台</span><span class="font-label-sm text-label-sm text-on-surface-variant hidden sm:inline-block leading-tight">智慧校招与实习育人服务系统</span></div></div><nav class="hidden lg:flex items-center gap-space-lg h-full" data-active-classes="text-primary font-headline-sm border-b-2 border-primary"><a aria-current="page" class="h-full flex items-center px-space-2xs transition-colors text-primary font-headline-sm border-b-2 border-primary" data-path="home" href="#">首页</a><a class="h-full flex items-center px-space-2xs text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors border-b-2 border-transparent" data-path="job-search" href="#">职位搜索</a><a class="relative h-full flex items-center px-space-2xs text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors border-b-2 border-transparent" data-path="recommended-jobs" href="#"><span>推荐职位</span><span class="ml-1.5 px-1.5 py-0.5 bg-error text-on-error rounded-full font-label-sm text-label-sm font-semibold uppercase scale-90">HOT</span></a><a class="h-full flex items-center px-space-2xs text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors border-b-2 border-transparent" data-path="campus-recruitment" href="#">校园宣讲会</a><a class="h-full flex items-center px-space-2xs text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors border-b-2 border-transparent" data-path="career-guidance" href="#">求职指导</a></nav><div class="flex items-center gap-space-md shrink-0"><button aria-label="通知消息" class="relative p-space-xs text-on-surface-variant hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors" type="button"><span class="material-symbols-outlined">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full ring-2 ring-surface-container-lowest"></span></button><div class="relative group"><button class="flex items-center gap-space-xs p-space-2xs rounded-lg hover:bg-surface-container-low transition-colors" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7Ry2UvxlSzjb_kFjfIwAeuT1Xk3X2Hv-H9n-oqChnJGTwdIBZ34b3YB2-Va_zbSePu5OdcuwI_0tI4_ngnaK9qQBKO69TWQQiSiRCsG7DF7BSsUbXAAswG2Qs9WQ5CXsmt5MSxxJomf7neGvQgBhX4pw7bvLf_5xBK59zr93S2WrTI-VRXDtwisMYJdjFYWO8ROSO5ONgLZ7UlwHj0p-J3xuhZUnu4dYp5m3CLvI6J3aWq4seds7UKg"/><div class="hidden md:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-medium leading-none">林晨</span><span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 leading-none">计算机系 · 2025届</span></div><span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface transition-transform duration-200 group-hover:rotate-180 text-[18px]">expand_more</span></button><div class="absolute right-0 top-full mt-2 w-56 bg-surface-container-lowest rounded-xl shadow-lg border border-surface-container py-space-xs opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 z-50"><div class="px-space-md py-space-xs border-b border-surface-container md:hidden"><p class="font-label-md text-label-md text-on-surface font-semibold">林晨</p><p class="font-label-sm text-label-sm text-on-surface-variant">计算机系 · 2025届</p></div><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="profile-center" href="#"><span class="material-symbols-outlined text-[20px]">account_circle</span><span>个人中心</span></a><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="my-applications" href="#"><span class="material-symbols-outlined text-[20px]">send</span><span>我的投递</span></a><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="online-resume" href="#"><span class="material-symbols-outlined text-[20px]">description</span><span>在线简历</span></a><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="application-progress" href="#"><span class="material-symbols-outlined text-[20px]">timeline</span><span>求职进度</span></a><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="account-settings" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span>账号设置</span></a><div class="h-px bg-surface-container my-space-2xs"></div><a class="flex items-center gap-space-sm px-space-md py-space-xs font-body-md text-body-md text-error hover:bg-error-container/20 transition-colors" data-path="login" href="#"><span class="material-symbols-outlined text-[20px]">logout</span><span>退出登录</span></a></div></div><button aria-label="切换菜单" class="lg:hidden p-space-xs text-on-surface-variant hover:text-primary rounded-lg transition-colors" type="button"><span class="material-symbols-outlined">menu</span></button></div></div></header><main class="w-full pt-16 bg-surface flex-1"><div class="flex flex-col w-full bg-surface-container-low min-w-0">
+<!-- Top Bar / Breadcrumb & Header Title -->
+<div class="w-full bg-surface-container-lowest shadow-sm">
+<div class="max-w-7xl mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop py-space-lg">
 <!-- Breadcrumb -->
-
-<!-- Page Header & Action Hub -->
-<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md mb-space-xl">
-<div class="space-y-1">
+<nav aria-label="路径导航" class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant mb-space-xs">
+<a class="hover:text-primary transition-colors" href="#">企业管理中心</a>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">职位管理</a>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">chevron_right</span>
+<span class="text-primary font-medium">发布新校招/实习职位</span>
+</nav>
+<!-- Headline -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-space-md">
+<div>
 <div class="flex items-center gap-space-sm">
-<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight font-bold">我的简历档案库</h1>
-<span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold tracking-wide uppercase">
-            3/5 已创建
-          </span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">发布新校招 / 实习职位</h1>
+<span class="inline-flex items-center px-space-xs py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-semibold">
+              高校互联通道已就绪
+            </span>
 </div>
-<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
-          支持维护多份针对性简历，根据算法、前端或央企国企精准投递，告别“千企一面”，有效提升面试邀约率。
-        </p>
-</div>
-<!-- Action Buttons -->
-<div class="flex flex-wrap items-center gap-space-sm shrink-0">
-
-<button class="group flex items-center gap-space-xs px-space-md py-2.5 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface rounded-lg shadow-sm hover:shadow-md transition-all duration-200" type="button">
-<span class="material-symbols-outlined text-on-surface-variant text-[20px]">picture_as_pdf</span>
-<span class="font-label-lg text-label-lg font-medium">一键导出 PDF</span>
-</button>
-<button class="flex items-center gap-space-xs px-space-lg py-2.5 bg-primary-container hover:bg-primary text-on-primary rounded-lg shadow-sm hover:shadow-md transition-all duration-200" type="button">
-<span class="material-symbols-outlined text-[20px]">add</span>
-<span class="font-label-lg text-label-lg font-semibold">新建简历</span>
-</button>
-</div>
-</div>
-<!-- Main 12-Column Responsive Workspace Grid -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
-<!-- Left Column: Resume Repository & Version Matrix (4 Columns) -->
-<div class="lg:col-span-4 space-y-space-md">
-<!-- Live Diagnostic Status Banner -->
-
-<!-- Section Title with Metadata -->
-<div class="flex items-center justify-between px-1">
-<span class="font-label-md text-label-md font-semibold text-on-surface tracking-wider uppercase">
-            简历列表
-          </span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">点击卡片切换右侧预览</span>
-</div>
-<!-- Resume Cards Stack -->
-<div class="space-y-space-sm">
-<!-- Card 1: Default Active Resume -->
-<div class="relative bg-surface-container-lowest rounded-xl p-space-md shadow-md transition-all duration-200 cursor-pointer">
-<!-- Active indicator ribbon on top right corner -->
-<div class="absolute top-0 right-0 overflow-hidden w-20 h-20 pointer-events-none">
-<div class="absolute transform rotate-45 bg-primary text-on-primary text-[10px] font-bold py-0.5 right-[-35px] top-[18px] w-[120px] text-center shadow-sm">
-                预览中
-              </div>
-</div>
-<div class="flex items-center gap-space-xs mb-1">
-<span class="px-2 py-0.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm font-semibold">
-                默认投递
-              </span>
-<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm font-medium">
-                研发岗专用
-              </span>
-</div>
-<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-2 pr-12 line-clamp-1">
-              2025届计算机研发与算法专向简历
-            </h2>
-<!-- Metrics Bar -->
-<div class="mt-space-sm space-y-1">
-<div class="flex justify-between items-center font-label-sm text-label-sm">
-<span class="text-on-surface-variant">简历完整度</span>
-<span class="font-semibold text-primary">95%</span>
-</div>
-<div class="w-full bg-surface-container-low h-1.5 rounded-full overflow-hidden">
-<div class="bg-primary h-full rounded-full transition-all duration-500" style="width: 95%;"></div>
-</div>
-</div>
-<div class="flex items-center justify-between mt-space-md pt-space-xs text-on-surface-variant font-label-sm text-label-sm">
-<span class="flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">schedule</span>
-                2025-03-08 14:20
-              </span>
-<span class="text-on-surface-variant/60 font-medium">默认简历不可删除</span>
-</div>
-<!-- Card Bottom Quick Action Panel -->
-<div class="mt-space-sm pt-space-sm bg-surface-container-low/50 -mx-space-md -mb-space-md px-space-md py-2.5 rounded-b-xl flex items-center justify-between">
-<span class="font-label-sm text-label-sm text-primary font-semibold flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px]">visibility</span> 当前显示中
-              </span>
-<div class="flex items-center gap-2">
-<button class="px-3 py-1 bg-surface-container-lowest hover:bg-surface-container text-on-surface rounded-md font-label-sm text-label-sm font-medium shadow-sm transition-colors flex items-center gap-1" type="button">
-<span class="material-symbols-outlined text-[14px]">edit</span>
-                  编辑内容
-                </button>
-<button class="p-1 text-on-surface-variant hover:text-primary rounded-md transition-colors" title="快速导出PDF" type="button">
-<span class="material-symbols-outlined text-[18px]">download</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Card 2: Fullstack Development Resume -->
-<div class="group bg-surface-container-lowest hover:bg-surface-container-low/40 rounded-xl p-space-md shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
-<div class="flex items-center justify-between">
-<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">
-                备用版本
-              </span>
-<button class="font-label-sm text-label-sm text-primary hover:underline font-semibold flex items-center gap-0.5" type="button">
-<span class="material-symbols-outlined text-[14px]">star</span>
-                设为默认
-              </button>
-</div>
-<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold mt-2 line-clamp-1 group-hover:text-primary transition-colors">
-              互联网全栈 / 前端开发通用简历
-            </h2>
-<!-- Metrics Bar -->
-<div class="mt-space-sm space-y-1">
-<div class="flex justify-between items-center font-label-sm text-label-sm">
-<span class="text-on-surface-variant">简历完整度</span>
-<span class="font-semibold text-on-surface">88%</span>
-</div>
-<div class="w-full bg-surface-container-low h-1.5 rounded-full overflow-hidden">
-<div class="bg-secondary-container h-full rounded-full" style="width: 88%;"></div>
-</div>
-</div>
-<div class="flex items-center justify-between mt-space-md pt-space-xs text-on-surface-variant font-label-sm text-label-sm">
-<span class="flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">schedule</span>
-                2025-03-02 09:15
-              </span>
-<div class="flex items-center gap-1">
-<button class="p-1 text-on-surface-variant hover:text-primary rounded transition-colors" title="编辑简历" type="button">
-<span class="material-symbols-outlined text-[18px]">edit_note</span>
-</button>
-<button class="p-1 text-on-surface-variant hover:text-error rounded transition-colors" title="删除简历" type="button">
-<span class="material-symbols-outlined text-[18px]">delete</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Card 3: SOE & Research Institute Edition -->
-<div class="group bg-surface-container-lowest hover:bg-surface-container-low/40 rounded-xl p-space-md shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
-<div class="flex items-center justify-between">
-<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">
-                院所专版
-              </span>
-<button class="font-label-sm text-label-sm text-primary hover:underline font-semibold flex items-center gap-0.5" type="button">
-<span class="material-symbols-outlined text-[14px]">star</span>
-                设为默认
-              </button>
-</div>
-<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold mt-2 line-clamp-1 group-hover:text-primary transition-colors">
-              央国企及科研院所投递专版 (附政审与成绩单)
-            </h2>
-<!-- Metrics Bar -->
-<div class="mt-space-sm space-y-1">
-<div class="flex justify-between items-center font-label-sm text-label-sm">
-<span class="text-on-surface-variant">简历完整度</span>
-<span class="font-semibold text-on-surface">90%</span>
-</div>
-<div class="w-full bg-surface-container-low h-1.5 rounded-full overflow-hidden">
-<div class="bg-secondary h-full rounded-full" style="width: 90%;"></div>
-</div>
-</div>
-<div class="flex items-center justify-between mt-space-md pt-space-xs text-on-surface-variant font-label-sm text-label-sm">
-<span class="flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">schedule</span>
-                2025-02-25 18:40
-              </span>
-<div class="flex items-center gap-1">
-<button class="p-1 text-on-surface-variant hover:text-primary rounded transition-colors" title="编辑简历" type="button">
-<span class="material-symbols-outlined text-[18px]">edit_note</span>
-</button>
-<button class="p-1 text-on-surface-variant hover:text-error rounded transition-colors" title="删除简历" type="button">
-<span class="material-symbols-outlined text-[18px]">delete</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Add New Version Slot Card -->
-<button class="w-full p-space-lg rounded-xl bg-surface-container-low/40 hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-all duration-200 flex flex-col items-center justify-center gap-space-xs group shadow-sm" type="button">
-<div class="w-10 h-10 rounded-full bg-surface-container-lowest flex items-center justify-center text-on-surface-variant group-hover:text-primary group-hover:scale-110 transition-all shadow-sm">
-<span class="material-symbols-outlined text-[24px]">add</span>
-</div>
-<span class="font-label-lg text-label-lg font-semibold">新建简历版本</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant/70">还可创建 2 份专用简历 (上限 5 份)</span>
-</button>
-</div>
-<!-- Career Advisor Helper Widget -->
-<div class="bg-surface-container rounded-xl p-space-md text-on-surface">
-<div class="flex items-center gap-space-xs mb-2">
-<span class="material-symbols-outlined text-secondary text-[20px]">lightbulb</span>
-<span class="font-headline-sm text-headline-sm font-semibold">就业导师建议</span>
-</div>
-<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-            算法类岗位重点考察顶会论文、竞赛名次与模型微调实际业务指标；央国企则注重专业课程成绩排位与综合素养认证。建议保持 2 份以上差异化版本！
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+            面向全国高校应届毕业生及在校生精准推送，支持一键关联三方协议、网签流程及高校就业指导中心直联分发。
           </p>
 </div>
+<!-- Quick Help Pill -->
+<div class="flex items-center gap-space-sm self-start md:self-auto bg-surface-container-high px-space-md py-space-xs rounded-lg">
+<span class="material-symbols-outlined text-primary text-[20px]">verified_user</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-primary font-bold">校企直通保障</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">已认证：北京智维人工智能研究院</span>
 </div>
-<!-- Right Column: High-Fidelity A4 Sheet Realistic Resume Preview (8 Columns) -->
-<div class="lg:col-span-8">
-<!-- Top Preview Functional Toolbar -->
-<div class="bg-surface-container-lowest rounded-t-xl px-space-lg py-space-sm shadow-sm flex flex-wrap items-center justify-between gap-space-sm mb-1">
-<div class="flex items-center gap-space-sm">
-<span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
-<span class="font-label-md text-label-md font-semibold text-on-surface">
-              实时高保真排版预览 (标准 A4 · 紧凑单页)
-            </span>
-<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
-              缩放: 100%
-            </span>
 </div>
+</div>
+</div>
+</div>
+<!-- Main Workstation Layout (60% Form / 40% Preview) -->
+<div class="max-w-7xl mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop py-space-xl w-full">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+<!-- LEFT: Structured Form Section (60% -> 7 Cols on desktop) -->
+<div class="lg:col-span-7 flex flex-col gap-space-lg">
+<!-- Section 1: 基础信息 -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+<div class="flex items-center justify-between pb-space-sm mb-space-md">
 <div class="flex items-center gap-space-xs">
-
-
-
+<span class="flex items-center justify-center w-7 h-7 rounded-lg bg-primary-container text-on-primary font-label-sm text-label-sm font-bold">01</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">基础信息</h2>
 </div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">必填项用于生成教育部备案编码</span>
 </div>
-<!-- Simulated Paper Sheet View with Deep Crisp Elevation -->
-<div class="bg-surface-container-lowest rounded-b-xl shadow-xl p-space-xl lg:p-space-2xl text-on-surface space-y-space-lg select-text">
-<!-- 1. Header Profile & Identification -->
-<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-lg pb-space-lg bg-surface-container-low/30 rounded-xl p-space-lg">
-<div class="flex items-center gap-space-lg min-w-0">
-<img alt="林晨个人照片" class="w-24 h-24 rounded-full object-cover shadow-md shrink-0 bg-surface-container" src="https://lh3.googleusercontent.com/aida/AEtjO1XPn4bde-4FIJg1FALQjcAhAP80q33UdVIKCmaL-MAe9qcVJd1HGVT9JHwj4c4QhSIgeZf6fGHV-oqpvv3w5-87SYzFzqbVd0-YPQdK6tEvWoHOQx475L_8KeDWSwOZBUrjnYSWTt9dKqeDHaVvG9ctKkXLwoQ426PlISPNlGKBCtkMQX3MOc1pilemHGmKg4CLXdO-0J9yWSmaT7xsJQ_8aKhapFEg27CHOD2qPJ_04HKwZ1zR7RmuDcQ">
-<div class="space-y-1.5 min-w-0">
-<div class="flex items-center gap-space-sm flex-wrap">
-<h3 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">林晨</h3>
-<span class="px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm font-semibold">
-                    在校 · 积极寻职中 (随时到岗)
-                  </span>
-</div>
-<p class="font-headline-sm text-headline-sm text-primary font-semibold">
-                  求职意向：大模型算法工程师 / 全栈架构研发
-                </p>
-<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-2 flex-wrap">
-<span class="">北京科技重点大学</span>
-<span class="">·</span>
-<span class="">计算机科学与技术</span>
-<span class="">·</span>
-<span class="">2025届统招工学硕士</span>
-</p>
-<div class="flex items-center gap-space-md pt-1 text-on-surface-variant font-body-sm text-body-sm flex-wrap">
-<span class="flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px] text-primary">call</span>
-                    188****6820
-                  </span>
-<span class="flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px] text-primary">mail</span>
-                    linchen.cs@campus.edu.cn
-                  </span>
-<span class="flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
-                    北京 · 海淀区
-                  </span>
-</div>
-</div>
-</div>
-<!-- Match Score Gauge Badge -->
-<div class="hidden sm:flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-lowest shadow-sm shrink-0">
-<div class="relative w-14 h-14 flex items-center justify-center">
-<svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
-<path class="text-surface-container" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
-<path class="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="96, 100" stroke-linecap="round" stroke-width="3.5"></path>
-</svg>
-<span class="absolute font-headline-sm text-headline-sm font-bold text-primary">96</span>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant mt-1 font-medium">算法岗匹配度</span>
-</div>
-</div>
-<!-- 2. Target & Career Objectives -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md p-space-md bg-surface-container-low rounded-xl">
+<div class="space-y-space-md">
+<!-- 职位标题 -->
 <div>
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block">求职性质</span>
-<span class="font-label-lg text-label-lg font-semibold text-on-surface mt-0.5 block">2025届全职校招 / 实习转正</span>
+<label class="block font-label-lg text-label-lg text-on-surface mb-1" for="job-title-input">
+                职位名称 <span class="text-error">*</span>
+</label>
+<div class="relative">
+<input class="w-full h-10 px-space-md bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary shadow-inner" id="job-title-input" placeholder="例如：2025届 研发管培生 / 全栈软件工程师" type="text" value="2025届 大模型算法工程师 (校招/实习)"/>
+<span class="absolute right-3 top-2.5 font-label-sm text-label-sm text-outline">28/50字</span>
+</div>
+</div>
+<!-- 职位类别 & 招聘人数 -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md">
+<div class="sm:col-span-2">
+<label class="block font-label-lg text-label-lg text-on-surface mb-1" for="job-category-select">
+                  职位类别 (三级级联) <span class="text-error">*</span>
+</label>
+<div class="relative">
+<select class="w-full h-10 px-space-md bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-primary" id="job-category-select">
+<option selected="">技术研发 > 人工智能 > 算法工程师</option>
+<option>技术研发 > 后端开发 > Java开发工程师</option>
+<option>产品设计 > 产品策划 > AI智能产品经理</option>
+<option>运营市场 > 高校生态 > 产学研管培生</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 pointer-events-none text-outline">expand_more</span>
+</div>
 </div>
 <div>
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block">期望城市</span>
-<span class="font-label-lg text-label-lg font-semibold text-on-surface mt-0.5 block">北京、上海、深圳 (支持驻场)</span>
+<label class="block font-label-lg text-label-lg text-on-surface mb-1" for="hire-count">
+                  招聘人数 <span class="text-error">*</span>
+</label>
+<div class="relative">
+<input class="w-full h-10 px-space-md bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="hire-count" max="500" min="1" type="number" value="5"/>
+<span class="absolute right-3 top-2.5 font-body-sm text-body-sm text-outline">人</span>
+</div>
+</div>
+</div>
+<!-- 工作类型 Radio Buttons -->
+<div>
+<span class="block font-label-lg text-label-lg text-on-surface mb-space-xs">
+                工作类型 <span class="text-error">*</span>
+</span>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm">
+<label class="flex items-center gap-space-xs p-space-sm rounded-lg bg-surface-container cursor-pointer transition-colors hover:bg-surface-container-high">
+<input checked="" class="accent-primary w-4 h-4" name="job_nature" type="radio" value="全职校招"/>
+<span class="font-body-md text-body-md text-on-surface font-medium">全职校招 (应届正式)</span>
+</label>
+<label class="flex items-center gap-space-xs p-space-sm rounded-lg bg-surface-container-low cursor-pointer transition-colors hover:bg-surface-container-high">
+<input class="accent-primary w-4 h-4" name="job_nature" type="radio" value="实习(可转正)"/>
+<span class="font-body-md text-body-md text-on-surface">实习 (可转正)</span>
+</label>
+<label class="flex items-center gap-space-xs p-space-sm rounded-lg bg-surface-container-low cursor-pointer transition-colors hover:bg-surface-container-high">
+<input class="accent-primary w-4 h-4" name="job_nature" type="radio" value="寒暑期日常实习"/>
+<span class="font-body-md text-body-md text-on-surface">寒暑期日常实习</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 2: 岗位要求与薪资 -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+<div class="flex items-center justify-between pb-space-sm mb-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="flex items-center justify-center w-7 h-7 rounded-lg bg-primary-container text-on-primary font-label-sm text-label-sm font-bold">02</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">岗位要求与薪资体系</h2>
+</div>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-fixed px-2 py-0.5 rounded-full font-medium">符合教育部招聘透明度标准</span>
+</div>
+<div class="space-y-space-md">
+<!-- 工作地点 -->
+<div>
+<label class="block font-label-lg text-label-lg text-on-surface mb-1" for="work-city-input">
+                工作城市与园区地点 <span class="text-error">*</span>
+</label>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm">
+<div class="relative">
+<select class="w-full h-10 px-space-md bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-primary" id="work-city-input">
+<option selected="">北京市</option>
+<option>上海市</option>
+<option>深圳市</option>
+<option>杭州市</option>
+<option>成都市</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 pointer-events-none text-outline">arrow_drop_down</span>
+</div>
+<div class="sm:col-span-2">
+<input class="w-full h-10 px-space-md bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="work-address-input" placeholder="详细地址，如写字楼/工业园区" type="text" value="海淀区 中关村软件园二期 智维大厦A座8层"/>
+</div>
+</div>
+</div>
+<!-- 薪资结构 -->
+<div>
+<label class="block font-label-lg text-label-lg text-on-surface mb-1">
+                薪酬范围与薪数 <span class="text-error">*</span>
+</label>
+<div class="grid grid-cols-1 sm:grid-cols-12 gap-space-sm items-center">
+<div class="sm:col-span-4 relative">
+<span class="absolute left-3 top-2.5 font-label-md text-label-md text-outline">最低:</span>
+<input class="w-full h-10 pl-12 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary font-bold" id="salary-min-input" type="number" value="20"/>
+<span class="absolute right-3 top-2.5 font-label-md text-label-md text-outline">k</span>
+</div>
+<div class="sm:col-span-1 text-center font-headline-sm text-outline hidden sm:block">-</div>
+<div class="sm:col-span-4 relative">
+<span class="absolute left-3 top-2.5 font-label-md text-label-md text-outline">最高:</span>
+<input class="w-full h-10 pl-12 pr-8 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary font-bold" id="salary-max-input" type="number" value="35"/>
+<span class="absolute right-3 top-2.5 font-label-md text-label-md text-outline">k</span>
+</div>
+<div class="sm:col-span-3 relative">
+<select class="w-full h-10 px-space-md bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-primary" id="salary-months-input">
+<option>12薪 (基本)</option>
+<option>13薪</option>
+<option>14薪</option>
+<option selected="">15薪 (标准大厂)</option>
+<option>16薪</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 pointer-events-none text-outline text-[18px]">expand_more</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">info</span>
+                若选择实习日薪制，可填写如 400-600元/天，系统将在卡片高亮标注“日结/月结实习”。
+              </p>
+</div>
+<!-- 学历要求 & 面向届别 -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div>
+<label class="block font-label-lg text-label-lg text-on-surface mb-1" for="degree-select">
+                  最低学历门槛 <span class="text-error">*</span>
+</label>
+<div class="relative">
+<select class="w-full h-10 px-space-md bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-primary" id="degree-select">
+<option>大专及以上</option>
+<option>大学本科及以上</option>
+<option selected="">硕士研究生及以上</option>
+<option>博士研究生</option>
+<option>学历不限</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 pointer-events-none text-outline">expand_more</span>
+</div>
 </div>
 <div>
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block">期望薪资范围</span>
-<span class="font-label-lg text-label-lg font-semibold text-secondary mt-0.5 block">25k - 40k / 月 (可面议)</span>
-</div>
-</div>
-<!-- 3. Education Background -->
-<section class="space-y-space-sm">
-<div class="flex items-center gap-space-xs pb-1">
-<span class="w-1.5 h-4 bg-primary rounded-full"></span>
-<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface uppercase tracking-wide">教育背景</h4>
-</div>
-<div class="space-y-space-sm">
-<!-- Master -->
-<div class="p-space-md rounded-xl bg-surface-container-low/40 hover:bg-surface-container-low transition-colors">
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-<div class="flex items-center gap-space-sm">
-<span class="font-headline-sm text-headline-sm font-bold text-on-surface">北京科技重点大学</span>
-<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm">双一流 / 985高校</span>
-</div>
-<span class="font-label-md text-label-md text-on-surface-variant font-medium">2022.09 — 2025.06 (硕士毕业)</span>
-</div>
-<div class="flex items-center gap-space-md mt-1 text-on-surface-variant font-body-md text-body-md">
-<span class="font-medium text-on-surface">计算机学院 · 计算机科学与技术 (学术硕士)</span>
-<span class="">|</span>
-<span class="">专业成绩：前 5%</span>
-<span class="">|</span>
-<span class="">荣誉：国家励志奖学金、校级一等学业奖学金</span>
-</div>
-</div>
-<!-- Bachelor -->
-<div class="p-space-md rounded-xl bg-surface-container-low/40 hover:bg-surface-container-low transition-colors">
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-<div class="flex items-center gap-space-sm">
-<span class="font-headline-sm text-headline-sm font-bold text-on-surface">北京邮电大学</span>
-<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm">教育部直属高校</span>
-</div>
-<span class="font-label-md text-label-md text-on-surface-variant font-medium">2018.09 — 2022.06 (学士)</span>
-</div>
-<div class="flex items-center gap-space-md mt-1 text-on-surface-variant font-body-md text-body-md">
-<span class="font-medium text-on-surface">计算机与软件学院 · 软件工程 (工学学士)</span>
-<span class="">|</span>
-<span class="">综合绩点：3.82 / 4.0</span>
-<span class="">|</span>
-<span class="">荣誉：北京市优秀毕业生</span>
+<span class="block font-label-lg text-label-lg text-on-surface mb-1">
+                  面向届别 (可多选) <span class="text-error">*</span>
+</span>
+<div class="flex flex-wrap gap-space-xs mt-1">
+<label class="cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<span class="inline-flex items-center px- space-xs py-1 rounded-md bg-surface-container-low text-on-surface font-label-md text-label-md peer-checked:bg-primary-container peer-checked:text-on-primary transition-all">
+                      2024届往届 (补录)
+                    </span>
+</label>
+<label class="cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-surface-container-low text-on-surface font-label-md text-label-md peer-checked:bg-primary-container peer-checked:text-on-primary transition-all shadow-sm">
+                      ✓ 2025届应届生
+                    </span>
+</label>
+<label class="cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-surface-container-low text-on-surface font-label-md text-label-md peer-checked:bg-primary-container peer-checked:text-on-primary transition-all shadow-sm">
+                      ✓ 2026届实习生
+                    </span>
+</label>
 </div>
 </div>
 </div>
-</section>
-<!-- 4. Professional Skill Tags Cluster -->
-<section class="space-y-space-sm">
-<div class="flex items-center gap-space-xs pb-1">
-<span class="w-1.5 h-4 bg-primary rounded-full"></span>
-<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface uppercase tracking-wide">专业技术栈与工具</h4>
-</div>
+<!-- 推荐专业标签勾选 -->
+<div>
+<span class="block font-label-lg text-label-lg text-on-surface mb-1.5">
+                专业对口标签 (系统智能匹配高校专业代码)
+              </span>
 <div class="flex flex-wrap gap-2">
-<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md font-semibold text-primary">Python (熟练 / 核心研发语言)</span>
-<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md font-semibold text-primary">PyTorch &amp; DeepSpeed</span>
-<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md font-semibold text-on-surface">C++ 17 (高并发与底层系统)</span>
-<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md font-semibold text-on-surface">大语言模型微调 (SFT / LoRA / RLHF)</span>
-<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md font-semibold text-on-surface">vLLM / TensorRT-LLM 加速推理</span>
-<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md font-semibold text-on-surface">Linux 内核优化 &amp; Docker / K8s</span>
-<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md font-semibold text-on-surface">分布式通信 NCCL &amp; Ray</span>
-<span class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md font-semibold text-on-surface">Gitflow / CI-CD Pipeline</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md">
+                  计算机科学与技术
+                  <span class="material-symbols-outlined text-[14px] cursor-pointer hover:opacity-75">close</span>
+</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md">
+                  人工智能 / 智能科学
+                  <span class="material-symbols-outlined text-[14px] cursor-pointer hover:opacity-75">close</span>
+</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md">
+                  软件工程
+                  <span class="material-symbols-outlined text-[14px] cursor-pointer hover:opacity-75">close</span>
+</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md cursor-pointer hover:bg-surface-container-high">
+                  + 自动化控制
+                </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md cursor-pointer hover:bg-surface-container-high">
+                  + 应用数学 / 统计学
+                </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md cursor-pointer hover:bg-surface-container-high">
+                  + 电子信息工程
+                </span>
 </div>
-</section>
-<!-- 5. Work & Internship Experience -->
-<section class="space-y-space-sm">
-<div class="flex items-center gap-space-xs pb-1">
-<span class="w-1.5 h-4 bg-primary rounded-full"></span>
-<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface uppercase tracking-wide">核心实习经历</h4>
+</div>
+</div>
+</div>
+<!-- Section 3: 职位详情描述 (富文本区域) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+<div class="flex items-center justify-between pb-space-sm mb-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="flex items-center justify-center w-7 h-7 rounded-lg bg-primary-container text-on-primary font-label-sm text-label-sm font-bold">03</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">职位职责与任职要求</h2>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">支持 Markdown 规范排版</span>
+</div>
+<!-- 职位职责 -->
+<div class="space-y-space-md">
+<div>
+<div class="flex items-center justify-between mb-1">
+<label class="font-label-lg text-label-lg text-on-surface" for="job-resp-textarea">
+                  岗位职责 (Key Responsibilities) <span class="text-error">*</span>
+</label>
+<!-- Editor Toolbar Mock -->
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="p-1 rounded hover:bg-surface-container" title="加粗" type="button"><span class="material-symbols-outlined text-[18px]">format_bold</span></button>
+<button class="p-1 rounded hover:bg-surface-container" title="无序列表" type="button"><span class="material-symbols-outlined text-[18px]">format_list_bulleted</span></button>
+<button class="p-1 rounded hover:bg-surface-container" title="有序列表" type="button"><span class="material-symbols-outlined text-[18px]">format_list_numbered</span></button>
+</div>
+</div>
+<textarea class="w-full p-space-md bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary leading-relaxed" id="job-resp-textarea" rows="5">1. 参与百亿/千亿级多模态大模型的预训练、指令微调（SFT）以及基于人类反馈的强化学习（RLHF）；
+2. 负责面向校园智能教育助手的算法落地，优化推理延迟与显存占用；
+3. 协助推进前沿大语言模型（LLM）对齐算法研发及学术论文产出；
+4. 与工程团队密切协作，搭建高可用模型蒸馏与低精度量化部署工作流。</textarea>
+</div>
+<!-- 任职要求 -->
+<div>
+<div class="flex items-center justify-between mb-1">
+<label class="font-label-lg text-label-lg text-on-surface" for="job-req-textarea">
+                  任职要求 (Requirements) <span class="text-error">*</span>
+</label>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="p-1 rounded hover:bg-surface-container" title="加粗" type="button"><span class="material-symbols-outlined text-[18px]">format_bold</span></button>
+<button class="p-1 rounded hover:bg-surface-container" title="无序列表" type="button"><span class="material-symbols-outlined text-[18px]">format_list_bulleted</span></button>
+<button class="p-1 rounded hover:bg-surface-container" title="代码块" type="button"><span class="material-symbols-outlined text-[18px]">code</span></button>
+</div>
+</div>
+<textarea class="w-full p-space-md bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary leading-relaxed" id="job-req-textarea" rows="6">1. 2025年毕业的海内外知名高校硕士及以上学历，计算机、AI、软件等相关专业；
+2. 熟练掌握 Python，深入理解 PyTorch/DeepSpeed/Megatron 等主流分布式训练框架；
+3. 具备坚实的数据结构与算法基础，熟悉 Transformer 架构内部机制与 Attention 优化；
+4. 在 NeurIPS、ICLR、ACL、CVPR 等顶级 AI 会议发表第一作者论文者，或 Kaggle / 天池大模型赛道高分选手优先；
+5. 善于沟通探索，对 AGI 技术保持极致热爱，具备优秀的团队协作抗压能力。</textarea>
+</div>
+</div>
+</div>
+<!-- Section 4: 校园专属福利待遇 -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+<div class="flex items-center justify-between pb-space-sm mb-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="flex items-center justify-center w-7 h-7 rounded-lg bg-primary-container text-on-primary font-label-sm text-label-sm font-bold">04</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">校园福利与人才补贴</h2>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">点击即可点亮或取消</span>
 </div>
 <div class="space-y-space-md">
-<!-- Job 1 -->
-<div class="p-space-md rounded-xl bg-surface-container-low/40">
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+<div class="flex flex-wrap gap-space-xs" id="welfare-tags-container">
+<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary-fixed text-on-primary-fixed font-label-md text-label-md cursor-pointer select-none">
+<span class="material-symbols-outlined text-[16px]">check</span>五险一金
+              </span>
+<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary-fixed text-on-primary-fixed font-label-md text-label-md cursor-pointer select-none">
+<span class="material-symbols-outlined text-[16px]">check</span>转正机会90%
+              </span>
+<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary-fixed text-on-primary-fixed font-label-md text-label-md cursor-pointer select-none">
+<span class="material-symbols-outlined text-[16px]">check</span>导师1对1带教
+              </span>
+<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary-fixed text-on-primary-fixed font-label-md text-label-md cursor-pointer select-none">
+<span class="material-symbols-outlined text-[16px]">check</span>租房补贴 (2500/月)
+              </span>
+<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary-fixed text-on-primary-fixed font-label-md text-label-md cursor-pointer select-none">
+<span class="material-symbols-outlined text-[16px]">check</span>免费精品三餐
+              </span>
+<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary-fixed text-on-primary-fixed font-label-md text-label-md cursor-pointer select-none">
+<span class="material-symbols-outlined text-[16px]">check</span>落户指标申报通道
+              </span>
+<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary-fixed text-on-primary-fixed font-label-md text-label-md cursor-pointer select-none">
+<span class="material-symbols-outlined text-[16px]">check</span>弹性工时/不打卡
+              </span>
+<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant font-label-md text-label-md cursor-pointer select-none hover:bg-surface-container-high">
+                + 定期学术休假
+              </span>
+<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant font-label-md text-label-md cursor-pointer select-none hover:bg-surface-container-high">
+                + 毕业设计专属辅导
+              </span>
+</div>
+<!-- 自定义福利输入 -->
+<div class="flex items-center gap-space-sm pt-2">
+<input class="flex-1 h-9 px-space-md bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" placeholder="新增特色福利（如：MacBook顶配办公、报销答辩往返机票）" type="text"/>
+<button class="h-9 px-space-md bg-surface-container text-primary font-label-md text-label-md rounded-lg hover:bg-surface-container-high transition-colors" type="button">
+                添加标签
+              </button>
+</div>
+</div>
+</div>
+<!-- Section 5: 操作执行底栏 -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[20px] text-secondary">cloud_done</span>
+<span>表单已自动保存于 10:42:15</span>
+</div>
+<div class="flex items-center gap-space-sm w-full sm:w-auto">
+<button class="flex-1 sm:flex-none h-11 px-space-lg rounded-lg bg-surface-container text-on-surface font-label-lg text-label-lg hover:bg-surface-container-high transition-colors" type="button">
+              保存为草稿
+            </button>
+<button class="flex-1 sm:flex-none h-11 px-space-xl rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg hover:bg-surface-tint shadow-md transition-all flex items-center justify-center gap-space-xs" id="publish-action-btn" type="button">
+<span class="material-symbols-outlined text-[20px]">rocket_launch</span>
+<span>立即发布至全国高校就业网</span>
+</button>
+</div>
+</div>
+</div>
+<!-- RIGHT: Realtime Preview Container (40% -> 5 Cols on desktop, Sticky) -->
+<div class="lg:col-span-5 lg:sticky lg:top-20 space-y-space-md">
+<!-- Live Preview Header Pill -->
+<div class="flex items-center justify-between px-space-md py-space-xs bg-surface-container rounded-lg">
+<div class="flex items-center gap-space-xs">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
+</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">📱 学生端职位卡片实时渲染</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">1:1 视口真实映射</span>
+</div>
+<!-- Student View Mock Phone / Card Surface -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-xl relative overflow-hidden transition-all duration-300">
+<!-- Background Atmospheric Glow -->
+<div class="absolute -top-16 -right-16 w-48 h-48 bg-primary-fixed/20 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Enterprise Top Badge & Fast Verification -->
+<div class="flex items-center justify-between mb-space-md">
 <div class="flex items-center gap-space-sm">
-<span class="font-headline-sm text-headline-sm font-bold text-on-surface">智维未来人工智能研究院</span>
-<span class="px-2 py-0.5 rounded bg-surface-container text-primary font-label-sm text-label-sm font-semibold">大模型算法实习生</span>
+<img class="w-12 h-12 rounded-xl object-cover shadow-sm bg-surface-container" data-alt="Modern high-tech AI research laboratory and headquarters logo badge, sleek blue isometric geometric design icon, high resolution white clean background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOv4CmQI2g605Z-bXUydX1B__2uBj-SGEoWTY3I_AyFw6YJXU2_B44PA49dnU5HdBHi6O0aR3XAG5tdGN8bM3GrQw0h0WnCQN_wrlJul0rzG9UxqkUla9-2WTCWrTc_BanMUhm0FYOq3gxq1BWa0uPre_rC3JZ2O6F4je6HuQPd-gst0xqHMNU7eIyIHQZ-US1-fO54gWcAT_oCxXessLLAFqjXi0S853Wns0xHrfpQ_gOiYHp6l8CqA"/>
+<div>
+<div class="flex items-center gap-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">智维人工智能研究院</h3>
+<span class="material-symbols-outlined text-secondary text-[18px]" title="全国高校官方认证签约用人单位">verified</span>
 </div>
-<span class="font-label-md text-label-md text-on-surface-variant font-medium">2024.06 — 至今 (北京)</span>
-</div>
-<ul class="mt-2 space-y-1.5 text-on-surface-variant font-body-md text-body-md list-disc list-inside">
-<li class="">主导基于 Llama-3 与 Qwen-2 百亿量级多模态模型的指令微调 (SFT) 数据工程构建，清洗高价值多轮对齐语料 450万+ 条。</li>
-<li class="">结合 DeepSpeed ZeRO-3 与 FlashAttention-2 优化集群分布式通信拓扑，显存占用降低 <strong class="text-on-surface font-semibold">28%</strong>，训练集群吞吐提升 <strong class="text-on-surface font-semibold">35%</strong>。</li>
-<li class="">引入 AWQ 4-bit 权重激活感知量化算法与 vLLM 连续批处理（Continuous Batching）推理框架，服务首字响应延迟降低至 45ms，并发能力提升 2.4 倍。</li>
-</ul>
-</div>
-<!-- Job 2 -->
-<div class="p-space-md rounded-xl bg-surface-container-low/40">
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
-<div class="flex items-center gap-space-sm">
-<span class="font-headline-sm text-headline-sm font-bold text-on-surface">字节跳动 (ByteDance)</span>
-<span class="px-2 py-0.5 rounded bg-surface-container text-primary font-label-sm text-label-sm font-semibold">后端架构研发实习生</span>
-</div>
-<span class="font-label-md text-label-md text-on-surface-variant font-medium">2023.07 — 2023.11 (北京)</span>
-</div>
-<ul class="mt-2 space-y-1.5 text-on-surface-variant font-body-md text-body-md list-disc list-inside">
-<li class="">深度参与高并发信息流推荐服务重构，基于 Go + gRPC 微服务链路设计多级本地缓存架构 (LRU + Redis Cluster)。</li>
-<li class="">定位并治理网络 IO 阻塞热点，通过协程池精细化调度与内存逃逸优化，使得核心服务 P99 延迟由 120ms 压降至 42ms，保障千万级 QPS 稳定运行。</li>
-<li class="">主笔输出《微服务高可用熔断与兜底降级方案白皮书》，荣获实习生最佳工程技术分享奖。</li>
-</ul>
+<p class="font-body-sm text-body-sm text-on-surface-variant">人工智能 · 前沿科技 / 500-1000人 / 国有参股独角兽</p>
 </div>
 </div>
-</section>
-<!-- 6. Project Experience -->
-<section class="space-y-space-sm">
-<div class="flex items-center gap-space-xs pb-1">
-<span class="w-1.5 h-4 bg-primary rounded-full"></span>
-<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface uppercase tracking-wide">项目经历</h4>
+<span class="px-2 py-1 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-bold uppercase">
+              校招热招中
+            </span>
 </div>
-<div class="space-y-space-md">
-<!-- Project 1 -->
-<div class="p-space-md rounded-xl bg-surface-container-low/40">
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
-<span class="font-headline-sm text-headline-sm font-bold text-on-surface">“智绘校园”基于大模型的智能问答协同助理 (国家级大学生创新创业计划)</span>
-<span class="font-label-md text-label-md text-on-surface-variant font-medium">核心主导 · 2023.12 — 2024.05</span>
+<!-- Dynamic Job Title (Synced) -->
+<div class="mb-space-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight" id="preview-job-title">
+              2025届 大模型算法工程师 (校招/实习)
+            </h2>
 </div>
-<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                  针对高校庞杂办事指南与校级公文检索痛点，设计多模态 RAG (检索增强生成) 检索流水线。构建基于 Milvus 向量库与 BGE-Reranker 的二次重排机制，准确率达 94.2%。
-                  服务目前已全校试运行，累计解答师生政策咨询超 20 万次。
-                </p>
+<!-- High-Contrast Salary Callout (Synced) -->
+<div class="flex items-baseline gap-space-xs mb-space-md">
+<span class="font-headline-xl text-headline-xl text-primary font-bold" id="preview-salary-amount">
+              20k - 35k
+            </span>
+<span class="font-label-lg text-label-lg text-primary font-semibold" id="preview-salary-months">
+              · 15薪
+            </span>
+<span class="ml-2 font-body-sm text-body-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">
+              五险一金全额
+            </span>
 </div>
-<!-- Project 2 -->
-<div class="p-space-md rounded-xl bg-surface-container-low/40">
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
-<span class="font-headline-sm text-headline-sm font-bold text-on-surface">ACM-ICPC 算法训练平台分布式沙箱评测引擎</span>
-<span class="font-label-md text-label-md text-on-surface-variant font-medium">独立开发者 · 2022.10 — 2023.04</span>
+<!-- Tags Cluster: Location, Degree, Experience, Role Category -->
+<div class="flex flex-wrap gap-space-xs mb-space-lg">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container text-on-surface-variant font-label-md text-label-md font-medium" id="preview-city-tag">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+              北京市 · 海淀区
+            </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container text-on-surface-variant font-label-md text-label-md font-medium" id="preview-degree-tag">
+<span class="material-symbols-outlined text-[16px]">school</span>
+              硕士及以上
+            </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container text-on-surface-variant font-label-md text-label-md font-medium">
+<span class="material-symbols-outlined text-[16px]">group</span>
+              招 5 人
+            </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md font-semibold" id="preview-nature-tag">
+              全职校招
+            </span>
 </div>
-<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                  使用 Linux cgroups 及 seccomp 构建微秒级安全沙箱隔离环境，支持 C++ / Java / Python 多语言判题与并发资源压制。系统开源至 GitHub 获得 1.2k+ Star，被全国多所高校集训队采用。
-                </p>
+<!-- Candidate Match Indicator / Resume Synergy -->
+<div class="p-space-md rounded-xl bg-surface-container-low mb-space-lg">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-md text-label-md text-on-surface font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-[18px]">auto_awesome</span>
+                高校学生画像 AI 拟合度
+              </span>
+<span class="font-label-md text-label-md text-secondary font-bold">96% 高度契合</span>
 </div>
+<!-- Progress Gauge SVG Bar -->
+<div class="w-full bg-surface-container-highest rounded-full h-2 overflow-hidden">
+<div class="bg-secondary h-2 rounded-full transition-all duration-500" style="width: 96%"></div>
 </div>
-</section>
-<!-- 7. Honors & Certifications -->
-<section class="space-y-space-sm">
-<div class="flex items-center gap-space-xs pb-1">
-<span class="w-1.5 h-4 bg-primary rounded-full"></span>
-<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface uppercase tracking-wide">重要荣誉与语言资质</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5">
+              该岗位画像优先推送给：清华大学、北京大学、北京航空航天大学、中国科学院大学计算机与人工智能学院。
+            </p>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
-<div class="flex items-center gap-space-sm p-space-sm rounded-lg bg-surface-container-low/50">
-<span class="material-symbols-outlined text-tertiary-container text-[20px]">military_tech</span>
-<div class="text-on-surface font-body-md text-body-md">
-<span class="font-bold">ACM-ICPC 国际大学生程序设计竞赛</span> 亚洲区域赛金牌 (2021)
-                </div>
-</div>
-<div class="flex items-center gap-space-sm p-space-sm rounded-lg bg-surface-container-low/50">
-<span class="material-symbols-outlined text-tertiary-container text-[20px]">military_tech</span>
-<div class="text-on-surface font-body-md text-body-md">
-<span class="font-bold">全国研究生数学建模竞赛</span> 国家一等奖 (2023)
-                </div>
-</div>
-<div class="flex items-center gap-space-sm p-space-sm rounded-lg bg-surface-container-low/50">
-<span class="material-symbols-outlined text-secondary text-[20px]">translate</span>
-<div class="text-on-surface font-body-md text-body-md">
-<span class="font-bold">大学英语六级 (CET-6)</span>：612 分 (流利查阅外文前沿论文)
-                </div>
-</div>
-<div class="flex items-center gap-space-sm p-space-sm rounded-lg bg-surface-container-low/50">
-<span class="material-symbols-outlined text-secondary text-[20px]">verified</span>
-<div class="text-on-surface font-body-md text-body-md">
-<span class="font-bold">计算机技术与软件专业资格</span>：系统分析师 (高级)
-                </div>
-</div>
-</div>
-</section>
-</div>
-</div>
+<!-- Dynamic Welfare Pills Preview -->
+<div class="mb-space-lg">
+<span class="block font-label-sm text-label-sm text-outline font-bold uppercase mb-space-xs tracking-wider">专属校园福利</span>
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-body-sm text-body-sm">五险一金</span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-body-sm text-body-sm">转正机会90%</span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-body-sm text-body-sm">导师1对1</span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-body-sm text-body-sm">租房补贴</span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-body-sm text-body-sm">免费三餐</span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-body-sm text-body-sm">落户申报</span>
 </div>
 </div>
-</div></main><footer class="w-full bg-inverse-surface text-inverse-on-surface mt-auto"><div class="max-w-7xl mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop py-space-2xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-xl"><div class="space-y-space-md"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-inverse-primary text-[28px]">school</span><span class="font-headline-sm text-headline-sm text-inverse-on-surface font-bold">校园就业综合服务平台</span></div><p class="font-body-sm text-body-sm text-inverse-on-surface/80 leading-relaxed">服务高校大学生实习求职与校企直聘的数字化一站式就业枢纽平台。构筑产学融合协同桥梁，赋能青年人才高质量就业与职业成长。</p></div><div><h4 class="font-headline-sm text-headline-sm text-inverse-on-surface font-semibold mb-space-md">快速链接</h4><ul class="space-y-space-xs"><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">关于我们</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">联系方式</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">隐私保护政策</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">用户服务协议</a></li></ul></div><div><h4 class="font-headline-sm text-headline-sm text-inverse-on-surface font-semibold mb-space-md">合作通道</h4><ul class="space-y-space-xs"><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">高校就业中心入驻</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">名企专属招聘通告</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">双选会承办合作</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">实习基地共建</a></li></ul></div><div><h4 class="font-headline-sm text-headline-sm text-inverse-on-surface font-semibold mb-space-md">联系与咨询</h4><div class="space-y-space-xs font-body-sm text-body-sm text-inverse-on-surface/80"><p class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px] text-inverse-primary">call</span><span class="">服务热线：400-820-2025</span></p><p class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px] text-inverse-primary">mail</span><span class="">高校合作：career@campus-service.edu.cn</span></p><p class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px] text-inverse-primary">business</span><span class="">企业HR专线：hr-partner@campus-service.com</span></p><p class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px] text-inverse-primary">schedule</span><span class="">服务时间：工作日 09:00 - 18:00</span></p></div></div></div><div class="mt-space-xl pt-space-md border-t border-inverse-on-surface/10 flex flex-col md:flex-row items-center justify-between gap-space-sm font-label-sm text-label-sm text-inverse-on-surface/60"><p class="">© 2025 校园就业综合服务平台 版权所有</p><p class="">工业和信息化部备案号：京ICP备20250888号-1 | 全国高校就业指导网络认证</p></div></div></footer>
+<!-- Job Responsibilities Excerpt Preview -->
+<div class="space-y-space-xs mb-space-lg">
+<span class="block font-label-sm text-label-sm text-outline font-bold uppercase tracking-wider">岗位概要</span>
+<div class="font-body-sm text-body-sm text-on-surface-variant line-clamp-3 leading-relaxed" id="preview-job-summary">
+              参与百亿/千亿级多模态大模型的预训练、指令微调（SFT）以及基于人类反馈的强化学习（RLHF）；负责面向校园智能教育助手的算法落地，优化推理延迟与显存占用。
+            </div>
+</div>
+<!-- Interactive Action Button Simulation for Students -->
+<div class="pt-space-md flex items-center gap-space-sm">
+<button class="w-12 h-11 flex items-center justify-center rounded-xl bg-surface-container text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[22px]">bookmark_border</span>
+</button>
+<button class="w-12 h-11 flex items-center justify-center rounded-xl bg-surface-container text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[22px]">share</span>
+</button>
+<div class="flex-1 h-11 rounded-xl bg-primary-container text-on-primary font-label-lg text-label-lg font-bold flex items-center justify-center gap-space-xs shadow-md">
+<span>一键投递校园电子简历</span>
+<span class="material-symbols-outlined text-[18px]">send</span>
+</div>
+</div>
+<!-- Institutional Trust Watermark -->
+<div class="mt-space-md pt-space-xs flex items-center justify-center gap-1 font-label-sm text-label-sm text-outline">
+<span class="material-symbols-outlined text-[14px]">assured_workload</span>
+<span>已接入全国普通高校毕业生就业网格化备案通道</span>
+</div>
+</div>
+<!-- Extra Tips Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
+<div class="flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[24px] mt-0.5">lightbulb</span>
+<div>
+<h4 class="font-label-lg text-label-lg text-on-surface font-bold">校招发布高转化建议</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+                清晰注明“导师机制”与“转正比例”可使优质应届生投递意愿提高 <strong class="text-primary font-semibold">42%</strong>；明确标注入职第一年保底薪酬能有效降低面试爽约率。
+              </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple reactive bindings to simulate real-time desktop preview reflection
+  (function initJobPublishPreviewSync() {
+    const titleInput = document.getElementById('job-title-input');
+    const previewTitle = document.getElementById('preview-job-title');
 
+    const salaryMin = document.getElementById('salary-min-input');
+    const salaryMax = document.getElementById('salary-max-input');
+    const previewSalaryAmount = document.getElementById('preview-salary-amount');
 
+    const salaryMonths = document.getElementById('salary-months-input');
+    const previewSalaryMonths = document.getElementById('preview-salary-months');
 
+    const cityInput = document.getElementById('work-city-input');
+    const previewCityTag = document.getElementById('preview-city-tag');
 
+    const degreeSelect = document.getElementById('degree-select');
+    const previewDegreeTag = document.getElementById('preview-degree-tag');
 
-</body></html>
+    const jobRespTextarea = document.getElementById('job-resp-textarea');
+    const previewJobSummary = document.getElementById('preview-job-summary');
+
+    const natureRadios = document.querySelectorAll('input[name="job_nature"]');
+    const previewNatureTag = document.getElementById('preview-nature-tag');
+
+    if (titleInput && previewTitle) {
+      titleInput.addEventListener('input', (e) => {
+        previewTitle.textContent = e.target.value.trim() || '未填写职位名称';
+      });
+    }
+
+    function updateSalary() {
+      if (previewSalaryAmount && salaryMin && salaryMax) {
+        const min = salaryMin.value || '0';
+        const max = salaryMax.value || '0';
+        previewSalaryAmount.textContent = `${min}k - ${max}k`;
+      }
+    }
+
+    if (salaryMin) salaryMin.addEventListener('input', updateSalary);
+    if (salaryMax) salaryMax.addEventListener('input', updateSalary);
+
+    if (salaryMonths && previewSalaryMonths) {
+      salaryMonths.addEventListener('change', (e) => {
+        const text = e.target.value.split(' ')[0];
+        previewSalaryMonths.textContent = `· ${text}`;
+      });
+    }
+
+    if (cityInput && previewCityTag) {
+      cityInput.addEventListener('change', (e) => {
+        previewCityTag.innerHTML = `<span class="material-symbols-outlined text-[16px]">location_on</span> ${e.target.value}`;
+      });
+    }
+
+    if (degreeSelect && previewDegreeTag) {
+      degreeSelect.addEventListener('change', (e) => {
+        previewDegreeTag.innerHTML = `<span class="material-symbols-outlined text-[16px]">school</span> ${e.target.value}`;
+      });
+    }
+
+    if (jobRespTextarea && previewJobSummary) {
+      jobRespTextarea.addEventListener('input', (e) => {
+        const lines = e.target.value.trim().split('\n');
+        previewJobSummary.textContent = lines.slice(0, 2).join(' ') || '暂无职责说明';
+      });
+    }
+
+    natureRadios.forEach((radio) => {
+      radio.addEventListener('change', (e) => {
+        if (previewNatureTag && e.target.checked) {
+          previewNatureTag.textContent = e.target.value;
+        }
+      });
+    });
+
+    const publishBtn = document.getElementById('publish-action-btn');
+    if (publishBtn) {
+      publishBtn.addEventListener('click', () => {
+        alert('职位已通过全国高校联合网签认证体系，并推送至 2025 届应届生推荐流！');
+      });
+    }
+  })();
+</script></main><footer class="w-full bg-inverse-surface text-inverse-on-surface mt-auto"><div class="max-w-7xl mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop py-space-2xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-xl"><div class="space-y-space-md"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-inverse-primary text-[28px]">school</span><span class="font-headline-sm text-headline-sm text-inverse-on-surface font-bold">校园就业综合服务平台</span></div><p class="font-body-sm text-body-sm text-inverse-on-surface/80 leading-relaxed">服务高校大学生实习求职与校企直聘的数字化一站式就业枢纽平台。构筑产学融合协同桥梁，赋能青年人才高质量就业与职业成长。</p></div><div><h4 class="font-headline-sm text-headline-sm text-inverse-on-surface font-semibold mb-space-md">快速链接</h4><ul class="space-y-space-xs"><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">关于我们</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">联系方式</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">隐私保护政策</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">用户服务协议</a></li></ul></div><div><h4 class="font-headline-sm text-headline-sm text-inverse-on-surface font-semibold mb-space-md">合作通道</h4><ul class="space-y-space-xs"><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">高校就业中心入驻</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">名企专属招聘通告</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">双选会承办合作</a></li><li class="font-body-sm text-body-sm"><a class="text-inverse-on-surface/75 hover:text-inverse-on-surface transition-colors" href="#">实习基地共建</a></li></ul></div><div><h4 class="font-headline-sm text-headline-sm text-inverse-on-surface font-semibold mb-space-md">联系与咨询</h4><div class="space-y-space-xs font-body-sm text-body-sm text-inverse-on-surface/80"><p class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px] text-inverse-primary">call</span><span>服务热线：400-820-2025</span></p><p class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px] text-inverse-primary">mail</span><span>高校合作：career@campus-service.edu.cn</span></p><p class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px] text-inverse-primary">business</span><span>企业HR专线：hr-partner@campus-service.com</span></p><p class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px] text-inverse-primary">schedule</span><span>服务时间：工作日 09:00 - 18:00</span></p></div></div></div><div class="mt-space-xl pt-space-md border-t border-inverse-on-surface/10 flex flex-col md:flex-row items-center justify-between gap-space-sm font-label-sm text-label-sm text-inverse-on-surface/60"><p>© 2025 校园就业综合服务平台 版权所有</p><p>工业和信息化部备案号：京ICP备20250888号-1 | 全国高校就业指导网络认证</p></div></div></footer></body></html>
