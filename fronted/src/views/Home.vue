@@ -99,8 +99,8 @@
       </div>
 
       <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div v-for="job in jobs" :key="job.id"
-          class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-5 hover:shadow-lg hover:border-primary/30 transition-all group cursor-pointer flex flex-col">
+        <router-link v-for="job in jobs" :key="job.id" :to="`/jobs/${job.id}`"
+          class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-5 hover:shadow-lg hover:border-primary/30 transition-all group flex flex-col">
           <div class="flex items-start justify-between mb-3">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0" :style="{ background: job.logoBg }">
@@ -129,9 +129,9 @@
 
           <div class="flex items-center justify-between pt-3 border-t border-surface-container-high">
             <span class="text-[11px] text-on-surface-variant">{{ job.meta }}</span>
-            <button @click.stop="requireAuth" class="px-4 py-1.5 bg-primary text-on-primary text-xs font-semibold rounded-lg hover:bg-primary/90 transition-colors">投递简历</button>
+            <button @click.prevent="requireAuth" class="px-4 py-1.5 bg-primary text-on-primary text-xs font-semibold rounded-lg hover:bg-primary/90 transition-colors">投递简历</button>
           </div>
-        </div>
+        </router-link>
       </div>
     </section>
 

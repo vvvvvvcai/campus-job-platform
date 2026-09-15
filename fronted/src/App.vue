@@ -11,11 +11,21 @@
             </div>
           </router-link>
           <div v-if="store.isLoggedIn" class="hidden md:flex items-center gap-1">
-            <router-link v-for="item in navItems" :key="item.path" :to="item.path"
-              class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-              :class="$route.path === item.path ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'">
-              {{ item.label }}
-            </router-link>
+            <template v-if="store.role === 'hr'">
+              <router-link v-for="item in enterpriseNavItems" :key="item.path" :to="item.path"
+                class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                :class="$route.path === item.path ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'">
+                {{ item.label }}
+                <span v-if="item.badge" class="ml-1 px-1.5 py-0.5 bg-primary/10 text-primary text-[10px] font-semibold rounded">{{ item.badge }}</span>
+              </router-link>
+            </template>
+            <template v-else>
+              <router-link v-for="item in navItems" :key="item.path" :to="item.path"
+                class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                :class="$route.path === item.path ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'">
+                {{ item.label }}
+              </router-link>
+            </template>
           </div>
           <div class="flex items-center gap-3">
             <template v-if="store.isLoggedIn">
@@ -29,30 +39,71 @@
                 <button @click="showUserDropdown = !showUserDropdown" class="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full hover:bg-surface-container-low transition-colors">
                   <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" alt="avatar" class="w-9 h-9 rounded-full object-cover border-2 border-primary/20" />
                   <div class="text-left hidden sm:block">
-                    <p class="text-sm font-semibold text-on-surface leading-tight">{{ store.user?.name || '林晨' }}</p>
-                    <p class="text-[11px] text-on-surface-variant">{{ store.user?.dept || '计算机系' }} · {{ store.user?.year || '2025届' }}</p>
+                    <div class="flex items-center gap-1.5">
+                      <p class="text-sm font-semibold text-on-surface leading-tight">{{ store.user?.name || (store.role === 'hr' ? '张经理' : '林晨') }}</p>
+                      <span v-if="store.role === 'hr'" class="px-1.5 py-0.5 bg-primary/10 text-primary text-[9px] font-semibold rounded">企业端</span>
+                    </div>
+                    <p class="text-[11px] text-on-surface-variant">{{ store.role === 'hr' ? (store.user?.company || '智航未来HRD') : (store.user?.dept || '计算机系') }} · {{ store.role === 'hr' ? '已认证' : (store.user?.year || '2025届') }}</p>
                   </div>
                   <span class="material-symbols-outlined text-on-surface-variant text-[18px] transition-transform" :class="showUserDropdown ? 'rotate-180' : ''">expand_more</span>
                 </button>
                 <!-- Dropdown Menu -->
                 <Transition name="dropdown">
                   <div v-if="showUserDropdown" class="absolute right-0 top-full mt-2 w-52 bg-surface-container-lowest rounded-xl shadow-xl border border-surface-container-high py-2 z-50">
-                    <router-link to="/profile" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
-                      <span class="material-symbols-outlined text-[20px] text-on-surface-variant">person</span>
-                      个人中心
-                    </router-link>
-                    <router-link to="/applications" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
-                      <span class="material-symbols-outlined text-[20px] text-on-surface-variant">send</span>
-                      我的投递
-                    </router-link>
-                    <router-link to="/resume/manage" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
-                      <span class="material-symbols-outlined text-[20px] text-on-surface-variant">description</span>
-                      在线简历
-                    </router-link>
-                    <router-link to="/change-password" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
-                      <span class="material-symbols-outlined text-[20px] text-on-surface-variant">settings</span>
-                      账号设置
-                    </router-link>
+                    <template v-if="store.role === 'hr'">
+                      <router-link to="/enterprise/dashboard" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">dashboard</span>
+                        企业工作台
+                      </router-link>
+                      <router-link to="/enterprise/jobs" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">work</span>
+                        职位管理
+                      </router-link>
+                      <router-link to="/enterprise/post-job" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">add_circle</span>
+                        发布职位
+                      </router-link>
+                      <router-link to="/enterprise/candidates" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">people</span>
+                        简历投递
+                      </router-link>
+                      <router-link to="/enterprise/cert" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">verified</span>
+                        企业认证
+                      </router-link>
+                      <router-link to="/change-password" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">settings</span>
+                        账号设置
+                      </router-link>
+                      <div class="my-1.5 border-t border-surface-container"></div>
+                      <button @click="switchToStudent" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-primary hover:bg-primary/5 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">swap_horiz</span>
+                        切换为学生端
+                      </button>
+                    </template>
+                    <template v-else>
+                      <router-link to="/profile" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">person</span>
+                        个人中心
+                      </router-link>
+                      <router-link to="/applications" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">send</span>
+                        我的投递
+                      </router-link>
+                      <router-link to="/resume/manage" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">description</span>
+                        在线简历
+                      </router-link>
+                      <router-link to="/change-password" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">settings</span>
+                        账号设置
+                      </router-link>
+                      <div class="my-1.5 border-t border-surface-container"></div>
+                      <button @click="switchToHR" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-primary hover:bg-primary/5 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">swap_horiz</span>
+                        切换为企业端
+                      </button>
+                    </template>
                     <div class="my-1.5 border-t border-surface-container"></div>
                     <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-error hover:bg-error-container/30 transition-colors">
                       <span class="material-symbols-outlined text-[20px]">logout</span>
@@ -561,7 +612,29 @@ const navItems = [
   { path: '/jobs', label: '职位搜索' },
 ]
 
+const enterpriseNavItems = [
+  { path: '/enterprise/dashboard', label: '企业工作台' },
+  { path: '/enterprise/jobs', label: '职位管理' },
+  { path: '/enterprise/post-job', label: '发布职位' },
+  { path: '/enterprise/candidates', label: '简历投递' },
+  { path: '/enterprise/cert', label: '企业认证', badge: '已认证' },
+]
+
 function handleLogout() { store.logout(); router.push('/') }
+
+function switchToHR() {
+  showUserDropdown.value = false
+  store.logout()
+  loginMode.value = 'hr'
+  showLoginModal.value = true
+}
+
+function switchToStudent() {
+  showUserDropdown.value = false
+  store.logout()
+  loginMode.value = 'student'
+  showLoginModal.value = true
+}
 
 // ─── Modal State ───
 const showLoginModal = ref(false)
@@ -597,11 +670,16 @@ function handleLogin() {
   loginErrors.password = !loginForm.password ? '请输入密码' : loginForm.password.length < 6 ? '密码至少6位' : ''
   if (loginErrors.phone || loginErrors.password) return
   if (!loginForm.agree) { showToast('error', '请先阅读并同意用户协议与隐私政策'); return }
-  store.login({ phone: loginForm.phone, name: '林晨' }, loginMode.value === 'hr' ? 'hr' : 'student')
+  const userRole = loginMode.value === 'hr' ? 'hr' : 'student'
+  store.login({ phone: loginForm.phone, name: userRole === 'hr' ? '张经理' : '林晨' }, userRole)
   showLoginModal.value = false
   showToast('success', '登录成功')
-  const redirect = router.currentRoute.value.query.redirect
-  if (redirect) router.push(redirect)
+  if (userRole === 'hr') {
+    router.push('/enterprise/dashboard')
+  } else {
+    const redirect = router.currentRoute.value.query.redirect
+    if (redirect) router.push(redirect)
+  }
 }
 
 function handleSmsLogin() {
@@ -609,11 +687,16 @@ function handleSmsLogin() {
   smsErrors.code = !smsForm.code ? '请输入验证码' : smsForm.code.length < 6 ? '验证码为6位' : ''
   if (smsErrors.phone || smsErrors.code) return
   if (!smsForm.agree) { showToast('error', '请先阅读并同意用户协议与隐私政策'); return }
-  store.login({ phone: smsForm.phone, name: '林晨' }, loginMode.value === 'hr' ? 'hr' : 'student')
+  const userRole = loginMode.value === 'hr' ? 'hr' : 'student'
+  store.login({ phone: smsForm.phone, name: userRole === 'hr' ? '张经理' : '林晨' }, userRole)
   showLoginModal.value = false
   showToast('success', '登录成功')
-  const redirect = router.currentRoute.value.query.redirect
-  if (redirect) router.push(redirect)
+  if (userRole === 'hr') {
+    router.push('/enterprise/dashboard')
+  } else {
+    const redirect = router.currentRoute.value.query.redirect
+    if (redirect) router.push(redirect)
+  }
 }
 
 function sendSmsCode() {
