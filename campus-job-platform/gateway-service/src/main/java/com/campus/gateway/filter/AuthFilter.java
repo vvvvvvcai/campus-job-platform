@@ -35,6 +35,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
     private static final String SECRET = "campus-job-platform-secret-key-must-be-long-enough";
     private static final String TOKEN_PREFIX = "Bearer ";
     private static final String TOKEN_HEADER = "Authorization";
+    private static final Integer ADMIN_ROLE = 2;
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
@@ -52,6 +53,21 @@ public class AuthFilter implements GlobalFilter, Ordered {
             "/webjars/**",
             "/swagger-resources/**",
             "/v2/api-docs/**"
+    );
+
+    /**
+     * 管理员接口路径（需要管理员角色）
+     */
+    private static final List<String> ADMIN_PATHS = Arrays.asList(
+            "/api/user/list",
+            "/api/user/status/",
+            "/api/user/count",
+            "/api/company/list",
+            "/api/company/audit/approve/",
+            "/api/company/audit/reject/",
+            "/api/job/admin/list",
+            "/api/job/audit/",
+            "/api/job/count"
     );
 
     @Override
@@ -80,12 +96,20 @@ public class AuthFilter implements GlobalFilter, Ordered {
                 return unauthorizedResponse(exchange, "Token已过期，请重新登录");
             }
 
+            // 获取用户角色
+            Integer role = claims.get("role", Integer.class);
+
+            // 检查是否为管理员接口
+            if (isAdminPath(path) && (role == null || !role.equals(ADMIN_ROLE))) {
+                return forbiddenResponse(exchange, "无权限访问管理员接口");
+            }
+
             // 将用户信息传递给下游服务
             String userId = String.valueOf(claims.get("userId", Long.class));
             ServerHttpRequest mutatedRequest = request.mutate()
                     .header("X-User-Id", userId)
                     .header("X-User-Phone", claims.getSubject())
-                    .header("X-User-Role", String.valueOf(claims.get("role", Integer.class)))
+                    .header("X-User-Role", String.valueOf(role))
                     .build();
 
             return chain.filter(exchange.mutate().request(mutatedRequest).build());
@@ -102,6 +126,10 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
     private boolean isWhiteListed(String path) {
         return WHITE_LIST.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+    }
+
+    private boolean isAdminPath(String path) {
+        return ADMIN_PATHS.stream().anyMatch(pattern -> pathMatcher.match(pattern + "**", path));
     }
 
     private String getToken(ServerHttpRequest request) {
@@ -130,6 +158,15 @@ public class AuthFilter implements GlobalFilter, Ordered {
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         String body = "{\"code\":401,\"message\":\"" + message + "\",\"data\":null}";
+        DataBuffer buffer = response.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
+        return response.writeWith(Mono.just(buffer));
+    }
+
+    private Mono<Void> forbiddenResponse(ServerWebExchange exchange, String message) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.FORBIDDEN);
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        String body = "{\"code\":403,\"message\":\"" + message + "\",\"data\":null}";
         DataBuffer buffer = response.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
         return response.writeWith(Mono.just(buffer));
     }

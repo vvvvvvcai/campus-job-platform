@@ -5,6 +5,7 @@ import com.campus.user.dto.UserLoginDTO;
 import com.campus.user.dto.UserRegisterDTO;
 import com.campus.user.service.UserService;
 import com.campus.user.vo.UserInfoVO;
+import com.campus.user.vo.UserListVO;
 import com.campus.user.vo.UserLoginVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -55,5 +56,32 @@ public class UserController {
                                        @RequestParam String oldPassword,
                                        @RequestParam String newPassword) {
         return userService.updatePassword(userId, oldPassword, newPassword);
+    }
+
+    @ApiOperation("管理员获取用户列表")
+    @GetMapping("/list")
+    public Result<UserListVO> getUserList(
+            @RequestHeader("X-User-Id") Long adminId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer role,
+            @RequestParam(required = false) Integer status,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+        return userService.getUserList(keyword, role, status, page, pageSize);
+    }
+
+    @ApiOperation("管理员禁用/启用用户")
+    @PutMapping("/status/{id}")
+    public Result<Void> updateUserStatus(
+            @RequestHeader("X-User-Id") Long adminId,
+            @PathVariable Long id,
+            @RequestParam Integer status) {
+        return userService.updateUserStatus(id, status);
+    }
+
+    @ApiOperation("管理员获取用户统计数据")
+    @GetMapping("/count")
+    public Result<Object> getUserCount(@RequestHeader("X-User-Id") Long adminId) {
+        return userService.getUserCount();
     }
 }

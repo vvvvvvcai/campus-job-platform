@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * 用户信息响应VO
  */
@@ -37,4 +39,7 @@ public class UserInfoVO {
 
     @ApiModelProperty("状态：0-禁用，1-正常")
     private Integer status;
+
+    @ApiModelProperty("创建时间")
+    private LocalDateTime createTime;
 }
