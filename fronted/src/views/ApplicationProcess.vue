@@ -1,112 +1,107 @@
 <template>
   <div class="min-h-screen bg-background">
     <div class="bg-surface-container-low py-6 border-b border-surface-container-high">
-      <div class="max-w-7xl mx-auto px-6">
-        <h1 class="text-2xl font-bold text-on-surface">招聘流程</h1>
-        <p class="text-on-surface-variant mt-1">跟踪候选人招聘进度</p>
+      <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-on-surface">投递处理与流转</h1>
+          <p class="text-on-surface-variant mt-1">查看候选人投递详情，推进面试 / 录用 / 不合适等流转状态</p>
+        </div>
+        <router-link to="/enterprise/candidates" class="px-4 py-2 border border-surface-container-high bg-surface-container-lowest text-on-surface text-sm font-medium rounded-xl hover:bg-surface-container transition-colors">
+          ← 返回候选人列表
+        </router-link>
       </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-6 py-8">
-      <!-- Horizontal Stepper -->
-      <div class="bg-surface-container-lowest rounded-2xl p-6 border border-surface-container-high shadow-sm mb-8">
-        <div class="flex items-center justify-between relative">
-          <div class="absolute top-5 left-0 right-0 h-0.5 bg-surface-container-high z-0">
-            <div class="h-full bg-primary transition-all duration-500" :style="{ width: ((currentStage) / (stages.length - 1)) * 100 + '%' }"></div>
-          </div>
-          <div v-for="(stage, index) in stages" :key="index" class="relative z-10 flex flex-col items-center">
-            <div
-              class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
-              :class="currentStage > index ? 'bg-primary text-on-primary' : currentStage === index ? 'bg-primary text-on-primary ring-4 ring-primary/20' : 'bg-surface-container-high text-on-surface-variant'"
-              @click="currentStage = index"
-            >
-              <span v-if="currentStage > index" class="material-symbols-outlined text-lg">check</span>
-              <span v-else>{{ index + 1 }}</span>
-            </div>
-            <span class="mt-2 text-xs font-medium text-center" :class="currentStage >= index ? 'text-primary' : 'text-on-surface-variant'">{{ stage }}</span>
-          </div>
-        </div>
+      <!-- 候选人选择 -->
+      <div class="bg-surface-container-lowest rounded-2xl p-5 border border-surface-container-high shadow-sm mb-6">
+        <label class="block text-xs font-semibold text-on-surface-variant mb-2">选择候选人</label>
+        <select v-model="selectedId" @change="loadDetail" class="w-full h-11 px-4 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
+          <option :value="null" disabled>选择一条投递记录…</option>
+          <option v-for="app in applications" :key="app.id" :value="app.id">
+            [{{ statusLabel(app.status) }}] {{ app.jobName }} · {{ app.resumeTitle }}（投递于 {{ formatDate(app.createTime) }}）
+          </option>
+        </select>
       </div>
 
-      <div class="grid lg:grid-cols-3 gap-6">
-        <!-- Candidate Info -->
+      <div v-if="detail" class="grid lg:grid-cols-3 gap-6">
+        <!-- Left: Detail + Handle -->
         <div class="lg:col-span-2 space-y-6">
-          <!-- Candidate Card -->
+          <!-- Info Card -->
           <div class="bg-surface-container-lowest rounded-2xl p-6 border border-surface-container-high shadow-sm">
             <div class="flex items-start gap-4">
-              <div class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl shrink-0" style="background: #0037b0">
-                李
+              <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xl shrink-0">
+                {{ (detail.resumeTitle || '简').charAt(0) }}
               </div>
               <div class="flex-1">
-                <div class="flex items-center gap-3 mb-1">
-                  <h2 class="text-xl font-bold text-on-surface">李明</h2>
-                  <span class="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">匹配度 95%</span>
+                <div class="flex items-center gap-3 mb-1 flex-wrap">
+                  <h2 class="text-xl font-bold text-on-surface">{{ detail.jobName || '未知职位' }}</h2>
+                  <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="APPLICATION_STATUS[detail.status]?.class || 'bg-gray-100 text-gray-600'">
+                    {{ APPLICATION_STATUS[detail.status]?.label || '未知状态' }}
+                  </span>
                 </div>
-                <p class="text-on-surface-variant">清华大学 · 计算机科学与技术 · 2026届</p>
-                <div class="flex flex-wrap gap-3 mt-3 text-sm text-on-surface-variant">
-                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base">work</span> 前端开发工程师</span>
-                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base">schedule</span> 投递于 2026-09-10</span>
-                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base">school</span> GPA 3.8/4.0</span>
+                <p class="text-on-surface-variant">使用简历：{{ detail.resumeTitle || '未填写' }} · 应聘企业：{{ detail.companyName || '未知企业' }}</p>
+                <div class="flex flex-wrap gap-4 mt-3 text-sm text-on-surface-variant">
+                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base">schedule</span> 投递于 {{ formatDateTime(detail.createTime) }}</span>
+                  <span v-if="detail.interviewTime" class="flex items-center gap-1"><span class="material-symbols-outlined text-base">event</span> 面试时间：{{ formatDateTime(detail.interviewTime) }}</span>
                 </div>
+                <p v-if="detail.hrRemark" class="text-xs text-on-surface-variant mt-3 bg-surface-container rounded-lg px-3 py-2">HR备注：{{ detail.hrRemark }}</p>
               </div>
-              <div class="flex gap-2 shrink-0">
-                <button class="px-4 py-2 bg-primary/10 text-primary text-sm font-medium rounded-xl hover:bg-primary/20 transition-colors">
-                  <span class="material-symbols-outlined text-base align-middle mr-1">download</span>下载简历
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Stage Actions -->
-          <div class="bg-surface-container-lowest rounded-2xl p-6 border border-surface-container-high shadow-sm">
-            <h3 class="text-lg font-bold text-on-surface mb-4">{{ stages[currentStage] }} - 操作面板</h3>
-            <div class="grid md:grid-cols-3 gap-3 mb-5">
-              <button
-                v-for="action in stageActions"
-                :key="action.label"
-                @click="handleAction(action.type)"
-                class="p-4 rounded-xl border-2 text-center transition-all hover:shadow-md"
-                :class="selectedAction === action.type ? 'border-primary bg-primary/5' : 'border-surface-container-high hover:border-primary/30'"
-              >
-                <span class="material-symbols-outlined text-2xl mb-1" :class="selectedAction === action.type ? 'text-primary' : 'text-on-surface-variant'">{{ action.icon }}</span>
-                <p class="text-sm font-medium" :class="selectedAction === action.type ? 'text-primary' : 'text-on-surface'">{{ action.label }}</p>
+              <button @click="showResume = true" class="shrink-0 px-4 py-2 border border-primary text-primary rounded-xl text-sm font-medium hover:bg-primary/5 transition-colors flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-base">visibility</span>
+                查看简历
               </button>
             </div>
           </div>
 
-          <!-- Notes -->
+          <!-- 处理面板 -->
           <div class="bg-surface-container-lowest rounded-2xl p-6 border border-surface-container-high shadow-sm">
-            <h3 class="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
-              <span class="material-symbols-outlined text-primary">edit_note</span>
-              备注记录
-            </h3>
-            <div class="space-y-4 mb-4">
-              <div v-for="note in notes" :key="note.id" class="p-4 bg-surface-container rounded-xl">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-sm font-medium text-on-surface">{{ note.author }}</span>
-                  <span class="text-xs text-on-surface-variant">{{ note.time }}</span>
-                </div>
-                <p class="text-sm text-on-surface-variant">{{ note.content }}</p>
+            <h3 class="text-lg font-bold text-on-surface mb-4">处理流转</h3>
+            <div class="flex flex-wrap gap-3 mb-5">
+              <button v-for="opt in flowOptions" :key="opt.key" @click="form.status = opt.key"
+                class="px-4 py-2.5 rounded-xl border-2 text-sm font-medium transition-all"
+                :class="form.status === opt.key ? 'border-primary bg-primary/5 text-primary' : 'border-surface-container-high text-on-surface hover:border-gray-300'">
+                {{ opt.label }}
+              </button>
+            </div>
+
+            <!-- 面试安排（状态=面试邀请时展示） -->
+            <div v-if="form.status === 2" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+              <div>
+                <label class="block text-xs text-on-surface-variant mb-1.5">面试时间</label>
+                <input v-model="form.interviewTime" type="datetime-local" class="w-full h-11 px-3 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div>
+                <label class="block text-xs text-on-surface-variant mb-1.5">面试地点</label>
+                <input v-model="form.interviewAddress" type="text" placeholder="线下地址或视频面试链接" class="w-full h-11 px-3 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div>
+                <label class="block text-xs text-on-surface-variant mb-1.5">面试联系人</label>
+                <input v-model="form.interviewContact" type="text" placeholder="HR 姓名" class="w-full h-11 px-3 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div>
+                <label class="block text-xs text-on-surface-variant mb-1.5">联系电话</label>
+                <input v-model="form.interviewContactPhone" type="text" placeholder="联系电话" class="w-full h-11 px-3 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
               </div>
             </div>
-            <div class="flex gap-3">
-              <input
-                v-model="newNote"
-                type="text"
-                placeholder="添加备注..."
-                class="flex-1 px-4 py-2.5 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm"
-                @keyup.enter="addNote"
-              />
-              <button @click="addNote" class="px-5 py-2.5 bg-primary text-on-primary font-medium rounded-xl hover:bg-primary-container transition-all text-sm">
-                添加
+
+            <div class="mb-5">
+              <label class="block text-xs text-on-surface-variant mb-1.5">HR 备注（对候选人可见）</label>
+              <textarea v-model="form.hrRemark" rows="3" placeholder="如：简历匹配度较高，请尽快确认面试时间"
+                class="w-full px-3 py-2.5 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"></textarea>
+            </div>
+
+            <div class="flex justify-end gap-3">
+              <button @click="resetForm" class="h-11 px-6 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface font-medium hover:bg-surface-container transition-colors text-sm">重置</button>
+              <button @click="submitHandle" :disabled="submitting" class="h-11 px-6 rounded-xl bg-primary text-white font-semibold hover:bg-primary-container transition-colors shadow-sm text-sm disabled:opacity-50">
+                {{ submitting ? '提交中...' : '确认处理' }}
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Right Sidebar -->
+        <!-- Right: Timeline -->
         <div class="space-y-6">
-          <!-- Timeline -->
           <div class="bg-surface-container-lowest rounded-2xl p-5 border border-surface-container-high shadow-sm">
             <h3 class="text-lg font-bold text-on-surface mb-5">流程时间线</h3>
             <div class="relative pl-6">
@@ -121,82 +116,193 @@
             </div>
           </div>
 
-          <!-- Quick Info -->
           <div class="bg-surface-container-lowest rounded-2xl p-5 border border-surface-container-high shadow-sm">
             <h3 class="text-lg font-bold text-on-surface mb-4">快速信息</h3>
             <div class="space-y-3 text-sm">
               <div class="flex justify-between">
                 <span class="text-on-surface-variant">投递时间</span>
-                <span class="text-on-surface font-medium">2026-09-10</span>
+                <span class="text-on-surface font-medium">{{ formatDateTime(detail.createTime) }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-on-surface-variant">简历更新</span>
-                <span class="text-on-surface font-medium">2026-09-12</span>
+                <span class="text-on-surface-variant">最近更新</span>
+                <span class="text-on-surface font-medium">{{ formatDateTime(detail.updateTime) }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-on-surface-variant">笔试成绩</span>
-                <span class="text-primary font-medium">92 分</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-on-surface-variant">一面评分</span>
-                <span class="text-primary font-medium">优秀</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-on-surface-variant">面试官</span>
-                <span class="text-on-surface font-medium">王工</span>
+                <span class="text-on-surface-variant">应聘职位</span>
+                <span class="text-on-surface font-medium">{{ detail.jobName || '-' }}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Empty State -->
+      <div v-else class="bg-surface-container-lowest rounded-2xl p-12 border border-surface-container-high text-center">
+        <span class="material-symbols-outlined text-5xl text-surface-container-high mb-4 block">person_search</span>
+        <p class="text-sm text-on-surface-variant">请选择一条投递记录开始处理</p>
+        <p v-if="applications.length === 0" class="text-xs text-on-surface-variant mt-2">暂无收到任何投递，先去发布职位吸引候选人吧</p>
+      </div>
     </div>
+
+    <!-- Toast -->
+    <div v-if="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 bg-on-surface text-on-primary rounded-xl shadow-lg text-sm font-medium z-[110]">
+      {{ toast }}
+    </div>
+
+    <!-- 候选人简历弹窗 -->
+    <CandidateResumeModal :visible="showResume" :application-id="selectedId" @close="showResume = false" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { getReceivedApplications, handleApplication } from '../api/application'
+import { getCompanyInfo } from '../api/company'
+import { APPLICATION_STATUS, formatDate, formatDateTime } from '../utils/format'
+import CandidateResumeModal from '../components/CandidateResumeModal.vue'
 
-const stages = ['投递成功', '简历筛选', '笔试', '一面', '二面', 'Offer']
-const currentStage = ref(3)
-const selectedAction = ref('')
-const newNote = ref('')
+const route = useRoute()
+const applications = ref([])
+const selectedId = ref(null)
+const detail = ref(null)
+const submitting = ref(false)
+const toast = ref('')
+const showResume = ref(false)
 
-const timeline = computed(() => {
-  return stages.map((stage, index) => ({
-    stage,
-    done: index < currentStage.value,
-    time: index < currentStage.value ? `2026-09-${10 + index * 2} 14:00` : index === currentStage.value ? '进行中' : ''
-  }))
+const flowOptions = [
+  { key: 1, label: '标为已查看' },
+  { key: 2, label: '面试邀请' },
+  { key: 3, label: '不合适' },
+  { key: 4, label: '已录用' }
+]
+
+const form = reactive({
+  status: 1,
+  hrRemark: '',
+  interviewTime: '',
+  interviewAddress: '',
+  interviewContact: '',
+  interviewContactPhone: ''
 })
 
-const stageActionsMap = {
-  0: [{ icon: 'mark_email_read', label: '确认投递', type: 'confirm' }, { icon: 'forward', label: '转交处理', type: 'forward' }, { icon: 'archive', label: '暂存', type: 'archive' }],
-  1: [{ icon: 'check_circle', label: '通过筛选', type: 'pass' }, { icon: 'cancel', label: '不通过', type: 'reject' }, { icon: 'rate_review', label: '标记待定', type: 'hold' }],
-  2: [{ icon: 'grading', label: '录入成绩', type: 'grade' }, { icon: 'check_circle', label: '通过笔试', type: 'pass' }, { icon: 'cancel', label: '未通过', type: 'reject' }],
-  3: [{ icon: 'event_available', label: '通过一面', type: 'pass' }, { icon: 'cancel', label: '未通过', type: 'reject' }, { icon: 'rate_review', label: '标记待定', type: 'hold' }],
-  4: [{ icon: 'event_available', label: '通过二面', type: 'pass' }, { icon: 'cancel', label: '未通过', type: 'reject' }, { icon: 'rate_review', label: '标记待定', type: 'hold' }],
-  5: [{ icon: 'send', label: '发送Offer', type: 'send' }, { icon: 'edit', label: '修改Offer', type: 'edit' }, { icon: 'cancel', label: '撤回', type: 'revoke' }]
-}
+const stages = [
+  { label: '投递成功' },
+  { label: 'HR 已查看' },
+  { label: '面试邀请' },
+  { label: '录用 / 不合适' }
+]
 
-const stageActions = computed(() => stageActionsMap[currentStage.value] || [])
-
-const notes = ref([
-  { id: 1, author: '张经理', time: '2026-09-12 15:30', content: '简历质量很高，技术栈匹配，推荐进入面试环节。' },
-  { id: 2, author: '王工', time: '2026-09-14 10:00', content: '一面表现优秀，基础扎实，沟通能力强，建议安排二面。' }
-])
-
-function handleAction(type) {
-  selectedAction.value = type
-}
-
-function addNote() {
-  if (!newNote.value.trim()) return
-  notes.value.push({
-    id: Date.now(),
-    author: '张经理',
-    time: new Date().toLocaleString('zh-CN'),
-    content: newNote.value.trim()
+const timeline = computed(() => {
+  if (!detail.value) return []
+  const s = detail.value.status
+  return stages.map((st, index) => {
+    let done = false
+    let time = ''
+    if (index === 0) { done = true; time = formatDateTime(detail.value.createTime) }
+    else if (index === 1) done = s >= 1
+    else if (index === 2) done = s >= 2
+    else if (index === 3) done = s >= 3
+    if (done && index === 2 && detail.value.interviewTime) time = formatDateTime(detail.value.interviewTime)
+    return { stage: st.label, done, time }
   })
-  newNote.value = ''
+})
+
+function statusLabel(s) {
+  return APPLICATION_STATUS[s]?.label || '未知'
 }
+
+function showToast(msg) {
+  toast.value = msg
+  setTimeout(() => { toast.value = '' }, 2500)
+}
+
+async function loadList() {
+  try {
+    const info = await getCompanyInfo()
+    const companyId = info && info.id
+    if (!companyId) {
+      showToast('请先完成企业认证')
+      return
+    }
+    const res = await getReceivedApplications({ companyId, page: 1, size: 100 })
+    applications.value = (res && res.records) || []
+    // 支持从候选人列表跳转 ?id=
+    const target = route.query.id ? Number(route.query.id) : null
+    if (target && applications.value.some(a => a.id === target)) {
+      selectedId.value = target
+      await loadDetail()
+    } else if (applications.value.length > 0 && selectedId.value == null) {
+      selectedId.value = applications.value[0].id
+      await loadDetail()
+    }
+  } catch (e) {
+    showToast('加载投递列表失败：' + (e.message || '请重试'))
+  }
+}
+
+async function loadDetail() {
+  if (!selectedId.value) { detail.value = null; return }
+  // 收到的投递列表（联表查询）已包含详情所需全部字段，
+  // 且 /application/detail/{id} 有学生归属校验（HR 调会报"投递记录不存在"），故直接从列表取
+  const found = applications.value.find(a => a.id === selectedId.value)
+  if (!found) {
+    showToast('投递记录不存在或不在当前列表')
+    return
+  }
+  detail.value = found
+  form.status = found.status ?? 1
+  form.hrRemark = found.hrRemark || ''
+  form.interviewTime = found.interviewTime ? found.interviewTime.substring(0, 16) : ''
+  form.interviewAddress = found.interviewAddress || ''
+  form.interviewContact = found.interviewContact || ''
+  form.interviewContactPhone = found.interviewContactPhone || ''
+  // 打开详情即视为已查看：待查看(0)自动标记为已查看(1)
+  if (found.status === 0) {
+    try {
+      await handleApplication(selectedId.value, { status: 1 })
+      detail.value.status = 1
+      form.status = 1
+      showToast('已自动标记为已查看')
+      loadList()
+    } catch (e) {
+      console.error('标记已查看失败:', e)
+    }
+  }
+}
+
+function resetForm() {
+  if (!detail.value) return
+  form.status = detail.value.status ?? 1
+  form.hrRemark = detail.value.hrRemark || ''
+  form.interviewTime = detail.value.interviewTime ? detail.value.interviewTime.substring(0, 16) : ''
+  form.interviewAddress = detail.value.interviewAddress || ''
+  form.interviewContact = detail.value.interviewContact || ''
+  form.interviewContactPhone = detail.value.interviewContactPhone || ''
+}
+
+async function submitHandle() {
+  if (!selectedId.value) return
+  submitting.value = true
+  try {
+    const payload = {
+      status: form.status,
+      hrRemark: form.hrRemark,
+      interviewTime: form.interviewTime || null,
+      interviewAddress: form.interviewAddress || null,
+      interviewContact: form.interviewContact || null,
+      interviewContactPhone: form.interviewContactPhone || null
+    }
+    await handleApplication(selectedId.value, payload)
+    showToast('处理成功，状态已更新')
+    await loadDetail()
+    await loadList()
+  } catch (e) {
+    showToast(e.message || '处理失败，请重试')
+  } finally {
+    submitting.value = false
+  }
+}
+
+onMounted(loadList)
 </script>

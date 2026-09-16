@@ -1,6 +1,7 @@
 package com.campus.application.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.campus.application.dto.ApplicationHandleDTO;
 import com.campus.application.dto.ApplicationSubmitDTO;
@@ -11,7 +12,9 @@ import com.campus.application.mapper.ResumeMapper;
 import com.campus.application.service.ApplicationService;
 import com.campus.application.vo.ApplicationInfoVO;
 import com.campus.application.vo.ApplicationListVO;
+import com.campus.application.vo.ResumeInfoVO;
 import com.campus.common.enums.ApplicationEnum;
+import com.campus.common.utils.PhoneUtils;
 import com.campus.common.exception.BusinessException;
 import com.campus.common.result.Result;
 import com.campus.common.result.ResultCode;
@@ -65,18 +68,11 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public Result<ApplicationListVO> getApplicationList(Long userId, Integer status, Integer page, Integer size) {
-        LambdaQueryWrapper<Application> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Application::getUserId, userId);
-        if (status != null) {
-            wrapper.eq(Application::getStatus, status);
-        }
-        wrapper.orderByDesc(Application::getCreateTime);
-
-        Page<Application> pageParam = new Page<>(page, size);
-        Page<Application> result = applicationMapper.selectPage(pageParam, wrapper);
+        Page<ApplicationInfoVO> pageParam = new Page<>(page, size);
+        IPage<ApplicationInfoVO> result = applicationMapper.selectApplicationList(pageParam, userId, null, status);
 
         ApplicationListVO listVO = new ApplicationListVO();
-        listVO.setRecords(null); // 简化处理，实际应转换为VO
+        listVO.setRecords(result.getRecords());
         listVO.setTotal(result.getTotal());
         listVO.setPage((long) page);
         listVO.setSize((long) size);
@@ -128,23 +124,42 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public Result<ApplicationListVO> getReceivedApplications(Long userId, Long companyId, Integer status, Integer page, Integer size) {
-        LambdaQueryWrapper<Application> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Application::getCompanyId, companyId);
-        if (status != null) {
-            wrapper.eq(Application::getStatus, status);
-        }
-        wrapper.orderByDesc(Application::getCreateTime);
-
-        Page<Application> pageParam = new Page<>(page, size);
-        Page<Application> result = applicationMapper.selectPage(pageParam, wrapper);
+        Page<ApplicationInfoVO> pageParam = new Page<>(page, size);
+        IPage<ApplicationInfoVO> result = applicationMapper.selectApplicationList(pageParam, null, companyId, status);
 
         ApplicationListVO listVO = new ApplicationListVO();
-        listVO.setRecords(null); // 简化处理，实际应转换为VO
+        listVO.setRecords(result.getRecords());
         listVO.setTotal(result.getTotal());
         listVO.setPage((long) page);
         listVO.setSize((long) size);
         listVO.setPages(result.getPages());
 
         return Result.success(listVO);
+    }
+
+    @Override
+    public Result<ResumeInfoVO> getCandidateResume(Long userId, Integer role, Long applicationId) {
+        // 仅企业HR(1)或管理员(2)可查看候选人简历
+        if (role == null || (role != 1 && role != 2)) {
+            throw new BusinessException(ResultCode.FAIL.getCode(), "无权查看候选人简历");
+        }
+
+        Application application = applicationMapper.selectById(applicationId);
+        if (application == null) {
+            throw new BusinessException(ResultCode.APPLICATION_NOT_FOUND);
+        }
+
+        Resume resume = resumeMapper.selectById(application.getResumeId());
+        if (resume == null) {
+            throw new BusinessException(ResultCode.RESUME_NOT_FOUND);
+        }
+
+        ResumeInfoVO vo = new ResumeInfoVO();
+        BeanUtils.copyProperties(resume, vo);
+        // 候选人隐私保护：手机号脱敏
+        vo.setPhone(PhoneUtils.desensitize(resume.getPhone()));
+        log.info("企业查看候选人简历: applicationId={}, resumeId={}, byUserId={}", applicationId, resume.getId(), userId);
+
+        return Result.success(vo);
     }
 }

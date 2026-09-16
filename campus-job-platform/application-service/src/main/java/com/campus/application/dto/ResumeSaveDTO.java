@@ -39,7 +39,7 @@ public class ResumeSaveDTO {
     private String email;
 
     @ApiModelProperty("学历：0-大专，1-本科，2-硕士，3-博士")
-    private Integer education;
+    private String education;
 
     @ApiModelProperty("毕业院校")
     private String school;

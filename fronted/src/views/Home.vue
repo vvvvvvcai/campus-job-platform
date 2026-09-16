@@ -14,19 +14,20 @@
           <p class="text-sm text-on-surface-variant">提供直连名企HR、导师背书推荐、线上智能网签的三维一体化智慧就业保障系统。</p>
         </div>
         <!-- Resume Score Card -->
-        <div class="hidden md:flex items-center gap-4 bg-surface-container-lowest rounded-xl border border-surface-container-high px-5 py-4 shrink-0">
+        <div v-if="store.isLoggedIn" class="hidden md:flex items-center gap-4 bg-surface-container-lowest rounded-xl border border-surface-container-high px-5 py-4 shrink-0">
           <div class="relative w-14 h-14">
             <svg class="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
               <circle cx="28" cy="28" r="24" fill="none" stroke="#e8e8e8" stroke-width="4"/>
-              <circle cx="28" cy="28" r="24" fill="none" stroke="#1a56db" stroke-width="4" stroke-linecap="round" :stroke-dasharray="150.8" :stroke-dashoffset="150.8 - (150.8 * 0.92)"/>
+              <circle cx="28" cy="28" r="24" fill="none" stroke="#1a56db" stroke-width="4" stroke-linecap="round"
+                :stroke-dasharray="150.8" :stroke-dashoffset="150.8 - (150.8 * resumeCompleteness / 100)"/>
             </svg>
-            <span class="absolute inset-0 flex items-center justify-center text-sm font-bold text-primary">92%</span>
+            <span class="absolute inset-0 flex items-center justify-center text-sm font-bold text-primary">{{ resumeCompleteness }}%</span>
           </div>
           <div>
-            <p class="text-sm font-semibold text-on-surface">林晨的在线简历</p>
-            <p class="text-xs text-on-surface-variant mt-0.5">竞争力评估：极高，击败 <span class="text-primary font-semibold">94%</span> 同级同学</p>
+            <p class="text-sm font-semibold text-on-surface">{{ defaultResumeTitle }}</p>
+            <p class="text-xs text-on-surface-variant mt-0.5">简历完整度 {{ resumeCompleteness }}%，完整度越高越容易被 HR 关注</p>
           </div>
-          <button class="px-3 py-1.5 text-xs font-semibold text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors shrink-0">优化建议</button>
+          <button @click="router.push('/resume/manage')" class="px-3 py-1.5 text-xs font-semibold text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors shrink-0">优化简历</button>
         </div>
       </div>
     </section>
@@ -126,7 +127,7 @@
 
           <div class="flex items-center justify-between pt-3 border-t border-surface-container-high">
             <span class="text-[11px] text-on-surface-variant">{{ job.meta }}</span>
-            <button @click.prevent="requireAuth" class="px-4 py-1.5 bg-primary text-on-primary text-xs font-semibold rounded-lg hover:bg-primary/90 transition-colors">投递简历</button>
+            <button @click.prevent="applyJob(job)" class="px-4 py-1.5 bg-primary text-on-primary text-xs font-semibold rounded-lg hover:bg-primary/90 transition-colors">投递简历</button>
           </div>
         </router-link>
       </div>
@@ -166,6 +167,8 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
 import { searchJobs, getJobCategories } from '../api/job'
+import { getResumeList } from '../api/resume'
+import { formatSalary } from '../utils/format'
 
 const router = useRouter()
 const store = useAppStore()
@@ -176,6 +179,8 @@ const industryOptions = ref([])
 const hotIndustryTags = ref([])
 const jobTabs = ref(['全部推荐'])
 const activeJobTab = ref('全部推荐')
+const resumeCompleteness = ref(0)
+const defaultResumeTitle = ref('我的在线简历')
 
 const ALL_CITIES = ['北京', '上海', '广州', '深圳', '杭州', '南京', '成都', '武汉', '西安', '苏州', '天津', '重庆', '长沙', '郑州', '青岛', '大连', '宁波', '厦门', '合肥', '佛山', '东莞', '无锡', '昆明', '福州', '济南', '哈尔滨', '沈阳', '长春', '贵阳', '南宁', '太原', '石家庄', '兰州', '海口', '银川', '西宁', '拉萨', '呼和浩特', '乌鲁木齐', '台北', '香港', '澳门']
 const cityOptions = ALL_CITIES
@@ -194,6 +199,30 @@ function shuffle(arr) {
 function requireAuth() {
   if (!store.isLoggedIn) {
     window.dispatchEvent(new CustomEvent('open-login-modal'))
+  }
+}
+
+function applyJob(job) {
+  if (!store.isLoggedIn) {
+    requireAuth()
+    return
+  }
+  router.push(`/jobs/${job.id}`)
+}
+
+async function loadResumeCard() {
+  if (!store.isLoggedIn) return
+  try {
+    const res = await getResumeList()
+    if (Array.isArray(res) && res.length > 0) {
+      const def = res.find(r => r.isDefault === 1) || res[0]
+      defaultResumeTitle.value = def.title || '我的在线简历'
+      const fields = [def.title, def.name, def.phone, def.email, def.school, def.major, def.selfIntroduction, def.skills, def.experiences, def.projects]
+      const filled = fields.filter(Boolean).length
+      resumeCompleteness.value = Math.round(filled / fields.length * 100)
+    }
+  } catch (e) {
+    console.error('获取简历信息失败:', e)
   }
 }
 
@@ -231,7 +260,7 @@ async function fetchJobs(params = { pageNum: 1, pageSize: 4 }) {
         company: j.companyName || '未知企业',
         logoBg: LOGO_COLORS[i % LOGO_COLORS.length],
         logoText: j.companyName ? j.companyName.charAt(0) : '企',
-        salary: j.salaryMin && j.salaryMax ? `${j.salaryMin}k-${j.salaryMax}k` : '面议',
+        salary: formatSalary(j.salaryMin, j.salaryMax),
         tags: [j.city, j.education, j.experience, j.jobType === 2 ? '实习' : '全职'].filter(Boolean),
         desc: j.description ? j.description.substring(0, 80) + (j.description.length > 80 ? '...' : '') : '暂无描述',
         meta: `${j.viewCount || 0}人看过 · ${j.applyCount || 0}人投递`
@@ -255,6 +284,7 @@ onMounted(async () => {
     console.error('获取行业类别失败:', e)
   }
   fetchJobs()
+  loadResumeCard()
 })
 
 const steps = [

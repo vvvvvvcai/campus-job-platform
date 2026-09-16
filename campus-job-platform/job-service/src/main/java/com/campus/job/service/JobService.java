@@ -1,8 +1,10 @@
 package com.campus.job.service;
 
 import com.campus.common.result.Result;
+import com.campus.job.dto.JobAuditDTO;
 import com.campus.job.dto.JobPublishDTO;
 import com.campus.job.dto.JobSearchDTO;
+import com.campus.job.vo.JobAdminListVO;
 import com.campus.job.vo.JobInfoVO;
 import com.campus.job.vo.JobListVO;
 
@@ -43,4 +45,29 @@ public interface JobService {
      * 获取所有职位类别和行业
      */
     Result<Map<String, List<String>>> getJobCategories();
+
+    /**
+     * 获取企业发布的职位列表（含已关闭/待审核，用于企业端职位管理）
+     */
+    Result<List<JobInfoVO>> getCompanyJobList(Long companyId);
+
+    /**
+     * 管理员：获取职位列表
+     */
+    Result<JobAdminListVO> getJobAdminList(String keyword, Integer auditStatus, Integer status, String category, String city, Integer page, Integer pageSize);
+
+    /**
+     * 管理员：获取职位详情（含企业名称）
+     */
+    Result<JobInfoVO> getJobAdminDetail(Long jobId, Long adminId);
+
+    /**
+     * 管理员：审核职位
+     */
+    Result<Void> auditJob(Long jobId, JobAuditDTO dto);
+
+    /**
+     * 管理员：获取职位统计数据
+     */
+    Result<Object> getJobCount();
 }

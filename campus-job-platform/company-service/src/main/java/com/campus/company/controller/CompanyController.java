@@ -2,8 +2,10 @@ package com.campus.company.controller;
 
 import com.campus.common.result.Result;
 import com.campus.company.dto.CompanyAuditDTO;
+import com.campus.company.dto.CompanyAuditHandleDTO;
 import com.campus.company.service.CompanyService;
 import com.campus.company.vo.CompanyInfoVO;
+import com.campus.company.vo.CompanyListVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +42,42 @@ public class CompanyController {
     public Result<Void> updateCompanyInfo(@RequestHeader("X-User-Id") Long userId,
                                           @RequestBody CompanyInfoVO vo) {
         return companyService.updateCompanyInfo(userId, vo);
+    }
+
+    @ApiOperation("管理员获取企业列表")
+    @GetMapping("/list")
+    public Result<CompanyListVO> getCompanyList(
+            @RequestHeader("X-User-Id") Long adminId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer auditStatus,
+            @RequestParam(required = false) String industry,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        return companyService.getCompanyList(keyword, auditStatus, industry, page, pageSize);
+    }
+
+    @ApiOperation("管理员获取企业详情")
+    @GetMapping("/admin/detail/{id}")
+    public Result<CompanyInfoVO> getCompanyAdminDetail(
+            @RequestHeader("X-User-Id") Long adminId,
+            @PathVariable Long id) {
+        return companyService.getCompanyAdminDetail(id);
+    }
+
+            @ApiOperation("管理员通过企业审核")
+            @PutMapping("/audit/approve/{id}")
+            public Result<Void> approveCompany(
+            @RequestHeader("X-User-Id") Long adminId,
+            @PathVariable Long id) {
+        return companyService.approveCompany(id);
+    }
+
+    @ApiOperation("管理员拒绝企业审核")
+    @PutMapping("/audit/reject/{id}")
+    public Result<Void> rejectCompany(
+            @RequestHeader("X-User-Id") Long adminId,
+            @PathVariable Long id,
+            @RequestBody CompanyAuditHandleDTO dto) {
+        return companyService.rejectCompany(id, dto);
     }
 }

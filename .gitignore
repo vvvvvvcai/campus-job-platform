@@ -19,3 +19,10 @@ Thumbs.db
 
 # Package files
 *.zip
+
+# 本地基础设施与工具（不入库）
+/nacos/
+/redis/
+/.arts/
+/.MyOllamaEnhancer/
+*.patch

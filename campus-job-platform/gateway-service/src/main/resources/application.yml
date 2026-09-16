@@ -19,6 +19,18 @@ spring:
             - Path=/api/user/**
           filters:
             - StripPrefix=0
+        - id: upload-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/upload/**
+          filters:
+            - StripPrefix=0
+        - id: upload-static
+          uri: lb://user-service
+          predicates:
+            - Path=/uploads/**
+          filters:
+            - StripPrefix=0
         - id: company-service
           uri: lb://company-service
           predicates:
@@ -41,6 +53,12 @@ spring:
           uri: lb://application-service
           predicates:
             - Path=/api/application/**
+          filters:
+            - StripPrefix=0
+        - id: resume-service
+          uri: lb://application-service
+          predicates:
+            - Path=/api/resume/**
           filters:
             - StripPrefix=0
         - id: recommend-service

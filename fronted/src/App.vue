@@ -30,20 +30,22 @@
           <div class="flex items-center gap-3">
             <template v-if="store.isLoggedIn">
               <!-- Bell Icon -->
-              <button class="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors">
+              <button @click="notificationUnavailable" class="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors">
                 <span class="material-symbols-outlined text-on-surface-variant text-[22px]">notifications</span>
-                <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
               </button>
               <!-- User Avatar & Dropdown -->
               <div class="relative" ref="userDropdownRef">
                 <button @click="showUserDropdown = !showUserDropdown" class="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full hover:bg-surface-container-low transition-colors">
-                  <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" alt="avatar" class="w-9 h-9 rounded-full object-cover border-2 border-primary/20" />
+                  <span class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold border-2 border-primary/20">
+                    {{ displayName.charAt(0) }}
+                  </span>
                   <div class="text-left hidden sm:block">
                     <div class="flex items-center gap-1.5">
-                      <p class="text-sm font-semibold text-on-surface leading-tight">{{ store.user?.name || (store.role === 'hr' ? '张经理' : '林晨') }}</p>
+                      <p class="text-sm font-semibold text-on-surface leading-tight">{{ displayName }}</p>
                       <span v-if="store.role === 'hr'" class="px-1.5 py-0.5 bg-primary/10 text-primary text-[9px] font-semibold rounded">企业端</span>
+                      <span v-else class="px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-semibold rounded">学生端</span>
                     </div>
-                    <p class="text-[11px] text-on-surface-variant">{{ store.role === 'hr' ? (store.user?.company || '智航未来HRD') : (store.user?.dept || '计算机系') }} · {{ store.role === 'hr' ? '已认证' : (store.user?.year || '2025届') }}</p>
+                    <p class="text-[11px] text-on-surface-variant">{{ store.role === 'hr' ? '企业HR账号' : '学生账号' }}</p>
                   </div>
                   <span class="material-symbols-outlined text-on-surface-variant text-[18px] transition-transform" :class="showUserDropdown ? 'rotate-180' : ''">expand_more</span>
                 </button>
@@ -89,6 +91,10 @@
                       <router-link to="/applications" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
                         <span class="material-symbols-outlined text-[20px] text-on-surface-variant">send</span>
                         我的投递
+                      </router-link>
+                      <router-link to="/favorites" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant">bookmark</span>
+                        我的收藏
                       </router-link>
                       <router-link to="/resume/manage" @click="showUserDropdown = false" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
                         <span class="material-symbols-outlined text-[20px] text-on-surface-variant">description</span>
@@ -479,32 +485,17 @@
                     <p v-if="regErrors.name" class="text-error text-xs">{{ regErrors.name }}</p>
                   </div>
 
-                  <!-- Phone + SMS code inline -->
+                  <!-- Phone -->
                   <div class="space-y-1.5">
                     <label class="block text-xs text-on-surface font-medium">手机号码</label>
-                    <div class="flex gap-2">
-                      <div class="flex rounded-lg shadow-sm bg-surface-container-lowest flex-1">
-                        <div class="relative shrink-0">
-                          <select class="h-10 pl-3 pr-7 bg-surface-container-low text-on-surface text-sm rounded-l-lg appearance-none cursor-pointer focus:outline-none border-0"><option>+86 中国</option></select>
-                          <span class="material-symbols-outlined pointer-events-none absolute right-1.5 top-2.5 text-on-surface-variant text-[18px]">arrow_drop_down</span>
-                        </div>
-                        <input v-model="regForm.phone" type="tel" maxlength="11" placeholder="请输入11位手机号" class="flex-1 h-10 px-3 bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm rounded-r-lg focus:outline-none border-0" />
+                    <div class="flex rounded-lg shadow-sm bg-surface-container-lowest">
+                      <div class="relative shrink-0">
+                        <select class="h-10 pl-3 pr-7 bg-surface-container-low text-on-surface text-sm rounded-l-lg appearance-none cursor-pointer focus:outline-none border-0"><option>+86 中国</option></select>
+                        <span class="material-symbols-outlined pointer-events-none absolute right-1.5 top-2.5 text-on-surface-variant text-[18px]">arrow_drop_down</span>
                       </div>
-                      <button type="button" @click="sendRegSmsCode" :disabled="regSmsCooldown > 0" class="px-4 h-10 bg-primary-container text-on-primary hover:opacity-90 text-xs font-semibold rounded-lg transition-all whitespace-nowrap shrink-0" :class="regSmsCooldown > 0 ? 'opacity-50 cursor-not-allowed' : ''">
-                        {{ regSmsCooldown > 0 ? `${regSmsCooldown}秒` : '获取验证码' }}
-                      </button>
+                      <input v-model="regForm.phone" type="tel" maxlength="11" placeholder="请输入11位手机号" class="flex-1 h-10 px-3 bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm rounded-r-lg focus:outline-none border-0" />
                     </div>
                     <p v-if="regErrors.phone" class="text-error text-xs">{{ regErrors.phone }}</p>
-                  </div>
-
-                  <!-- SMS Code -->
-                  <div class="space-y-1.5">
-                    <label class="block text-xs text-on-surface font-medium">短信验证码</label>
-                    <div class="relative">
-                      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">sms</span>
-                      <input v-model="regForm.code" type="text" maxlength="6" placeholder="请输入收到的 6 位数字验证码" class="w-full h-10 pl-10 px-3 bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm rounded-lg shadow-sm focus:outline-none border border-surface-container-high focus:border-primary transition-colors" />
-                    </div>
-                    <p v-if="regErrors.code" class="text-error text-xs">{{ regErrors.code }}</p>
                   </div>
 
                   <!-- Password -->
@@ -611,6 +602,7 @@ onUnmounted(() => {
 const navItems = [
   { path: '/', label: '首页' },
   { path: '/jobs', label: '职位搜索' },
+  { path: '/favorites', label: '我的收藏' },
 ]
 
 const enterpriseNavItems = [
@@ -618,8 +610,14 @@ const enterpriseNavItems = [
   { path: '/enterprise/jobs', label: '职位管理' },
   { path: '/enterprise/post-job', label: '发布职位' },
   { path: '/enterprise/candidates', label: '简历投递' },
-  { path: '/enterprise/cert', label: '企业认证', badge: '已认证' },
+  { path: '/enterprise/cert', label: '企业认证' },
 ]
+
+const displayName = computed(() => (store.user && store.user.name) || '用户')
+
+function notificationUnavailable() {
+  showToast('error', '消息中心接口暂未开放')
+}
 
 function handleLogout() { store.logout(); router.push('/') }
 
@@ -707,9 +705,8 @@ function sendSmsCode() {
 // ─── Register ───
 const regRole = ref('student')
 const showRegPass = ref(false)
-const regSmsCooldown = ref(0)
-const regForm = reactive({ name: '', phone: '', code: '', password: '', confirmPassword: '', agree: false })
-const regErrors = reactive({ name: '', phone: '', code: '', password: '' })
+const regForm = reactive({ name: '', phone: '', password: '', confirmPassword: '', agree: false })
+const regErrors = reactive({ name: '', phone: '', password: '' })
 
 const regPassStrength = computed(() => {
   const p = regForm.password
@@ -741,9 +738,8 @@ const regPassColor = computed(() => {
 async function handleRegister() {
   regErrors.name = !regForm.name ? '请输入真实姓名' : ''
   regErrors.phone = validatePhone(regForm.phone)
-  regErrors.code = !regForm.code ? '请输入验证码' : regForm.code.length < 6 ? '验证码为6位' : ''
   regErrors.password = !regForm.password ? '请输入密码' : regForm.password.length < 8 ? '密码至少8位' : ''
-  if (regErrors.name || regErrors.phone || regErrors.code || regErrors.password) return
+  if (regErrors.name || regErrors.phone || regErrors.password) return
   if (regForm.password !== regForm.confirmPassword) { showToast('error', '两次输入的密码不一致'); return }
   if (!regForm.agree) { showToast('error', '请先阅读并同意用户协议与隐私政策'); return }
   try {
@@ -763,12 +759,6 @@ async function handleRegister() {
   }
 }
 
-function sendRegSmsCode() {
-  const phoneError = validatePhone(regForm.phone)
-  if (phoneError) { regErrors.phone = phoneError; return }
-  regErrors.phone = ''
-  showToast('error', '后端暂未实现短信发送功能')
-}
 </script>
 
 <style scoped>

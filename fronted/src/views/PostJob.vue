@@ -322,17 +322,17 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2 text-body-sm text-on-surface-variant">
             <span class="material-symbols-outlined text-base text-primary">check_circle</span>
-            表单已自动保存于 {{ lastSaveTime }}
+            <span v-if="lastSaveTime" class="text-xs text-on-surface-variant">上次发布：{{ lastSaveTime }}</span>
           </div>
           <div class="flex items-center gap-3">
-            <button @click="saveDraft"
+            <button @click="router.push('/enterprise/jobs')"
               class="h-11 px-6 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface font-medium hover:bg-surface-container transition-colors text-sm">
-              保存为草稿
+              取消返回
             </button>
-            <button @click="publishJob"
-              class="h-11 px-6 rounded-xl bg-primary text-on-primary font-semibold hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2 text-sm">
+            <button @click="handlePublish" :disabled="saving"
+              class="h-11 px-6 rounded-xl bg-primary text-on-primary font-semibold hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2 text-sm disabled:opacity-50">
               <span class="material-symbols-outlined text-lg">send</span>
-              立即发布至全国高校就业网
+              {{ saving ? '发布中...' : (editingId ? '保存修改' : '立即发布职位') }}
             </button>
           </div>
         </div>
@@ -347,10 +347,17 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { publishJob, updateJob, getJobDetail } from '../api/job'
+import { getCompanyInfo } from '../api/company'
 
+const route = useRoute()
+const router = useRouter()
 const toast = ref('')
-const lastSaveTime = ref(new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
+const saving = ref(false)
+const editingId = computed(() => route.query.id ? Number(route.query.id) : null)
+const lastSaveTime = ref('')
 const showMajorDropdown = ref(false)
 const majorTagDropdown = ref(null)
 const newBenefit = ref('')
@@ -367,6 +374,8 @@ const majorOptions = ['计算机科学与技术', '人工智能/智能科学', '
 
 const benefitOptions = ['五险一金', '转正机会90%', '导师1对1带教', '租房补贴（2500/月）', '免费精品三餐', '落户指标申报通道', '弹性工时/不打卡', '定期学术休假', '毕业设计专属辅导']
 
+const educationMap = { '硕士研究生及以上': '硕士', '本科及以上': '本科', '大专及以上': '大专', '不限学历': '不限' }
+
 const form = reactive({
   title: '',
   category: '',
@@ -374,22 +383,15 @@ const form = reactive({
   workType: 'fulltime',
   city: '',
   address: '',
-  salaryMin: 20,
-  salaryMax: 35,
+  salaryMin: null,
+  salaryMax: null,
   salaryType: '15薪 (标准大厂)',
-  education: '硕士研究生及以上',
-  years: ['2025届应届生', '2026届实习生'],
-  majorTags: ['计算机科学与技术', '人工智能/智能科学', '软件工程'],
-  responsibilities: `1. 参与百亿/千亿级多模态大模型的预训练、指令微调（SFT）以及基于人类反馈的强化学习（RLHF）；
-2. 负责面向校园智能教育助手的算法落地，优化推理延迟与显存占用；
-3. 协助推进前沿大语言模型（LLM）对齐算法研发与学术论文产出；
-4. 与工程团队密切协作，搭建高可用模型训练与低精度量化部署工作流。`,
-  requirements: `1. 2025年毕业的海内外知名高校硕士及以上学历，计算机、AI、软件等相关专业；
-2. 熟练掌握 Python，深入理解 PyTorch/DeepSpeed/Megatron 等主流分布式训练框架；
-3. 具备扎实的数据结构与算法基础，熟悉 Transformer 架构内部机制与 Attention 优化；
-4. 在 NeurIPS、ICLR、ACL、CVPR 等顶级 AI 会议发表第一作者论文者，或 Kaggle / 天池大模型赛道高分选手优先；
-5. 善于沟通探索，对 AGI 技术保持极致热爱，具备优秀的团队协作抗压能力。`,
-  benefits: ['五险一金', '转正机会90%', '导师1对1带教', '租房补贴（2500/月）', '免费精品三餐', '落户指标申报通道', '弹性工时/不打卡', '定期学术休假']
+  education: '本科及以上',
+  years: [],
+  majorTags: [],
+  responsibilities: '',
+  requirements: '',
+  benefits: []
 })
 
 const availableMajors = computed(() => majorOptions.filter(m => !form.majorTags.includes(m)))
@@ -422,14 +424,78 @@ function quickAddBenefit(benefit) {
   }
 }
 
-function saveDraft() {
-  lastSaveTime.value = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-  showToast('草稿已保存')
+async function handlePublish() {
+  if (!form.title.trim()) { showToast('请填写职位名称'); return }
+  if (!form.category) { showToast('请选择岗位类型'); return }
+  if (!form.city) { showToast('请选择工作城市'); return }
+  if (!form.salaryMin || !form.salaryMax) { showToast('请填写薪资范围'); return }
+  saving.value = true
+  try {
+    let companyId = null
+    try {
+      const info = await getCompanyInfo()
+      companyId = info && info.id
+    } catch (e) {
+      console.error('获取企业信息失败:', e)
+    }
+    if (!companyId) {
+      showToast('未找到企业信息，请先完成企业认证')
+      saving.value = false
+      return
+    }
+    const payload = {
+      companyId,
+      title: form.title.trim(),
+      category: form.category,
+      city: form.city,
+      salaryMin: Math.round(form.salaryMin * 1000),
+      salaryMax: Math.round(form.salaryMax * 1000),
+      education: educationMap[form.education] || form.education,
+      experience: form.years.join(' / '),
+      jobType: form.workType === 'fulltime' ? 1 : 2,
+      description: form.responsibilities,
+      requirement: form.requirements,
+      benefits: form.benefits.join(','),
+      headcount: form.headcount || 1
+    }
+    if (editingId.value) {
+      await updateJob(editingId.value, payload)
+      showToast('职位已更新')
+    } else {
+      await publishJob(payload)
+      showToast('职位发布成功，等待平台审核')
+    }
+    lastSaveTime.value = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+    setTimeout(() => router.push('/enterprise/jobs'), 800)
+  } catch (e) {
+    showToast(e.message || '发布失败，请重试')
+  } finally {
+    saving.value = false
+  }
 }
 
-function publishJob() {
-  showToast('职位已发布至全国高校就业网')
+async function loadForEdit() {
+  if (!editingId.value) return
+  try {
+    const j = await getJobDetail(editingId.value)
+    form.title = j.title || ''
+    form.category = j.category || ''
+    form.city = j.city || ''
+    form.salaryMin = j.salaryMin ? Math.round(j.salaryMin / 1000) : null
+    form.salaryMax = j.salaryMax ? Math.round(j.salaryMax / 1000) : null
+    form.education = j.education || '本科及以上'
+    form.headcount = j.headcount || 1
+    form.workType = j.jobType === 2 ? 'intern' : 'fulltime'
+    form.responsibilities = j.description || ''
+    form.requirements = j.requirement || ''
+    form.benefits = j.benefits ? j.benefits.split(/[,，、]/).map(s => s.trim()).filter(Boolean) : []
+    if (j.experience) form.years = j.experience.split(' / ').filter(y => yearOptions.includes(y))
+  } catch (e) {
+    showToast('加载职位失败：' + (e.message || '请重试'))
+  }
 }
+
+onMounted(loadForEdit)
 
 function showToast(msg) {
   toast.value = msg

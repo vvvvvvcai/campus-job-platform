@@ -60,4 +60,13 @@ public class CompanyInfoVO {
 
     @ApiModelProperty("更新时间")
     private LocalDateTime updateTime;
+
+    @ApiModelProperty("HR联系人姓名")
+    private String hrName;
+
+    @ApiModelProperty("HR联系电话")
+    private String hrPhone;
+
+    @ApiModelProperty("HR电子邮箱")
+    private String hrEmail;
 }

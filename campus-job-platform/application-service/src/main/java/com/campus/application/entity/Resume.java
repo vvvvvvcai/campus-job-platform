@@ -52,9 +52,9 @@ public class Resume {
     private String email;
 
     /**
-     * 学历：0-大专，1-本科，2-硕士，3-博士
+     * 学历（如：大专、本科、硕士、博士）
      */
-    private Integer education;
+    private String education;
 
     /**
      * 毕业院校

@@ -103,7 +103,7 @@
                 <span class="material-symbols-outlined text-[16px]">visibility</span>
                 查看进度
               </button>
-              <button v-if="app.status !== 'rejected'" @click="router.push({ name: 'JobDetail', params: { id: app.id } })"
+              <button v-if="app.status !== 'rejected'" @click="router.push({ name: 'JobDetail', params: { id: app.jobId } })"
                 class="text-xs text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors">
                 查看原招聘职位
                 <span class="material-symbols-outlined text-[14px]">open_in_new</span>
@@ -222,22 +222,30 @@ async function fetchApplications() {
   loading.value = true
   try {
     const res = await getApplicationList({ page: currentPage.value, size: 10 })
-    if (res && res.records) {
-      applications.value = res.records.map(a => ({
-        id: a.id,
-        position: a.jobName || '未知职位',
-        company: a.companyName || '未知企业',
-        location: '',
-        salary: '',
-        appliedAt: a.createTime || '',
-        resume: a.resumeTitle || '在线简历',
-        tags: [],
-        status: ['pending', 'viewed', 'interview', 'rejected', 'offer'][a.status] || 'pending',
-        statusRaw: a.status
-      }))
-      totalApplications.value = res.total || 0
-      totalPages.value = res.pages || 1
-    }
+    const records = (res && res.records) || []
+    applications.value = records.map(a => ({
+      id: a.id,
+      jobId: a.jobId,
+      position: a.jobName || '未知职位',
+      company: a.companyName || '未知企业',
+      location: '',
+      salary: '',
+      appliedAt: a.createTime ? a.createTime.substring(0, 10) : '',
+      resume: a.resumeTitle || '在线简历',
+      tags: [],
+      status: ['pending', 'viewed', 'interview', 'rejected', 'offer'][a.status] || 'pending',
+      statusRaw: a.status
+    }))
+    totalApplications.value = (res && res.total) || 0
+    totalPages.value = (res && res.pages) || 1
+    // 同步统计卡与筛选 Tab 计数（基于已加载数据）
+    statCards[0].value = totalApplications.value
+    statCards[1].value = records.filter(a => a.status === 0).length
+    statCards[2].value = records.filter(a => a.status === 2).length
+    statCards[3].value = records.filter(a => a.status === 4).length
+    filterTabs.forEach(tab => {
+      tab.count = tab.key === 'all' ? totalApplications.value : records.filter(a => String(a.status) === tab.key).length
+    })
   } catch (e) {
     console.error('获取投递列表失败:', e)
   } finally {

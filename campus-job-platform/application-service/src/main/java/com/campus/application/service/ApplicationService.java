@@ -4,6 +4,7 @@ import com.campus.application.dto.ApplicationHandleDTO;
 import com.campus.application.dto.ApplicationSubmitDTO;
 import com.campus.application.vo.ApplicationInfoVO;
 import com.campus.application.vo.ApplicationListVO;
+import com.campus.application.vo.ResumeInfoVO;
 import com.campus.common.result.Result;
 
 /**
@@ -35,4 +36,9 @@ public interface ApplicationService {
      * 获取收到的投递列表（企业）
      */
     Result<ApplicationListVO> getReceivedApplications(Long userId, Long companyId, Integer status, Integer page, Integer size);
+
+    /**
+     * 企业查看候选人简历（按投递记录取简历，手机号脱敏，仅HR/管理员可调）
+     */
+    Result<ResumeInfoVO> getCandidateResume(Long userId, Integer role, Long applicationId);
 }

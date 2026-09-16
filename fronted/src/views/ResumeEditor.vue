@@ -1,477 +1,305 @@
 <template>
   <div class="min-h-screen bg-[var(--background)]">
-    <div class="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-10 py-6">
+    <div class="max-w-[1100px] mx-auto px-4 md:px-6 lg:px-10 py-6">
       <!-- Header -->
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h1 class="text-2xl font-bold text-[var(--on-surface)]">编辑求职简历</h1>
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <button @click="router.push('/resume/manage')" class="p-2 rounded-lg hover:bg-gray-100 transition-colors text-[var(--on-surface-variant)]">
+            <span class="material-symbols-outlined">arrow_back</span>
+          </button>
+          <h1 class="text-2xl font-bold text-[var(--on-surface)]">{{ resumeId ? '编辑求职简历' : '新建求职简历' }}</h1>
         </div>
         <div class="flex items-center gap-3">
-          <span class="text-xs text-[var(--on-surface-variant)] flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm text-[var(--primary)]">cloud_done</span>
-            已于 00:38 自动保存为草稿
-          </span>
-          <button class="px-4 py-2 bg-white text-[var(--on-surface)] rounded-xl text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm">
-            <span class="material-symbols-outlined text-[16px]">visibility</span>
-            预览效果
+          <button @click="router.push('/resume/manage')" class="px-4 py-2 bg-white text-[var(--on-surface)] rounded-xl text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
+            返回档案库
           </button>
           <button @click="handleSave" :disabled="saving" class="px-5 py-2 bg-[var(--primary)] text-white rounded-xl text-sm font-semibold hover:bg-[var(--primary-container)] transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50">
             <span class="material-symbols-outlined text-[16px]">{{ saving ? 'hourglass_top' : 'check_circle' }}</span>
-            {{ saving ? '保存中...' : '完成并保存简历' }}
+            {{ saving ? '保存中...' : '保存简历' }}
           </button>
         </div>
       </div>
 
-      <!-- Progress Stepper -->
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-6">
-            <div v-for="(step, index) in steps" :key="step.key" class="flex items-center gap-2">
-              <span :class="['w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0',
-                index < activeStep ? 'bg-[var(--primary)] text-white' : index === activeStep ? 'bg-[var(--primary)] text-white' : 'bg-gray-100 text-gray-400']">
-                <span v-if="index < activeStep" class="material-symbols-outlined text-sm">check</span>
-                <span v-else>{{ index + 1 }}</span>
-              </span>
-              <div>
-                <span :class="['text-xs font-medium block', index <= activeStep ? 'text-[var(--on-surface)]' : 'text-gray-400']">{{ step.label }}</span>
-                <span v-if="index < activeStep" class="text-[10px] text-[var(--primary)]">已完成</span>
-                <span v-else-if="index === activeStep" class="text-[10px] text-[var(--primary)]">● 编辑中</span>
-                <span v-else class="text-[10px] text-gray-400">待补充</span>
-              </div>
-            </div>
-          </div>
+      <!-- 简历标题 -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <label class="block text-xs font-semibold text-[var(--on-surface-variant)] mb-2">简历标题</label>
+        <input v-model="form.title" type="text" placeholder="如：算法岗专用简历 / 央国企投递版"
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
+        <p class="text-[11px] text-[var(--on-surface-variant)] mt-1.5">最多可创建 5 份简历，用于不同岗位方向的精准投递。</p>
+      </div>
+
+      <!-- 1. 基本信息 -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
+          <span class="material-symbols-outlined text-[var(--primary)]">person</span>
+          <h3 class="font-bold text-[var(--on-surface)]">基本信息</h3>
         </div>
-        <!-- Progress Bar -->
-        <div class="flex items-center gap-4">
-          <span class="text-xs text-[var(--on-surface-variant)] flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm text-[var(--primary)]">info</span>
-            简历完善度：<span class="font-bold text-[var(--primary)]">88%</span>（建议补充第6步「项目经历」深度量化指标，以获得更多头部大厂与科研所 HR 青睐）
-          </span>
-          <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div class="h-full bg-[var(--primary)] rounded-full transition-all" style="width: 88%"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">姓名 *</label>
+            <input v-model="form.name" type="text" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
           </div>
-          <span class="text-sm font-bold text-[var(--primary)]">88%</span>
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">性别</label>
+            <select v-model="form.gender" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)]">
+              <option :value="0">未知</option>
+              <option :value="1">男</option>
+              <option :value="2">女</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">出生日期</label>
+            <input v-model="form.birthDate" type="date" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
+          </div>
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">联系电话</label>
+            <input v-model="form.phone" type="tel" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
+          </div>
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">电子邮箱</label>
+            <input v-model="form.email" type="email" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
+          </div>
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">求职状态</label>
+            <select v-model="form.workStatus" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)]">
+              <option :value="0">在校</option>
+              <option :value="1">应届生</option>
+              <option :value="2">往届生</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <!-- Main Content -->
-      <div class="flex gap-6">
-        <!-- Left Form Area -->
-        <div class="flex-1 space-y-6">
-          <!-- 基本信息与个人标签 -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div class="flex items-center justify-between p-5 pb-0">
-              <div class="flex items-center gap-2">
-                <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
-                <span class="material-symbols-outlined text-[var(--primary)]">person</span>
-                <h3 class="font-bold text-[var(--on-surface)]">基本信息与个人标签</h3>
-                <span class="px-2 py-0.5 bg-[var(--primary)]/10 text-[var(--primary)] text-[10px] font-semibold rounded-full border border-[var(--primary)]/20">已认证</span>
-              </div>
-            </div>
-            <div class="p-5">
-              <!-- Profile Card -->
-              <div class="bg-gray-50 rounded-xl p-4 flex items-start gap-4 mb-5">
-                <div class="relative">
-                  <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center border-2 border-blue-100 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" class="w-full h-full object-cover" />
-                  </div>
-                  <button class="absolute -bottom-1 -right-1 w-5 h-5 bg-[var(--primary)] rounded-full flex items-center justify-center shadow-sm">
-                    <span class="material-symbols-outlined text-white text-[10px]">photo_camera</span>
-                  </button>
-                </div>
-                <div class="flex-1">
-                  <div class="flex items-center gap-2 mb-1">
-                    <h4 class="font-bold text-[var(--on-surface)]">林晨</h4>
-                    <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-semibold rounded">2025届硕士</span>
-                    <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-semibold rounded">中共党员</span>
-                  </div>
-                  <p class="text-xs text-[var(--on-surface-variant)]">求职意向：全职算法研发 / 大模型架构工程师（随时到岗）</p>
-                </div>
-                <button class="text-xs text-[var(--primary)] hover:underline">更换照片</button>
-              </div>
-              <!-- Contact Fields -->
-              <div class="grid grid-cols-3 gap-4">
-                <div>
-                  <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">手机号码</label>
-                  <input v-model="form.phone" type="tel" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
-                </div>
-                <div>
-                  <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">教育邮箱 (Edu Mail)</label>
-                  <input v-model="form.email" type="email" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
-                </div>
-                <div>
-                  <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">出生年月 / 政治面貌</label>
-                  <input v-model="form.birthDate" type="text" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
-                </div>
-              </div>
-            </div>
+      <!-- 2. 教育背景 -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
+          <span class="material-symbols-outlined text-[var(--primary)]">school</span>
+          <h3 class="font-bold text-[var(--on-surface)]">教育背景</h3>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">最高学历</label>
+            <select v-model="form.education" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)]">
+              <option value="大专">大专</option>
+              <option value="本科">本科</option>
+              <option value="硕士">硕士</option>
+              <option value="博士">博士</option>
+            </select>
           </div>
-
-          <!-- 求职意向 -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
-                <span class="material-symbols-outlined text-[var(--primary)]">target</span>
-                <h3 class="font-bold text-[var(--on-surface)]">求职意向</h3>
-              </div>
-              <div class="flex items-center gap-3">
-                <button class="text-xs text-[var(--primary)] hover:underline flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">edit</span>修改意向
-                </button>
-                <button class="text-xs text-gray-400 hover:text-[var(--on-surface-variant)] flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">visibility_off</span>隐藏模块
-                </button>
-              </div>
-            </div>
-            <div class="grid grid-cols-3 gap-4">
-              <div class="bg-[#eef2ff] rounded-xl p-4">
-                <span class="text-[11px] text-[var(--on-surface-variant)]">期望城市</span>
-                <div class="flex flex-wrap gap-1.5 mt-2">
-                  <span class="px-2.5 py-1 bg-white border border-[var(--primary)] text-[var(--primary)] text-xs font-medium rounded-lg">北京（首选）</span>
-                  <span class="px-2.5 py-1 bg-white/60 text-gray-600 text-xs font-medium rounded-lg">上海</span>
-                  <span class="px-2.5 py-1 bg-white/60 text-gray-600 text-xs font-medium rounded-lg">深圳</span>
-                </div>
-              </div>
-              <div class="bg-[#eef2ff] rounded-xl p-4">
-                <span class="text-[11px] text-[var(--on-surface-variant)]">目标行业</span>
-                <div class="flex flex-wrap gap-1.5 mt-2">
-                  <span class="px-2.5 py-1 bg-white text-gray-700 text-xs font-medium rounded-lg">互联网 AI / 大模型</span>
-                  <span class="px-2.5 py-1 bg-white text-gray-700 text-xs font-medium rounded-lg">高端硬科技智能研发</span>
-                </div>
-              </div>
-              <div class="bg-[#eef2ff] rounded-xl p-4">
-                <span class="text-[11px] text-[var(--on-surface-variant)]">期望月薪（税前）</span>
-                <p class="text-sm font-bold text-[#1a56db] mt-2">25k - 40k · 16薪</p>
-                <p class="text-[10px] text-[var(--on-surface-variant)] mt-0.5">包含校招 SSP/SP 研发档位</p>
-              </div>
-            </div>
+          <div class="lg:col-span-2">
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">毕业院校</label>
+            <input v-model="form.school" type="text" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
           </div>
-
-          <!-- 教育背景 -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
-                <span class="material-symbols-outlined text-[var(--primary)]">school</span>
-                <h3 class="font-bold text-[var(--on-surface)]">教育背景</h3>
-              </div>
-              <div class="flex items-center gap-3">
-                <button class="text-xs text-[var(--primary)] hover:underline flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">add</span>添加学历
-                </button>
-                <button class="text-xs text-gray-400 hover:text-[var(--on-surface-variant)] flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">visibility_off</span>隐藏模块
-                </button>
-              </div>
-            </div>
-            <div class="space-y-3">
-              <div v-for="(edu, index) in educations" :key="index" class="bg-[#eef2ff] rounded-xl p-4 flex items-start justify-between">
-                <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="text-sm font-bold text-[var(--on-surface)]">{{ edu.school }}</span>
-                    <span v-for="tag in edu.tags" :key="tag" class="px-2 py-0.5 bg-white/80 text-[var(--primary)] text-[10px] font-semibold rounded border border-[var(--primary)]/20">{{ tag }}</span>
-                  </div>
-                  <p class="text-xs text-[var(--on-surface-variant)]">{{ edu.major }}</p>
-                  <p class="text-xs text-[var(--on-surface-variant)] mt-1">{{ edu.gpa }}</p>
-                </div>
-                <span class="text-xs text-[var(--on-surface-variant)] whitespace-nowrap">{{ edu.period }}</span>
-              </div>
-            </div>
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">毕业年份</label>
+            <input v-model="form.graduationYear" type="number" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
           </div>
-
-          <!-- 技能特长与技术栈 -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
-                <span class="material-symbols-outlined text-[var(--primary)]">psychology</span>
-                <h3 class="font-bold text-[var(--on-surface)]">技能特长与技术栈</h3>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="text-xs text-[var(--on-surface-variant)]">已选 8 项核心技能</span>
-                <button class="text-xs text-gray-400 hover:text-[var(--on-surface-variant)] flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">visibility_off</span>隐藏模块
-                </button>
-              </div>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-3">
-              <template v-for="(skill, i) in skills" :key="i">
-                <span v-if="i < 2"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1a56db] text-white rounded-lg text-xs font-medium">
-                  {{ skill }}
-                  <button @click="skills.splice(i, 1)" class="hover:text-white/70"><span class="material-symbols-outlined text-[14px]">close</span></button>
-                </span>
-                <span v-else
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#eef2ff] text-[var(--primary)] rounded-lg text-xs font-medium border border-[var(--primary)]/20">
-                  {{ skill }}
-                  <button @click="skills.splice(i, 1)" class="hover:text-[var(--primary)]/70"><span class="material-symbols-outlined text-[14px]">close</span></button>
-                </span>
-              </template>
-              <button class="px-3 py-1.5 bg-gray-50 text-gray-500 rounded-lg text-xs font-medium border border-dashed border-gray-300 hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors">
-                + 自定义添加技能
-              </button>
-            </div>
-            <div class="bg-[#eef2ff]/50 rounded-lg p-3 flex items-center gap-2">
-              <span class="material-symbols-outlined text-[var(--primary)] text-sm">lightbulb</span>
-              <span class="text-xs text-[var(--on-surface-variant)]">已自动关联大模型岗位高频检索词：8项技能全部命中校招算法岗 Top 10 核心标准。</span>
-            </div>
-          </div>
-
-          <!-- 工作与实习经历 -->
-          <div class="bg-white rounded-2xl border border-[var(--primary)]/20 shadow-sm p-5">
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
-                <span class="material-symbols-outlined text-[var(--primary)]">work</span>
-                <h3 class="font-bold text-[var(--on-surface)]">工作与实习经历</h3>
-                <span class="px-2 py-0.5 bg-[var(--primary)]/10 text-[var(--primary)] text-[10px] font-semibold rounded-full border border-[var(--primary)]/20">当前聚焦编辑</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="text-xs text-[var(--on-surface-variant)]">按照「时间倒序」撰写，建议结合 STAR 原则并突出可量化业务贡献</span>
-                <div class="flex items-center gap-1">
-                  <button class="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50"><span class="material-symbols-outlined text-[14px]">expand_less</span></button>
-                  <button class="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50"><span class="material-symbols-outlined text-[14px]">expand_more</span></button>
-                </div>
-                <button class="text-xs text-gray-400 hover:text-[var(--on-surface-variant)] flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">visibility_off</span>隐藏模块
-                </button>
-              </div>
-            </div>
-            <!-- Experience Entry 1 - Expanded -->
-            <div class="border border-[var(--primary)]/30 rounded-xl p-5 mb-4 bg-[#eef2ff]/30">
-              <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-[var(--primary)] text-lg">deployed_code</span>
-                  <h4 class="font-bold text-sm text-[var(--on-surface)]">经历 #1 · 深度学习与大模型推理优化</h4>
-                </div>
-                <button class="text-xs text-red-500 hover:underline flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">delete</span>删除本项
-                </button>
-              </div>
-              <div class="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">企业 / 科研院所名称 *</label>
-                  <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 text-[16px]">apartment</span>
-                    <input v-model="workExp1.company" type="text" class="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">职位名称 *</label>
-                  <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 text-[16px]">badge</span>
-                    <input v-model="workExp1.position" type="text" class="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">在职起止时间 *</label>
-                  <div class="flex items-center gap-2">
-                    <input v-model="workExp1.start" type="text" class="flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
-                    <span class="text-[var(--primary)] font-bold text-sm">至今（在职）</span>
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">所属团队 / 导师</label>
-                  <input v-model="workExp1.team" type="text" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">工作内容与成果（遵循 STAR 法则：情境、任务、行动、结果）</label>
-                <div class="border border-gray-200 rounded-xl overflow-hidden">
-                  <!-- Toolbar -->
-                  <div class="flex items-center gap-1 px-3 py-2 border-b border-gray-100 bg-gray-50">
-                    <button class="w-7 h-7 rounded flex items-center justify-center hover:bg-gray-200 text-sm font-bold">B</button>
-                    <button class="w-7 h-7 rounded flex items-center justify-center hover:bg-gray-200 text-sm italic">I</button>
-                    <button class="w-7 h-7 rounded flex items-center justify-center hover:bg-gray-200"><span class="material-symbols-outlined text-[14px]">format_list_numbered</span></button>
-                    <button class="w-7 h-7 rounded flex items-center justify-center hover:bg-gray-200"><span class="material-symbols-outlined text-[14px]">undo</span></button>
-                    <button class="w-7 h-7 rounded flex items-center justify-center hover:bg-gray-200"><span class="material-symbols-outlined text-[14px]">redo</span></button>
-                    <div class="h-4 w-px bg-gray-300 mx-1"></div>
-                    <button class="flex items-center gap-1 px-2 py-1 text-[var(--primary)] text-xs font-medium hover:bg-[var(--primary)]/5 rounded">
-                      <span class="material-symbols-outlined text-[14px]">auto_fix_high</span>AI 代写优化
-                    </button>
-                  </div>
-                  <textarea v-model="workExp1.desc" rows="8"
-                    class="w-full px-4 py-3 text-sm leading-relaxed focus:outline-none resize-none"></textarea>
-                </div>
-                <div class="flex items-center justify-between mt-2">
-                  <span class="text-xs text-[var(--primary)] flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[12px]">check_circle</span>
-                    已检测到 4 处高质量量化数据与关键成果指标
-                  </span>
-                  <span class="text-xs text-[var(--on-surface-variant)]">字数：238 / 1000</span>
-                </div>
-              </div>
-            </div>
-            <!-- Experience Entry 2 - Collapsed -->
-            <div class="border border-gray-200 rounded-xl p-4 mb-4 hover:border-gray-300 transition-colors">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-gray-400 text-lg">drag_indicator</span>
-                <div class="flex-1">
-                  <div class="flex items-center gap-2">
-                    <span class="text-sm font-bold text-[var(--on-surface)]">腾讯科技（深圳）有限公司 · 后台开发实习生（微信事业群）</span>
-                  </div>
-                  <p class="text-xs text-[var(--on-surface-variant)] mt-0.5">2023.07 — 2023.10 | 核心业务接口高并发重构与微服务容器化</p>
-                </div>
-                <button class="text-xs text-[var(--primary)] hover:underline">展开修改</button>
-              </div>
-            </div>
-            <!-- Add Button -->
-            <button class="w-full py-3 border border-dashed border-gray-300 rounded-xl text-sm text-[var(--primary)] font-medium hover:bg-blue-50/30 transition-colors flex items-center justify-center gap-2">
-              <span class="material-symbols-outlined text-[16px]">add_circle</span>
-              添加一段工作 / 实习经历
-            </button>
-          </div>
-
-          <!-- 项目经历 -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
-                <span class="material-symbols-outlined text-[var(--primary)]">folder_open</span>
-                <h3 class="font-bold text-[var(--on-surface)]">项目经历</h3>
-              </div>
-              <div class="flex items-center gap-3">
-                <button class="text-xs text-[var(--primary)] hover:underline flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">add</span>添加项目
-                </button>
-                <button class="text-xs text-gray-400 hover:text-[var(--on-surface-variant)] flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">visibility_off</span>隐藏模块
-                </button>
-              </div>
-            </div>
-            <!-- Project Card -->
-            <div class="border border-gray-100 rounded-xl p-5 mb-4">
-              <div class="flex items-start justify-between mb-2">
-                <div>
-                  <div class="flex items-center gap-2">
-                    <span class="text-sm font-bold text-[var(--on-surface)]">"智绘校园"多模态智能问答与学术文献解析系统</span>
-                    <span class="px-2 py-0.5 bg-[var(--primary)]/10 text-[var(--primary)] text-[10px] font-semibold rounded border border-[var(--primary)]/20">核心主导研发</span>
-                  </div>
-                </div>
-                <span class="text-xs text-[var(--on-surface-variant)]">2023.11 — 2024.04</span>
-              </div>
-              <div class="flex items-center gap-4 text-xs text-[var(--on-surface-variant)] mb-3">
-                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">link</span> Github: github.com/linchen/campus-rag-agent</span>
-                <span class="flex items-center gap-1"><span class="text-[var(--primary)]">★</span> Star 1.2k+</span>
-              </div>
-              <p class="text-xs text-[var(--on-surface-variant)] leading-relaxed mb-4">【项目背景与架构】该项目为北京大学产学研协同创新课题。针对校内跨学院万级 PDF 论文与学籍规章文档，设计基于 Milvus 向量检索与混合重排 (Hybrid BGE-Reranker) 的 RAG 智能中枢。</p>
-              <p class="text-xs text-[var(--on-surface-variant)] leading-relaxed mb-4">【个人核心产出】从零自研多模态文档切分与版面分析模块，准确率达 94.6%；引入动态上下文窗口自适应压缩策略，有效抑制大模型幻觉，使问答真实度提升 28.5%，服务全校逾 18,000 名师生。</p>
-              <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-50">
-                <button class="text-xs text-[var(--on-surface-variant)] hover:text-[var(--primary)] flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">edit</span>编辑
-                </button>
-                <button class="text-xs text-red-500 hover:underline flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[12px]">delete</span>删除
-                </button>
-              </div>
-            </div>
-            <!-- Add Button -->
-            <button class="w-full py-3 border border-dashed border-gray-300 rounded-xl text-sm text-[var(--primary)] font-medium hover:bg-blue-50/30 transition-colors flex items-center justify-center gap-2">
-              <span class="material-symbols-outlined text-[16px]">add</span>
-              + 添加更多学术项目 / 个人独立开发开源作品
-            </button>
-          </div>
-
-          <!-- Module Suggestions -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center">
-            <span class="material-symbols-outlined text-3xl text-gray-300 mb-2 block">widgets</span>
-            <h4 class="font-bold text-sm text-[var(--on-surface)] mb-1">丰富简历模块，打造高分竞争力</h4>
-            <p class="text-xs text-[var(--on-surface-variant)] mb-4">点击下方卡片快速启用未开启模块，或在右侧控制台自由配置排序与显隐</p>
-            <div class="flex items-center justify-center gap-3">
-              <button class="px-4 py-2 bg-gray-50 text-gray-600 rounded-xl text-xs font-medium border border-gray-200 hover:bg-gray-100 transition-colors flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[14px]">emoji_events</span>+ 荣誉证书
-              </button>
-              <button class="px-4 py-2 bg-gray-50 text-gray-600 rounded-xl text-xs font-medium border border-gray-200 hover:bg-gray-100 transition-colors flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[14px]">edit_note</span>+ 自我评价
-              </button>
-              <button class="px-4 py-2 bg-gray-50 text-gray-600 rounded-xl text-xs font-medium border border-gray-200 hover:bg-gray-100 transition-colors flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[14px]">school</span>+ 校园经历
-              </button>
-              <button class="px-4 py-2 bg-gray-50 text-gray-600 rounded-xl text-xs font-medium border border-gray-200 hover:bg-gray-100 transition-colors flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[14px]">favorite</span>+ 兴趣爱好
-              </button>
-              <button class="px-4 py-2 bg-[var(--primary)]/10 text-[var(--primary)] rounded-xl text-xs font-medium border border-[var(--primary)]/20 hover:bg-[var(--primary)]/15 transition-colors flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[14px]">dashboard</span>+ 新增自定义模块
-              </button>
-            </div>
+          <div class="lg:col-span-2">
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">专业</label>
+            <input v-model="form.major" type="text" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
           </div>
         </div>
+      </div>
 
-        <!-- Right Sidebar -->
-        <div class="w-[280px] shrink-0 space-y-4">
-          <!-- 信息模块 -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-            <div class="flex items-center gap-4 mb-4 border-b border-gray-100 pb-3">
-              <button class="text-xs font-bold text-[var(--primary)] border-b-2 border-[var(--primary)] pb-3 -mb-[13px] flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[14px]">view_module</span>信息模块
-              </button>
-              <button class="text-xs text-gray-400 flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[14px]">sort</span>排序设置
-              </button>
-            </div>
-            <div class="flex items-center justify-between mb-3">
-              <p class="text-[11px] text-[var(--on-surface-variant)] flex items-center gap-1">
-                <span class="material-symbols-outlined text-[12px]">toggle_on</span> 开关控制简历页面显隐
-              </p>
-              <button class="text-[11px] text-[var(--primary)] flex items-center gap-1">
-                <span class="material-symbols-outlined text-[12px]">add_circle</span>自定义模块
-              </button>
-            </div>
-            <div class="space-y-1">
-              <div v-for="mod in modules" :key="mod.key" class="flex items-center justify-between py-2.5 px-2 rounded-lg hover:bg-gray-50 transition-colors">
-                <div class="flex items-center gap-2.5">
-                  <span :class="['material-symbols-outlined text-[16px]', mod.enabled ? 'text-[var(--primary)]' : 'text-gray-400']">{{ mod.icon }}</span>
-                  <span class="text-xs text-[var(--on-surface)] font-medium">{{ mod.label }}</span>
-                  <span v-if="mod.required" class="px-1.5 py-0.5 bg-red-50 text-red-500 text-[9px] font-semibold rounded border border-red-100">必填</span>
-                </div>
-                <button @click="mod.enabled = !mod.enabled"
-                  :class="['relative w-10 h-5 rounded-full transition-colors',
-                    mod.enabled ? 'bg-[#1a56db]' : 'bg-[#c7d2fe]']">
-                  <span :class="['absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform',
-                    mod.enabled ? 'left-[22px]' : 'left-0.5']"></span>
-                </button>
-              </div>
-            </div>
+      <!-- 3. 求职意向 -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
+          <span class="material-symbols-outlined text-[var(--primary)]">target</span>
+          <h3 class="font-bold text-[var(--on-surface)]">求职意向</h3>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">期望城市（逗号分隔）</label>
+            <input v-model="form.expectCity" type="text" placeholder="北京、上海、深圳" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
           </div>
-
-          <!-- 2025届校招算法岗热度 -->
-          <div class="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 rounded-2xl border border-blue-100 p-5">
-            <div class="flex items-center gap-2 mb-3">
-              <span class="material-symbols-outlined text-[var(--primary)] text-lg">local_fire_department</span>
-              <h4 class="font-bold text-sm text-[var(--on-surface)]">2025届校招算法岗热度</h4>
-            </div>
-            <p class="text-xs text-[var(--on-surface-variant)] leading-relaxed">当前平台已有 <span class="font-bold text-[var(--primary)]">1,420+</span> 家校招合作企业发布大模型/算法岗，完成项目经历填写后将自动点亮「优先投递专享」内推免笔试特权。</p>
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">期望行业</label>
+            <input v-model="form.expectIndustry" type="text" placeholder="互联网、人工智能" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
+          </div>
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">期望岗位类型</label>
+            <input v-model="form.expectJobType" type="text" placeholder="算法工程师 / 全栈研发" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
+          </div>
+          <div>
+            <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">期望薪资</label>
+            <input v-model="form.expectSalary" type="text" placeholder="25k-40k / 月（可面议）" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
           </div>
         </div>
+      </div>
+
+      <!-- 4. 技能特长 -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
+          <span class="material-symbols-outlined text-[var(--primary)]">psychology</span>
+          <h3 class="font-bold text-[var(--on-surface)]">技能特长</h3>
+        </div>
+        <div class="flex flex-wrap gap-2 mb-3">
+          <span v-for="(skill, i) in skillList" :key="i"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#eef2ff] text-[var(--primary)] rounded-lg text-xs font-medium border border-[var(--primary)]/20">
+            {{ skill }}
+            <button @click="removeSkill(i)" class="hover:text-red-500"><span class="material-symbols-outlined text-[14px]">close</span></button>
+          </span>
+          <span v-if="skillList.length === 0" class="text-xs text-gray-400">暂无技能，添加一个吧</span>
+        </div>
+        <div class="flex gap-2">
+          <input v-model="newSkill" type="text" placeholder="输入技能名称，如 Python / Vue / MySQL" @keyup.enter="addSkill"
+            class="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
+          <button @click="addSkill" class="px-4 py-2 bg-[var(--primary)]/10 text-[var(--primary)] rounded-xl text-xs font-semibold hover:bg-[var(--primary)]/20 transition-colors">添加技能</button>
+        </div>
+      </div>
+
+      <!-- 5. 实习/工作经历 -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
+            <span class="material-symbols-outlined text-[var(--primary)]">work</span>
+            <h3 class="font-bold text-[var(--on-surface)]">实习 / 工作经历</h3>
+          </div>
+          <button @click="addWork" class="text-xs text-[var(--primary)] hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">add</span>添加一段经历
+          </button>
+        </div>
+        <div v-for="(exp, i) in workList" :key="i" class="border border-gray-100 rounded-xl p-4 mb-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-[11px] text-[var(--on-surface-variant)] mb-1">公司名称</label>
+              <input v-model="exp.company" type="text" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[var(--primary)]" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-[var(--on-surface-variant)] mb-1">职位</label>
+              <input v-model="exp.position" type="text" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[var(--primary)]" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-[var(--on-surface-variant)] mb-1">开始时间</label>
+              <input v-model="exp.start" type="text" placeholder="2024.06" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[var(--primary)]" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-[var(--on-surface-variant)] mb-1">结束时间</label>
+              <input v-model="exp.end" type="text" placeholder="至今" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[var(--primary)]" />
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="block text-[11px] text-[var(--on-surface-variant)] mb-1">工作内容与成果</label>
+            <textarea v-model="exp.desc" rows="3" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[var(--primary)]"></textarea>
+          </div>
+          <button @click="removeWork(i)" class="mt-2 text-xs text-red-400 hover:text-red-500 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">delete_outline</span>删除该经历
+          </button>
+        </div>
+        <p v-if="workList.length === 0" class="text-xs text-gray-400">暂无经历，点击右上角「添加一段经历」。</p>
+      </div>
+
+      <!-- 6. 项目经历 -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
+            <span class="material-symbols-outlined text-[var(--primary)]">folder_open</span>
+            <h3 class="font-bold text-[var(--on-surface)]">项目经历</h3>
+          </div>
+          <button @click="addProject" class="text-xs text-[var(--primary)] hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">add</span>添加项目
+          </button>
+        </div>
+        <div v-for="(proj, i) in projectList" :key="i" class="border border-gray-100 rounded-xl p-4 mb-3">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] text-[var(--on-surface-variant)] mb-1">项目名称</label>
+              <input v-model="proj.name" type="text" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[var(--primary)]" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-[var(--on-surface-variant)] mb-1">担任角色</label>
+              <input v-model="proj.role" type="text" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[var(--primary)]" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-[var(--on-surface-variant)] mb-1">时间</label>
+              <input v-model="proj.period" type="text" placeholder="2023.12 — 2024.05" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[var(--primary)]" />
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="block text-[11px] text-[var(--on-surface-variant)] mb-1">项目描述与成果</label>
+            <textarea v-model="proj.desc" rows="3" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[var(--primary)]"></textarea>
+          </div>
+          <button @click="removeProject(i)" class="mt-2 text-xs text-red-400 hover:text-red-500 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">delete_outline</span>删除该项目
+          </button>
+        </div>
+        <p v-if="projectList.length === 0" class="text-xs text-gray-400">暂无项目，点击右上角「添加项目」。</p>
+      </div>
+
+      <!-- 7. 自我介绍 -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
+          <span class="material-symbols-outlined text-[var(--primary)]">edit_note</span>
+          <h3 class="font-bold text-[var(--on-surface)]">自我介绍</h3>
+        </div>
+        <textarea v-model="form.selfIntroduction" rows="5" placeholder="简要介绍自己的技术方向、优势与求职目标..."
+          class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10"></textarea>
+      </div>
+
+      <!-- 8. 附件与作品图片 -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-1 h-5 bg-[var(--primary)] rounded-full"></span>
+            <span class="material-symbols-outlined text-[var(--primary)]">attach_file</span>
+            <h3 class="font-bold text-[var(--on-surface)]">附件与作品图片</h3>
+          </div>
+          <button @click="triggerAttach" class="text-xs text-[var(--primary)] hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">add_photo_alternate</span>
+            {{ attaching ? '上传中...' : '上传图片' }}
+          </button>
+        </div>
+        <div v-if="attachmentList.length" class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+          <div v-for="(att, i) in attachmentList" :key="att" class="relative group">
+            <img :src="att" alt="附件图片" class="w-full h-24 object-cover rounded-xl border border-gray-100" />
+            <button @click="removeAttachment(i)" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full hidden group-hover:flex items-center justify-center shadow">
+              <span class="material-symbols-outlined text-[14px]">close</span>
+            </button>
+          </div>
+        </div>
+        <p v-else class="text-xs text-gray-400">可上传作品截图、证书扫描件等图片，随简历一起提交给 HR。</p>
+        <input ref="attachInput" type="file" accept="image/*" class="hidden" @change="onAttachChange" />
+      </div>
+
+      <!-- Bottom Save Bar -->
+      <div class="flex justify-end gap-3 pb-10">
+        <button @click="router.push('/resume/manage')" class="px-6 py-2.5 bg-white text-[var(--on-surface)] rounded-xl text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors">
+          取消
+        </button>
+        <button @click="handleSave" :disabled="saving" class="px-8 py-2.5 bg-[var(--primary)] text-white rounded-xl text-sm font-semibold hover:bg-[var(--primary-container)] transition-colors disabled:opacity-50">
+          {{ saving ? '保存中...' : '保存简历' }}
+        </button>
       </div>
     </div>
 
+    <!-- Toast -->
+    <div v-if="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 bg-[var(--on-surface)] text-white rounded-xl shadow-lg text-sm font-medium z-[110]">
+      {{ toast }}
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
 import { getResumeInfo, saveResume, updateResume } from '../api/resume'
+import { uploadImage } from '../api/upload'
 
-const router = useRouter()
 const route = useRoute()
+const router = useRouter()
 const store = useAppStore()
 const saving = ref(false)
+const toast = ref('')
+const newSkill = ref('')
 const resumeId = computed(() => route.query.id ? Number(route.query.id) : null)
-
-const activeStep = ref(0)
-
-const steps = [
-  { key: 'basic', label: '基本信息' },
-  { key: 'career', label: '求职意向' },
-  { key: 'education', label: '教育背景' },
-  { key: 'skills', label: '技能特长' },
-  { key: 'work', label: '工作经历' },
-  { key: 'project', label: '项目经历' }
-]
 
 const form = reactive({
   title: '我的简历',
@@ -480,10 +308,10 @@ const form = reactive({
   birthDate: '',
   phone: '',
   email: '',
-  education: 1,
+  education: '本科',
   school: '',
   major: '',
-  graduationYear: 2025,
+  graduationYear: 2026,
   workStatus: 1,
   expectCity: '',
   expectIndustry: '',
@@ -497,72 +325,129 @@ const form = reactive({
   attachments: '[]'
 })
 
+const skillList = ref([])
+const workList = ref([])
+const projectList = ref([])
+const attachmentList = ref([])
+const attachInput = ref(null)
+const attaching = ref(false)
+
+function showToast(msg) {
+  toast.value = msg
+  setTimeout(() => { toast.value = '' }, 2500)
+}
+
+function parseList(field) {
+  if (Array.isArray(field)) return field
+  if (typeof field === 'string') {
+    try {
+      const v = JSON.parse(field)
+      return Array.isArray(v) ? v : []
+    } catch { /* ignore */ }
+  }
+  return []
+}
+
 onMounted(async () => {
+  if (store.user) {
+    form.name = form.name || store.user.name || ''
+    form.phone = form.phone || store.user.phone || ''
+  }
   if (resumeId.value) {
     try {
       const data = await getResumeInfo(resumeId.value)
       Object.keys(form).forEach(key => {
         if (data[key] !== null && data[key] !== undefined) form[key] = data[key]
       })
+      skillList.value = parseList(form.skills)
+      workList.value = parseList(form.experiences)
+      projectList.value = parseList(form.projects)
+      attachmentList.value = parseList(form.attachments)
     } catch (e) {
-      console.error('加载简历失败:', e)
+      showToast('加载简历失败：' + (e.message || '请重试'))
     }
-  } else if (store.user) {
-    form.name = store.user.name || ''
-    form.phone = store.user.phone || ''
   }
 })
 
-const skills = computed(() => {
-  try { return JSON.parse(form.skills || '[]') } catch { return [] }
-})
+function addSkill() {
+  const s = newSkill.value.trim()
+  if (!s) return
+  if (skillList.value.includes(s)) { newSkill.value = ''; return }
+  skillList.value.push(s)
+  newSkill.value = ''
+}
+
+function removeSkill(i) {
+  skillList.value.splice(i, 1)
+}
+
+function addWork() {
+  workList.value.push({ company: '', position: '', start: '', end: '', desc: '' })
+}
+
+function removeWork(i) {
+  workList.value.splice(i, 1)
+}
+
+function addProject() {
+  projectList.value.push({ name: '', role: '', period: '', desc: '' })
+}
+
+function removeProject(i) {
+  projectList.value.splice(i, 1)
+}
+
+function triggerAttach() {
+  attachInput.value && attachInput.value.click()
+}
+
+async function onAttachChange(e) {
+  const file = e.target.files && e.target.files[0]
+  e.target.value = ''
+  if (!file) return
+  if (!file.type.startsWith('image/')) { showToast('请选择图片文件'); return }
+  attaching.value = true
+  try {
+    const url = await uploadImage(file)
+    attachmentList.value.push(url)
+    showToast('图片上传成功')
+  } catch (err) {
+    showToast(err.message || '上传失败，请重试')
+  } finally {
+    attaching.value = false
+  }
+}
+
+function removeAttachment(i) {
+  attachmentList.value.splice(i, 1)
+}
 
 async function handleSave() {
+  if (!form.title.trim()) { showToast('请填写简历标题'); return }
+  if (!form.name.trim()) { showToast('请填写姓名'); return }
   saving.value = true
   try {
+    // 把可编辑列表序列化回 JSON 字段
+    form.skills = JSON.stringify(skillList.value)
+    form.experiences = JSON.stringify(workList.value.filter(e => e.company || e.position))
+    form.projects = JSON.stringify(projectList.value.filter(p => p.name))
+    form.attachments = JSON.stringify(attachmentList.value)
+    const payload = { ...form }
+    // 空字符串日期后端无法转 LocalDate，置为 null
+    if (!payload.birthDate) payload.birthDate = null
     if (resumeId.value) {
-      await updateResume(resumeId.value, form)
+      await updateResume(resumeId.value, payload)
+      showToast('简历已更新')
     } else {
-      const newId = await saveResume(form)
-      router.replace({ query: { id: newId } })
+      await saveResume(payload)
+      showToast('简历创建成功')
     }
-    alert('保存成功')
+    // 保存成功跳回「我的简历」档案库
+    setTimeout(() => router.push('/resume/manage'), 500)
   } catch (e) {
-    console.error('保存简历失败:', e)
-    alert(e.message || '保存失败，请重试')
+    showToast(e.message || '保存失败，请重试')
   } finally {
     saving.value = false
   }
-}
-
-const educations = reactive([
-  { school: '', tags: [], major: '', gpa: '', period: '' }
-])
-
-const workExp1 = reactive({
-  company: '', position: '', start: '', end: '', team: '', desc: ''
-})
-
-const modules = reactive([
-  { key: 'basic', label: '基本信息', icon: 'person', enabled: true, required: true },
-  { key: 'career', label: '求职意向', icon: 'flag', enabled: true, required: false },
-  { key: 'education', label: '教育经历', icon: 'school', enabled: true, required: false },
-  { key: 'work', label: '工作经验', icon: 'work', enabled: true, required: false },
-  { key: 'project', label: '项目经验', icon: 'folder_open', enabled: true, required: false },
-  { key: 'intern', label: '实习经验', icon: 'business_center', enabled: true, required: false },
-  { key: 'campus', label: '校园经历', icon: 'groups', enabled: false, required: false },
-  { key: 'skills', label: '技能特长', icon: 'psychology', enabled: true, required: false },
-  { key: 'awards', label: '荣誉证书', icon: 'emoji_events', enabled: false, required: false },
-  { key: 'self', label: '自我评价', icon: 'edit_note', enabled: false, required: false },
-  { key: 'hobby', label: '兴趣爱好', icon: 'favorite', enabled: false, required: false },
-  { key: 'custom', label: '自定义模块', icon: 'dashboard', enabled: false, required: false }
-])
-
-function prevStep() {
-  if (activeStep.value > 0) activeStep.value--
-}
-
-function nextStep() {
-  if (activeStep.value < steps.length - 1) activeStep.value++
 }
 </script>

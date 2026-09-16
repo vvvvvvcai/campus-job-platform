@@ -23,3 +23,7 @@ export function updateJob(id, data) {
 export function updateJobStatus(id, status) {
   return request.put(`/job/status/${id}`, null, { params: { status } })
 }
+
+export function getCompanyJobList(companyId) {
+  return request.get('/job/company/list', { params: { companyId } })
+}

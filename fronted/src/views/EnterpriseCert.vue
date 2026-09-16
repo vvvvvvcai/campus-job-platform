@@ -268,9 +268,9 @@
                 class="border-2 border-dashed border-surface-container-high rounded-2xl p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all"
                 @click="triggerUpload('license')">
                 <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span class="material-symbols-outlined text-primary text-3xl">cloud_upload</span>
+                  <span class="material-symbols-outlined text-primary text-3xl">{{ uploading.license ? 'hourglass_top' : 'cloud_upload' }}</span>
                 </div>
-                <p class="text-body-md text-on-surface font-medium">点击或将文件拖拽至此处上传</p>
+                <p class="text-body-md text-on-surface font-medium">{{ uploading.license ? '上传中...' : '点击上传本地图片' }}</p>
                 <p class="text-xs text-on-surface-variant mt-2">需保证企业名称、社会信用代码、法定代表人印章清晰无遮挡</p>
                 <p class="text-xs text-on-surface-variant mt-2 flex items-center justify-center gap-1">
                   <span class="material-symbols-outlined text-sm text-primary">info</span>
@@ -279,15 +279,12 @@
               </div>
               <div v-else class="border border-surface-container-high rounded-2xl p-4">
                 <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-primary text-xl">description</span>
+                  <img :src="form.businessLicense" alt="营业执照" class="w-20 h-14 object-cover rounded-lg border border-surface-container-high" />
                   <div class="flex-1 min-w-0">
-                    <p class="text-body-sm text-on-surface font-medium truncate">{{ form.businessLicense }}</p>
-                    <p class="text-xs text-on-surface-variant">3.4 MB</p>
+                    <p class="text-body-sm text-on-surface font-medium">营业执照已上传</p>
+                    <p class="text-xs text-on-surface-variant truncate">{{ form.businessLicense }}</p>
                   </div>
-                  <span class="flex items-center gap-1 text-xs text-emerald-600 font-medium">
-                    <span class="material-symbols-outlined text-sm">auto_fix_high</span>
-                    OCR已解析
-                  </span>
+                  <button @click="triggerUpload('license')" class="text-xs text-primary hover:underline">更换</button>
                   <button @click="form.businessLicense = ''" class="p-1 hover:bg-surface-container rounded-lg transition-colors">
                     <span class="material-symbols-outlined text-on-surface-variant text-lg">delete</span>
                   </button>
@@ -307,17 +304,18 @@
                   class="border-2 border-dashed border-surface-container-high rounded-2xl p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all"
                   @click="triggerUpload('idcard-front')">
                   <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-surface-container flex items-center justify-center">
-                    <span class="material-symbols-outlined text-on-surface-variant text-xl">credit_card</span>
+                    <span class="material-symbols-outlined text-on-surface-variant text-xl">{{ uploading.idfront ? 'hourglass_top' : 'credit_card' }}</span>
                   </div>
                   <p class="text-xs text-on-surface font-medium">身份证人像面</p>
-                  <p class="text-xs text-on-surface-variant mt-1">点击上传</p>
+                  <p class="text-xs text-on-surface-variant mt-1">{{ uploading.idfront ? '上传中...' : '点击上传' }}</p>
                 </div>
-                <div v-else class="border border-surface-container-high rounded-2xl p-4">
+                <div v-else class="border border-surface-container-high rounded-2xl p-3">
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary text-lg">credit_card</span>
+                    <img :src="form.idCardFront" alt="身份证人像面" class="w-20 h-12 object-cover rounded-lg border border-surface-container-high" />
                     <div class="flex-1 min-w-0">
-                      <p class="text-xs text-on-surface font-medium truncate">{{ form.idCardFront }}</p>
+                      <p class="text-xs text-on-surface font-medium">人像面已上传</p>
                     </div>
+                    <button @click="triggerUpload('idcard-front')" class="text-[10px] text-primary hover:underline">更换</button>
                     <button @click="form.idCardFront = ''" class="p-1 hover:bg-surface-container rounded">
                       <span class="material-symbols-outlined text-on-surface-variant text-sm">close</span>
                     </button>
@@ -329,17 +327,18 @@
                   class="border-2 border-dashed border-surface-container-high rounded-2xl p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all"
                   @click="triggerUpload('idcard-back')">
                   <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-surface-container flex items-center justify-center">
-                    <span class="material-symbols-outlined text-on-surface-variant text-xl">credit_card</span>
+                    <span class="material-symbols-outlined text-on-surface-variant text-xl">{{ uploading.idback ? 'hourglass_top' : 'credit_card' }}</span>
                   </div>
                   <p class="text-xs text-on-surface font-medium">身份证国徽面</p>
-                  <p class="text-xs text-on-surface-variant mt-1">点击上传</p>
+                  <p class="text-xs text-on-surface-variant mt-1">{{ uploading.idback ? '上传中...' : '点击上传' }}</p>
                 </div>
-                <div v-else class="border border-surface-container-high rounded-2xl p-4">
+                <div v-else class="border border-surface-container-high rounded-2xl p-3">
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary text-lg">credit_card</span>
+                    <img :src="form.idCardBack" alt="身份证国徽面" class="w-20 h-12 object-cover rounded-lg border border-surface-container-high" />
                     <div class="flex-1 min-w-0">
-                      <p class="text-xs text-on-surface font-medium truncate">{{ form.idCardBack }}</p>
+                      <p class="text-xs text-on-surface font-medium">国徽面已上传</p>
                     </div>
+                    <button @click="triggerUpload('idcard-back')" class="text-[10px] text-primary hover:underline">更换</button>
                     <button @click="form.idCardBack = ''" class="p-1 hover:bg-surface-container rounded">
                       <span class="material-symbols-outlined text-on-surface-variant text-sm">close</span>
                     </button>
@@ -351,6 +350,11 @@
           </div>
         </div>
       </div>
+
+      <!-- 隐藏的文件选择框 -->
+      <input ref="licenseInput" type="file" accept="image/*" class="hidden" @change="onFileChange($event, 'license')" />
+      <input ref="idFrontInput" type="file" accept="image/*" class="hidden" @change="onFileChange($event, 'idcard-front')" />
+      <input ref="idBackInput" type="file" accept="image/*" class="hidden" @change="onFileChange($event, 'idcard-back')" />
 
       <!-- 企业介绍与校招承诺 -->
       <div class="bg-surface-container-lowest rounded-2xl border border-surface-container-high mb-6">
@@ -398,15 +402,11 @@
             已阅读并全权同意《校园招聘用人单位入驻守则及合规声明》与《全国高校招聘信息安全承诺书》
           </label>
           <div class="flex items-center gap-3">
-            <button @click="saveDraft"
-              class="h-11 px-6 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface font-medium hover:bg-surface-container transition-colors text-sm flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg">draft</span>
-              保存草稿
-            </button>
-            <button @click="submitForm"
-              class="h-11 px-8 rounded-xl bg-primary text-on-primary font-semibold hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2 text-sm">
+            <span class="text-xs text-on-surface-variant">认证状态：<span class="font-semibold text-primary">{{ auditStatusText }}</span><span v-if="auditRemark" class="text-error ml-2">（{{ auditRemark }}）</span></span>
+            <button @click="submitForm" :disabled="submitting"
+              class="h-11 px-8 rounded-xl bg-primary text-on-primary font-semibold hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2 text-sm disabled:opacity-50">
               <span class="material-symbols-outlined text-lg">send</span>
-              提交资质审核
+              {{ submitting ? '提交中...' : (auditStatus === 1 ? '更新企业信息' : '提交资质审核') }}
             </button>
           </div>
         </div>
@@ -421,9 +421,25 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { getCompanyInfo, updateCompanyInfo, auditCompany } from '../api/company'
+import { uploadImage } from '../api/upload'
 
+const router = useRouter()
 const toast = ref('')
+const submitting = ref(false)
+const auditStatus = ref(null)
+const auditRemark = ref('')
+const licenseInput = ref(null)
+const idFrontInput = ref(null)
+const idBackInput = ref(null)
+const uploading = reactive({ license: false, idfront: false, idback: false })
+
+const auditStatusText = computed(() => {
+  const map = { 0: '待审核', 1: '已通过', 2: '已拒绝' }
+  return auditStatus.value != null ? map[auditStatus.value] || '未知' : '未提交'
+})
 
 const form = reactive({
   companyName: '',
@@ -434,33 +450,95 @@ const form = reactive({
   district: '海淀区',
   address: '',
   website: '',
-  hrName: '陈雅静',
-  hrPhone: '18610248890',
-  hrEmail: 'yajing.chen@zhipuai.cn',
-  businessLicense: '北京智谱华章科技有限公司_营业执照副本2024.pdf',
+  hrName: '',
+  hrPhone: '',
+  hrEmail: '',
+  businessLicense: '',
   idCardFront: '',
   idCardBack: '',
-  intro: '北京智谱华章科技有限公司（智谱AI）致力于打造新一代认知智能通用模型，由清华大学计算机系技术成果转化而来。公司核心团队曾主导GLM系列大模型研发，在学术科研与产业赋能层面处于领先水平。我们为2025届应届毕业生设立了专项技术管培生计划，配备顶尖博士导师带教与前沿算力资源，提供极具竞争力的成长通道与薪酬保障。',
-  agreed: true,
-  agreeTerms: true
+  intro: '',
+  agreed: false,
+  agreeTerms: false
+})
+
+onMounted(async () => {
+  try {
+    const info = await getCompanyInfo()
+    if (info) {
+      form.companyName = info.companyName || ''
+      form.industry = info.industry || ''
+      form.scale = info.scale || ''
+      form.address = info.address || ''
+      form.website = info.website || ''
+      form.intro = info.description || ''
+      form.businessLicense = info.licenseUrl || ''
+      auditStatus.value = info.auditStatus
+      auditRemark.value = info.auditRemark || ''
+      if (info.address && info.address.includes('区')) {
+        form.district = info.address.split('区')[0] + '区'
+      }
+    }
+  } catch (e) {
+    console.error('获取企业信息失败:', e)
+  }
 })
 
 function triggerUpload(type) {
-  if (type === 'license') {
-    form.businessLicense = '营业执照_2024.pdf'
-  } else if (type === 'idcard-front') {
-    form.idCardFront = '法人身份证人像面.jpg'
-  } else {
-    form.idCardBack = '法人身份证国徽面.jpg'
+  if (type === 'license') licenseInput.value && licenseInput.value.click()
+  else if (type === 'idcard-front') idFrontInput.value && idFrontInput.value.click()
+  else idBackInput.value && idBackInput.value.click()
+}
+
+async function onFileChange(e, type) {
+  const file = e.target.files && e.target.files[0]
+  e.target.value = '' // 允许再次选择同一文件
+  if (!file) return
+  if (!file.type.startsWith('image/')) { showToast('请选择图片文件（jpg/png 等）'); return }
+  const key = type === 'license' ? 'license' : type === 'idcard-front' ? 'idfront' : 'idback'
+  uploading[key] = true
+  try {
+    const url = await uploadImage(file)
+    if (type === 'license') form.businessLicense = url
+    else if (type === 'idcard-front') form.idCardFront = url
+    else form.idCardBack = url
+    showToast('图片上传成功')
+  } catch (err) {
+    showToast(err.message || '上传失败，请重试')
+  } finally {
+    uploading[key] = false
   }
 }
 
-function saveDraft() {
-  showToast('草稿已保存')
-}
-
-function submitForm() {
-  showToast('资质审核已提交')
+async function submitForm() {
+  if (!form.companyName.trim()) { showToast('请填写企业名称'); return }
+  if (!form.agreed || !form.agreeTerms) { showToast('请勾选诚信声明与协议'); return }
+  submitting.value = true
+  try {
+    // 更新企业基础信息
+    await updateCompanyInfo({
+      companyName: form.companyName.trim(),
+      industry: form.industry,
+      scale: form.scale,
+      address: form.district + (form.address || ''),
+      website: form.website,
+      description: form.intro,
+      licenseUrl: form.businessLicense
+    })
+    // 提交认证申请（auditStatus 0=待审核）
+    await auditCompany({
+      companyName: form.companyName.trim(),
+      licenseUrl: form.businessLicense,
+      description: form.intro
+    })
+    auditStatus.value = 0
+    auditRemark.value = ''
+    showToast('资质认证已提交，等待平台审核')
+    setTimeout(() => router.push('/enterprise/dashboard'), 1000)
+  } catch (e) {
+    showToast(e.message || '提交失败，请重试')
+  } finally {
+    submitting.value = false
+  }
 }
 
 function showToast(msg) {

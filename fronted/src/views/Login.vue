@@ -130,14 +130,10 @@
             ]"
           >密码快捷登录</button>
           <button
-            @click="activeTab = 'sms'"
-            :class="[
-              'flex-1 py-2 rounded-md text-sm font-medium transition-all',
-              activeTab === 'sms'
-                ? 'bg-surface-container-lowest text-primary shadow-sm'
-                : 'text-on-surface-variant hover:text-on-surface'
-            ]"
-          >手机验证码登录</button>
+            @click="smsUnavailable"
+            class="flex-1 py-2 rounded-md text-sm font-medium transition-all text-on-surface-variant/50 cursor-not-allowed flex items-center justify-center gap-1"
+            title="短信服务暂未开通，请使用密码登录"
+          >手机验证码登录<span class="text-[10px]">(暂未开放)</span></button>
         </div>
 
         <!-- Password Login Form -->
@@ -167,7 +163,7 @@
           <div class="space-y-1.5">
             <div class="flex items-center justify-between">
               <label class="block text-xs text-on-surface font-medium">登录密码</label>
-              <a href="#" class="text-xs text-primary hover:underline">忘记密码？</a>
+              <a href="javascript:void(0)" @click="forgetUnavailable" class="text-xs text-primary hover:underline">忘记密码？</a>
             </div>
             <div class="relative">
               <input
@@ -342,7 +338,7 @@ function handlePasswordLogin() {
         data.userId
       )
       showToast('success', '登录成功，正在跳转...')
-      const redirect = route.query.redirect || '/'
+      const redirect = route.query.redirect || (roleStr === 'hr' ? '/enterprise/dashboard' : '/')
       setTimeout(() => router.push(redirect), 800)
     })
     .catch(err => {
@@ -374,6 +370,14 @@ function handleSmsLogin() {
       showToast('error', err.message || '登录失败，请检查手机号和验证码')
     })
     .finally(() => { loading.value = false })
+}
+
+function smsUnavailable() {
+  showToast('error', '短信登录暂未开放，请使用密码登录')
+}
+
+function forgetUnavailable() {
+  showToast('error', '忘记密码功能暂未开放，请联系管理员重置')
 }
 
 function sendSmsCode() {

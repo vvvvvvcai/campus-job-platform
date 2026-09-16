@@ -5,6 +5,7 @@ import com.campus.application.dto.ApplicationSubmitDTO;
 import com.campus.application.service.ApplicationService;
 import com.campus.application.vo.ApplicationInfoVO;
 import com.campus.application.vo.ApplicationListVO;
+import com.campus.application.vo.ResumeInfoVO;
 import com.campus.common.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -66,5 +67,14 @@ public class ApplicationController {
             @ApiParam("页码") @RequestParam(defaultValue = "1") Integer page,
             @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size) {
         return applicationService.getReceivedApplications(userId, companyId, status, page, size);
+    }
+
+    @ApiOperation("企业查看候选人简历（脱敏）")
+    @GetMapping("/resume/{applicationId}")
+    public Result<ResumeInfoVO> getCandidateResume(
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestHeader(value = "X-User-Role", required = false) Integer role,
+            @PathVariable Long applicationId) {
+        return applicationService.getCandidateResume(userId, role, applicationId);
     }
 }

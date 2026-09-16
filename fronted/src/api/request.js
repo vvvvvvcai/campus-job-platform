@@ -30,7 +30,13 @@ request.interceptors.response.use(
   },
   error => {
     console.error('API Error:', error)
-    return Promise.reject(error)
+    // 拼上真实请求路径与状态码，便于定位 404/401 等错误来源
+    const url = error.config && error.config.url ? error.config.url : 'unknown'
+    const status = error.response ? error.response.status : 'no-response'
+    const detail = error.response && error.response.data && error.response.data.message
+      ? error.response.data.message
+      : (status === 'no-response' ? '无法连接到服务器' : error.message)
+    return Promise.reject(new Error(`[${url}] HTTP ${status}${detail ? '：' + detail : ''}`))
   }
 )
 

@@ -19,3 +19,7 @@ export function handleApplication(id, data) {
 export function getReceivedApplications(params) {
   return request.get('/application/received', { params })
 }
+
+export function getCandidateResume(applicationId) {
+  return request.get(`/application/resume/${applicationId}`)
+}

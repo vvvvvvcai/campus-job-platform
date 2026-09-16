@@ -33,7 +33,7 @@
 
     <!-- Filters -->
     <div class="max-w-7xl mx-auto px-6 py-4">
-      <div class="grid grid-cols-4 gap-3">
+      <div class="grid grid-cols-3 gap-3">
         <div class="relative">
           <label class="block text-[11px] text-on-surface-variant mb-1 font-medium">行业类别</label>
           <select v-model="selectedIndustry" @change="handleSearch()" class="w-full h-10 pl-3 pr-8 bg-surface-container-lowest text-on-surface text-xs rounded-lg appearance-none cursor-pointer border border-surface-container-high focus:outline-none focus:border-primary">
@@ -48,30 +48,11 @@
           </select>
           <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 mt-1 text-on-surface-variant text-[16px]">arrow_drop_down</span>
         </div>
-        <div class="relative">
-          <label class="block text-[11px] text-on-surface-variant mb-1 font-medium">学历要求</label>
-          <select v-model="selectedEducation" @change="handleSearch()" class="w-full h-10 pl-3 pr-8 bg-surface-container-lowest text-on-surface text-xs rounded-lg appearance-none cursor-pointer border border-surface-container-high focus:outline-none focus:border-primary">
-            <option v-for="opt in educationOptions" :key="opt" :value="opt">{{ opt }}</option>
-          </select>
-          <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 mt-1 text-on-surface-variant text-[16px]">arrow_drop_down</span>
-        </div>
         <div class="flex items-end">
           <button @click="resetFilters" class="w-full h-10 px-4 text-xs font-medium text-on-surface-variant bg-surface-container-low hover:bg-surface-container rounded-lg transition-colors">
             重置全部筛选
           </button>
         </div>
-      </div>
-
-      <!-- Special Tags -->
-      <div class="flex items-center gap-3 mt-4 flex-wrap">
-        <span class="text-xs text-primary font-semibold flex items-center gap-1 shrink-0">
-          <span class="material-symbols-outlined text-[14px]">school</span>
-          高校就业专区特色筛选项：
-        </span>
-        <label v-for="tag in specialTags" :key="tag" class="flex items-center gap-1.5 cursor-pointer select-none">
-          <input type="checkbox" class="w-3.5 h-3.5 rounded accent-primary cursor-pointer" />
-          <span class="text-xs text-on-surface-variant hover:text-on-surface transition-colors">{{ tag }}</span>
-        </label>
       </div>
     </div>
 
@@ -141,11 +122,11 @@
                   <div class="flex items-center justify-between mt-3 pt-3 border-t border-surface-container-high">
                     <span class="text-[11px] text-on-surface-variant">{{ job.meta }}</span>
                     <div class="flex items-center gap-2">
-                      <button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-primary/5 transition-colors">
-                        <span class="material-symbols-outlined text-[18px]">favorite_border</span>
+                      <button @click.stop="toggleFavorite(job)" :class="['w-8 h-8 rounded-lg flex items-center justify-center transition-colors', job.isFav ? 'text-red-500 hover:bg-red-50' : 'text-on-surface-variant hover:text-primary hover:bg-primary/5']">
+                        <span class="material-symbols-outlined text-[18px]">{{ job.isFav ? 'favorite' : 'favorite_border' }}</span>
                       </button>
-                      <button class="h-8 px-3 rounded-lg text-xs font-medium border border-surface-container-high text-on-surface-variant hover:border-primary hover:text-primary transition-colors">在线沟通</button>
-                      <button @click.stop="requireAuth" class="h-8 px-4 rounded-lg text-xs font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors">立即投递</button>
+                      <button @click.stop="chatUnavailable" class="h-8 px-3 rounded-lg text-xs font-medium border border-surface-container-high text-on-surface-variant hover:border-primary hover:text-primary transition-colors">在线沟通</button>
+                      <button @click.stop="applyJob(job)" class="h-8 px-4 rounded-lg text-xs font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors">立即投递</button>
                     </div>
                   </div>
                 </div>
@@ -175,16 +156,16 @@
                 <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
                 <span class="text-xs font-semibold bg-white/15 px-2 py-0.5 rounded-full">AI 智能就业助手</span>
               </div>
-              <h3 class="text-lg font-bold mb-2">简历匹配度即时诊断</h3>
-              <p class="text-xs text-on-primary/80 leading-relaxed mb-4">上传当前在线简历，AI大模型将根据您的主修课程、项目实操及竞赛经历，一键智能推演匹配度高于 90% 的校招高压冲刺岗位。</p>
-              <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center border border-white/15">
-                <span class="material-symbols-outlined text-3xl text-on-primary/60 mb-2">cloud_upload</span>
-                <p class="text-xs text-on-primary/80">拖拽简历文件或点击选择</p>
-                <p class="text-[10px] text-on-primary/60 mt-1">支持 PDF / DOCX（不超过20MB）</p>
-              </div>
+              <h3 class="text-lg font-bold mb-2">完善简历 · 提高匹配</h3>
+              <p class="text-xs text-on-primary/80 leading-relaxed mb-4">完善在线简历中的教育背景、技能特长与项目经历，让 HR 更快发现你，提升面试邀约率。</p>
+              <router-link to="/resume/manage" class="block bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center border border-white/15 hover:bg-white/15 transition-colors">
+                <span class="material-symbols-outlined text-3xl text-on-primary/80 mb-2 block">description</span>
+                <p class="text-xs text-on-primary font-semibold">前往「我的简历档案库」</p>
+                <p class="text-[10px] text-on-primary/60 mt-1">支持创建最多 5 份针对性简历</p>
+              </router-link>
               <div class="flex items-center justify-between mt-3">
-                <span class="text-[11px] text-on-primary/70">✓ 已对本校 8,420 位同学提供匹配</span>
-                <button class="text-[11px] text-on-primary hover:underline">查看诊断案例</button>
+                <span class="text-[11px] text-on-primary/70">简历完整度越高越容易被 HR 关注</span>
+                <router-link to="/resume/editor" class="text-[11px] text-on-primary hover:underline">去完善简历</router-link>
               </div>
             </div>
           </div>
@@ -199,7 +180,7 @@
               <span class="text-[10px] text-on-surface-variant">每日10:00更新</span>
             </div>
             <div class="space-y-3">
-              <div v-for="(item, i) in hotJobs" :key="i"
+              <div v-for="(item, i) in hotJobs" :key="i" @click="item.jobId && $router.push(`/jobs/${item.jobId}`)"
                 class="flex items-center gap-3 py-1.5 cursor-pointer hover:bg-surface-container-low -mx-2 px-2 rounded-lg transition-colors">
                 <span class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold shrink-0"
                   :class="i < 3 ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface-variant'">{{ i + 1 }}</span>
@@ -208,8 +189,7 @@
                   <p class="text-[10px] text-on-surface-variant">{{ item.company }} · {{ item.city }}</p>
                 </div>
                 <div class="text-right shrink-0">
-                  <span class="text-xs font-bold" :class="i < 3 ? 'text-primary' : 'text-on-surface-variant'">{{ item.score }}</span>
-                  <p class="text-[10px] text-on-surface-variant">{{ item.applicants }}人投递</p>
+                  <span class="text-xs font-bold" :class="i < 3 ? 'text-primary' : 'text-on-surface-variant'">{{ item.applicants }}人投递</span>
                 </div>
               </div>
             </div>
@@ -240,6 +220,11 @@
         </div>
       </div>
     </div>
+
+    <!-- Toast -->
+    <div v-if="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 bg-on-surface text-on-primary rounded-xl shadow-lg text-sm font-medium z-[110]">
+      {{ toast }}
+    </div>
   </div>
 </template>
 
@@ -248,6 +233,8 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
 import { searchJobs, getJobCategories } from '../api/job'
+import { addFavorite, removeFavorite, getFavoriteList } from '../api/favorite'
+import { formatSalary } from '../utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -256,8 +243,9 @@ const searchQuery = ref('')
 const selectedCity = ref('全国')
 const selectedIndustry = ref('不限')
 const selectedJobType = ref('不限')
-const selectedEducation = ref('不限')
 const activeSort = ref('综合排序')
+const favoriteIds = ref(new Set())
+const toast = ref('')
 const sortMap = { '综合排序': '', '最新发布': 'latest', '薪资最高': 'salary', '投递响应最快': 'response' }
 const currentPage = ref(1)
 const totalPages = ref(1)
@@ -270,16 +258,84 @@ function requireAuth() {
   }
 }
 
+function showToast(msg) {
+  toast.value = msg
+  setTimeout(() => { toast.value = '' }, 2500)
+}
+
+function applyJob(job) {
+  if (!store.isLoggedIn) {
+    requireAuth()
+    return
+  }
+  router.push(`/jobs/${job.id}`)
+}
+
+function chatUnavailable() {
+  showToast('在线沟通功能暂未开放')
+}
+
+async function toggleFavorite(job) {
+  if (!store.isLoggedIn) {
+    requireAuth()
+    return
+  }
+  try {
+    if (job.isFav) {
+      await removeFavorite(job.id)
+      job.isFav = false
+      favoriteIds.value.delete(job.id)
+      showToast('已取消收藏')
+    } else {
+      await addFavorite(job.id)
+      job.isFav = true
+      favoriteIds.value.add(job.id)
+      showToast('收藏成功')
+    }
+  } catch (e) {
+    showToast(e.message || '收藏操作失败')
+  }
+}
+
+async function loadFavorites() {
+  if (!store.isLoggedIn) return
+  try {
+    const res = await getFavoriteList()
+    if (Array.isArray(res)) {
+      favoriteIds.value = new Set(res.map(f => f.id))
+      jobs.value.forEach(j => { j.isFav = favoriteIds.value.has(j.id) })
+    }
+  } catch (e) {
+    console.error('获取收藏列表失败:', e)
+  }
+}
+
+async function loadHotJobs() {
+  try {
+    const res = await searchJobs({ sortBy: 'response', pageNum: 1, pageSize: 5 })
+    if (res && res.records) {
+      hotJobs.value = res.records.map(j => ({
+        jobId: j.id,
+        title: j.title,
+        company: j.companyName || '未知企业',
+        city: j.city || '',
+        applicants: j.applyCount || 0
+      }))
+    }
+  } catch (e) {
+    console.error('获取热度榜失败:', e)
+  }
+}
+
 const ALL_CITIES = ['全国', '北京', '上海', '广州', '深圳', '杭州', '南京', '成都', '武汉', '西安', '苏州', '天津', '重庆', '长沙', '郑州', '青岛', '大连', '宁波', '厦门', '合肥', '佛山', '东莞', '无锡', '昆明', '福州', '济南', '哈尔滨', '沈阳', '长春', '贵阳', '南宁', '太原', '石家庄', '兰州', '海口', '银川', '西宁', '拉萨', '呼和浩特', '乌鲁木齐', '台北', '香港', '澳门']
 const cities = ALL_CITIES
 
 const industryOptions = ref(['不限'])
 const jobTypeOptions = ['不限', '全职', '实习', '兼职']
-const educationOptions = ['不限', '大专', '本科', '硕士', '博士']
 
-const specialTags = ['留用转正率 > 80%', '央企国企直属名录', '985/211校友导师通道', '解决户口/提供宿舍', '无需笔试直面业务合伙人']
 const sortTabs = ['综合排序', '最新发布', '薪资最高', '投递响应最快']
 const jobs = ref([])
+const hotJobs = ref([])
 
 const LOGO_COLORS = ['#1a56db', '#006591', '#0a8754', '#0078d4', '#e74c3c', '#8e44ad', '#e67e22', '#1abc9c', '#2c3e50', '#d35400', '#27ae60', '#c0392b']
 
@@ -293,7 +349,6 @@ function resetFilters() {
   selectedCity.value = '全国'
   selectedIndustry.value = '不限'
   selectedJobType.value = '不限'
-  selectedEducation.value = '不限'
   currentPage.value = 1
   fetchJobs()
 }
@@ -330,11 +385,12 @@ async function fetchJobs() {
         logoBg: LOGO_COLORS[i % LOGO_COLORS.length],
         logoText: j.companyName ? j.companyName.charAt(0) : '企',
         badges: [],
-        salary: j.salaryMin && j.salaryMax ? `${j.salaryMin}k-${j.salaryMax}k` : '面议',
+        salary: formatSalary(j.salaryMin, j.salaryMax),
         tags: [j.city, j.education, j.experience, j.jobType === 1 ? '全职' : j.jobType === 2 ? '实习' : '兼职'].filter(Boolean),
         benefits: j.benefits ? j.benefits.split(/[,，、]/).filter(Boolean) : [],
         desc: j.description ? j.description.substring(0, 60) + (j.description.length > 60 ? '...' : '') : '',
-        meta: `${j.viewCount || 0}人看过 · ${j.applyCount || 0}人投递`
+        meta: `${j.viewCount || 0}人看过 · ${j.applyCount || 0}人投递`,
+        isFav: favoriteIds.value.has(j.id)
       }))
       totalJobs.value = res.total || 0
       totalPages.value = res.totalPages || 1
@@ -363,6 +419,8 @@ onMounted(async () => {
     console.error('获取行业类别失败:', e)
   }
   fetchJobs()
+  loadFavorites()
+  loadHotJobs()
 })
 
 watch(() => route.query, (q) => {

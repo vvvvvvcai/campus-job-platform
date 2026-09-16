@@ -5,6 +5,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 主题 CSS 变量（与 tailwind.config.js 中的设计令牌一致，供 bg-[var(--primary)] 等用法引用） */
+:root {
+  --primary: #0037b0;
+  --primary-container: #1d4ed8;
+  --on-primary: #ffffff;
+  --on-surface: #131b2e;
+  --on-surface-variant: #434655;
+  --background: #faf8ff;
+  --surface: #faf8ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f2f3ff;
+  --surface-container: #eaedff;
+  --surface-container-high: #e2e7ff;
+  --secondary-fixed: #c9e6ff;
+  --secondary: #006591;
+  --error: #ba1a1a;
+  --outline: #747686;
+}
+
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
   font-weight: normal;

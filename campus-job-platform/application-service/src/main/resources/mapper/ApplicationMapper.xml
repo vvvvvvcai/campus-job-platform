@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.application.mapper.ApplicationMapper">
+
+    <select id="selectApplicationList" resultType="com.campus.application.vo.ApplicationInfoVO">
+        SELECT a.id,
+               a.user_id,
+               a.job_id,
+               a.company_id,
+               a.resume_id,
+               a.status,
+               a.hr_remark,
+               a.interview_time,
+               a.interview_address,
+               a.interview_contact,
+               a.interview_contact_phone,
+               a.interview_result,
+               a.create_time,
+               a.update_time,
+               j.title     AS job_name,
+               c.company_name,
+               c.logo      AS company_logo,
+               r.title     AS resume_title
+        FROM t_application a
+        LEFT JOIN t_job j ON j.id = a.job_id
+        LEFT JOIN t_company c ON c.id = a.company_id
+        LEFT JOIN t_resume r ON r.id = a.resume_id
+        <where>
+            <if test="userId != null">
+                AND a.user_id = #{userId}
+            </if>
+            <if test="companyId != null">
+                AND a.company_id = #{companyId}
+            </if>
+            <if test="status != null">
+                AND a.status = #{status}
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+</mapper>

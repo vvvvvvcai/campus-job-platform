@@ -6,7 +6,7 @@
         <div>
           <div class="flex items-center gap-3">
             <h1 class="text-2xl md:text-3xl font-bold text-[var(--on-surface)]">我的简历档案库</h1>
-            <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-full border border-blue-100">3/5 已创建</span>
+            <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-full border border-blue-100">{{ resumes.length }}/5 已创建</span>
           </div>
           <p class="text-sm text-[var(--on-surface-variant)] mt-1">支持维护多份针对性简历，根据算法、前端或央国企企精准投递，告别「千人一面」，有效提升面试邀约率。</p>
         </div>
@@ -33,12 +33,12 @@
 
           <!-- Resume Cards -->
           <div v-for="resume in resumes" :key="resume.id"
-            @click="selectedResume = resume"
+            @click="selectResume(resume)"
             :class="['rounded-2xl border p-5 cursor-pointer transition-all relative',
               selectedResume?.id === resume.id
                 ? 'bg-white border-[var(--primary)] ring-2 ring-[var(--primary)]/10 shadow-sm'
                 : 'bg-white border-gray-100 hover:border-gray-200 shadow-sm hover:shadow']">
-            <!-- 使用中 Badge -->
+            <!-- Selected Badge -->
             <div v-if="selectedResume?.id === resume.id" class="absolute -top-2 -right-2 px-3 py-1 bg-[var(--primary)] text-white text-[10px] font-bold rounded-full shadow-sm">
               使用中
             </div>
@@ -69,7 +69,7 @@
               </span>
               <span v-if="resume.isDefault" class="text-[11px] text-[var(--primary)] flex items-center gap-1">
                 <span class="material-symbols-outlined text-[12px]">check_circle</span>
-                默认简历不可删除
+                默认简历
               </span>
             </div>
             <!-- Actions -->
@@ -79,12 +79,16 @@
                 当前显示中
               </span>
               <div class="flex items-center gap-3 ml-auto">
-                <router-link to="/resume/editor" class="text-[11px] text-[var(--on-surface-variant)] hover:text-[var(--primary)] flex items-center gap-1 transition-colors">
+                <router-link :to="{ path: '/resume/editor', query: { id: resume.id } }" class="text-[11px] text-[var(--on-surface-variant)] hover:text-[var(--primary)] flex items-center gap-1 transition-colors">
                   <span class="material-symbols-outlined text-[14px]">edit</span>
                   编辑内容
                 </router-link>
-                <button class="text-[11px] text-[var(--on-surface-variant)] hover:text-[var(--primary)] flex items-center gap-1 transition-colors">
-                  <span class="material-symbols-outlined text-[14px]">download</span>
+                <button @click="setDefault(resume.id)" v-if="!resume.isDefault" class="text-[11px] text-[var(--on-surface-variant)] hover:text-[var(--primary)] flex items-center gap-1 transition-colors">
+                  <span class="material-symbols-outlined text-[14px]">star</span>
+                  设为默认
+                </button>
+                <button @click="removeResume(resume.id)" v-if="!resume.isDefault" class="text-[11px] text-[var(--on-surface-variant)] hover:text-red-500 flex items-center gap-1 transition-colors">
+                  <span class="material-symbols-outlined text-[14px]">delete_outline</span>
                 </button>
               </div>
             </div>
@@ -94,7 +98,7 @@
           <button @click="createResume" class="w-full rounded-2xl border-2 border-dashed border-gray-200 p-6 flex flex-col items-center gap-2 hover:border-[var(--primary)]/30 hover:bg-blue-50/30 transition-all">
             <span class="material-symbols-outlined text-3xl text-gray-300">add_circle</span>
             <span class="text-sm font-medium text-[var(--on-surface-variant)]">新建简历版本</span>
-            <span class="text-[11px] text-gray-400">还可创建 {{ 5 - resumes.length }} 份专用简历（上限 5 份）</span>
+            <span class="text-[11px] text-gray-400">还可创建 {{ Math.max(0, 5 - resumes.length) }} 份专用简历（上限 5 份）</span>
           </button>
 
           <!-- Advisor Tip Box -->
@@ -123,25 +127,30 @@
 
             <!-- Resume Content -->
             <div class="p-8 max-h-[700px] overflow-y-auto">
-              <div class="max-w-3xl mx-auto">
+              <div v-if="detailLoading" class="py-20 text-center text-sm text-[var(--on-surface-variant)]">
+                <span class="material-symbols-outlined text-4xl text-gray-200 mb-3 block">hourglass_top</span>
+                正在加载简历内容…
+              </div>
+
+              <div v-else class="max-w-3xl mx-auto">
                 <!-- Profile Header -->
                 <div class="flex items-start gap-6 mb-6 pb-6 border-b border-gray-200">
                   <!-- Avatar -->
                   <div class="w-20 h-20 rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center border-2 border-blue-100 shrink-0 overflow-hidden">
-                    <span class="text-2xl text-blue-300 font-bold">林</span>
+                    <span class="text-2xl text-blue-300 font-bold">{{ initialChar }}</span>
                   </div>
                   <!-- Info -->
                   <div class="flex-1">
                     <div class="flex items-center gap-3 mb-1">
-                      <h2 class="text-xl font-bold text-[var(--on-surface)]">林晨</h2>
-                      <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-semibold rounded-full border border-emerald-100">在校·积极求职中（随时到岗）</span>
+                      <h2 class="text-xl font-bold text-[var(--on-surface)]">{{ d.name || '未填写姓名' }}</h2>
+                      <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-semibold rounded-full border border-emerald-100">{{ workStatusText }}·积极求职中</span>
                     </div>
-                    <p class="text-sm font-semibold text-[var(--primary)] mb-2">求职意向：大模型算法工程师 / 全栈架构研发</p>
-                    <p class="text-xs text-[var(--on-surface-variant)] mb-2">北京科技重点大学 · 计算机科学与技术 · 2025届统招工学硕士</p>
-                    <div class="flex items-center gap-4 text-xs text-[var(--on-surface-variant)]">
-                      <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">phone</span> 188****6820</span>
-                      <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">email</span> linchen.cs@campus.edu.cn</span>
-                      <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">location_on</span> 北京·海淀区</span>
+                    <p class="text-sm font-semibold text-[var(--primary)] mb-2">求职意向：{{ d.expectJobType || d.expectIndustry || '未填写' }}</p>
+                    <p class="text-xs text-[var(--on-surface-variant)] mb-2">{{ schoolLine }}</p>
+                    <div class="flex items-center gap-4 text-xs text-[var(--on-surface-variant)] flex-wrap">
+                      <span v-if="d.phone" class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">phone</span> {{ maskPhone(d.phone) }}</span>
+                      <span v-if="d.email" class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">email</span> {{ d.email }}</span>
+                      <span v-if="d.expectCity" class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">location_on</span> {{ d.expectCity }}</span>
                     </div>
                   </div>
                   <!-- Score Circle -->
@@ -149,28 +158,28 @@
                     <svg class="w-full h-full -rotate-90" viewBox="0 0 64 64">
                       <circle cx="32" cy="32" r="28" fill="none" stroke="#e5e7eb" stroke-width="4" />
                       <circle cx="32" cy="32" r="28" fill="none" stroke="var(--primary)" stroke-width="4" stroke-linecap="round"
-                        :stroke-dasharray="`${175.93 * 96 / 100} 175.93`" />
+                        :stroke-dasharray="`${175.93 * (selectedResume.completeness || 0) / 100} 175.93`" />
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
-                      <span class="text-lg font-bold text-[var(--primary)]">96</span>
+                      <span class="text-lg font-bold text-[var(--primary)]">{{ selectedResume.completeness || 0 }}</span>
                     </div>
-                    <p class="text-[9px] text-[var(--on-surface-variant)] text-center -mt-0.5">算法岗匹配</p>
+                    <p class="text-[9px] text-[var(--on-surface-variant)] text-center -mt-0.5">简历完整度</p>
                   </div>
                 </div>
 
                 <!-- Summary Bar -->
                 <div class="grid grid-cols-3 gap-4 bg-gray-50 rounded-xl p-4 mb-8">
                   <div>
-                    <span class="text-[11px] text-[var(--on-surface-variant)]">求职务性质</span>
-                    <p class="text-xs font-semibold text-[var(--on-surface)] mt-1">2025届全职校招 / 实习转正</p>
+                    <span class="text-[11px] text-[var(--on-surface-variant)]">求职状态</span>
+                    <p class="text-xs font-semibold text-[var(--on-surface)] mt-1">{{ workStatusText }}{{ d.graduationYear ? '·' + d.graduationYear + '届' : '' }}</p>
                   </div>
                   <div>
                     <span class="text-[11px] text-[var(--on-surface-variant)]">期望城市</span>
-                    <p class="text-xs font-semibold text-[var(--on-surface)] mt-1">北京、上海、深圳（支持驻场）</p>
+                    <p class="text-xs font-semibold text-[var(--on-surface)] mt-1">{{ d.expectCity || '未填写' }}</p>
                   </div>
                   <div>
                     <span class="text-[11px] text-[var(--on-surface-variant)]">期望薪资范围</span>
-                    <p class="text-xs font-semibold text-[var(--primary)] mt-1">25k - 40k / 月（可面议）</p>
+                    <p class="text-xs font-semibold text-[var(--primary)] mt-1">{{ d.expectSalary || '未填写（可面议）' }}</p>
                   </div>
                 </div>
 
@@ -180,114 +189,53 @@
                     <span class="w-1 h-4 bg-[var(--primary)] rounded-full"></span>
                     教育背景
                   </h3>
-                  <div class="space-y-4">
-                    <!-- School 1 -->
-                    <div class="flex items-start justify-between">
-                      <div>
-                        <div class="flex items-center gap-2">
-                          <span class="text-sm font-bold text-[var(--on-surface)]">北京科技重点大学</span>
-                          <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-semibold rounded border border-blue-100">双一流/985高校</span>
-                        </div>
-                        <p class="text-xs text-[var(--on-surface-variant)] mt-1">计算机学院·计算机科学与技术（学术硕士）</p>
+                  <div v-if="d.school || d.major || d.graduationYear" class="flex items-start justify-between">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-[var(--on-surface)]">{{ d.school || '未填写院校' }}</span>
+                        <span v-if="educationText" class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-semibold rounded border border-blue-100">{{ educationText }}</span>
                       </div>
-                      <span class="text-xs text-[var(--on-surface-variant)]">2022.09 — 2025.06（硕士毕业）</span>
+                      <p v-if="d.major" class="text-xs text-[var(--on-surface-variant)] mt-1">专业：{{ d.major }}</p>
                     </div>
-                    <div class="flex items-center gap-6 text-xs text-[var(--on-surface-variant)]">
-                      <span>专业成绩：<span class="font-semibold text-[var(--on-surface)]">前 5%</span></span>
-                      <span>荣誉：<span class="font-semibold text-[var(--on-surface)]">国家励志奖学金、校级一等奖学业奖学金</span></span>
-                    </div>
-                    <!-- School 2 -->
-                    <div class="flex items-start justify-between pt-2 border-t border-gray-50">
-                      <div>
-                        <div class="flex items-center gap-2">
-                          <span class="text-sm font-bold text-[var(--on-surface)]">北京邮电大学</span>
-                          <span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-semibold rounded border border-amber-100">教育部直属高校</span>
-                        </div>
-                        <p class="text-xs text-[var(--on-surface-variant)] mt-1">计算机与软件学院·软件工程（工学学士）</p>
-                      </div>
-                      <span class="text-xs text-[var(--on-surface-variant)]">2018.09 — 2022.06（学士）</span>
-                    </div>
-                    <div class="text-xs text-[var(--on-surface-variant)]">
-                      <span>综合绩点：<span class="font-semibold text-[var(--on-surface)]">3.82 / 4.0</span></span>
-                      <span class="ml-4">荣誉：<span class="font-semibold text-[var(--on-surface)]">北京市优秀毕业生</span></span>
-                    </div>
+                    <span v-if="d.graduationYear" class="text-xs text-[var(--on-surface-variant)]">{{ d.graduationYear }} 届毕业</span>
                   </div>
+                  <p v-else class="text-xs text-[var(--on-surface-variant)]">暂未填写教育背景，点击左侧「编辑内容」完善。</p>
                 </div>
 
                 <!-- Professional Skills -->
                 <div class="mb-8">
                   <h3 class="text-sm font-bold text-[var(--on-surface)] mb-4 flex items-center gap-2">
                     <span class="w-1 h-4 bg-[var(--primary)] rounded-full"></span>
-                    专业技术栈与工具
+                    专业技能与特长
                   </h3>
-                  <div class="flex flex-wrap gap-2">
+                  <div v-if="skills.length" class="flex flex-wrap gap-2">
                     <span v-for="skill in skills" :key="skill"
                       class="px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg border border-blue-100">
                       {{ skill }}
                     </span>
                   </div>
+                  <p v-else class="text-xs text-[var(--on-surface-variant)]">暂未填写技能特长。</p>
                 </div>
 
-                <!-- Core Internship Experience -->
+                <!-- Work / Internship Experience -->
                 <div class="mb-8">
                   <h3 class="text-sm font-bold text-[var(--on-surface)] mb-4 flex items-center gap-2">
                     <span class="w-1 h-4 bg-[var(--primary)] rounded-full"></span>
-                    核心实习经历
+                    实习与工作经历
                   </h3>
-                  <div class="space-y-6">
-                    <!-- Intern 1 -->
-                    <div>
+                  <div v-if="workExps.length" class="space-y-6">
+                    <div v-for="(exp, i) in workExps" :key="i" :class="{ 'pt-4 border-t border-gray-50': i > 0 }">
                       <div class="flex items-start justify-between mb-2">
-                        <div>
-                          <div class="flex items-center gap-2">
-                            <span class="text-sm font-bold text-[var(--on-surface)]">智维未来人工智能研究院</span>
-                            <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-semibold rounded border border-emerald-100">大模型算法实习生</span>
-                          </div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-sm font-bold text-[var(--on-surface)]">{{ exp.company || '未填写公司' }}</span>
+                          <span v-if="exp.position" class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-semibold rounded border border-emerald-100">{{ exp.position }}</span>
                         </div>
-                        <span class="text-xs text-[var(--on-surface-variant)]">2024.06 — 至今（北京）</span>
+                        <span v-if="exp.period" class="text-xs text-[var(--on-surface-variant)]">{{ exp.period }}</span>
                       </div>
-                      <ul class="space-y-1.5">
-                        <li class="text-xs text-[var(--on-surface-variant)] flex items-start gap-2">
-                          <span class="w-1 h-1 rounded-full bg-[var(--primary)] mt-1.5 shrink-0"></span>
-                          主导基于 Llama-3 与 Qwen-2 百亿量级多模态模型的指令微调（SFT）数据工程构建，清洗高价值多轮对齐语料 450万+ 条。
-                        </li>
-                        <li class="text-xs text-[var(--on-surface-variant)] flex items-start gap-2">
-                          <span class="w-1 h-1 rounded-full bg-[var(--primary)] mt-1.5 shrink-0"></span>
-                          结合 DeepSpeed ZeRO-3 与 FlashAttention-2 优化集群分布式通信拓扑，显存占用降低 <span class="font-semibold text-[var(--primary)]">28%</span>，训练集群吞吐提升 <span class="font-semibold text-[var(--primary)]">35%</span>。
-                        </li>
-                        <li class="text-xs text-[var(--on-surface-variant)] flex items-start gap-2">
-                          <span class="w-1 h-1 rounded-full bg-[var(--primary)] mt-1.5 shrink-0"></span>
-                          引入 AWQ 4-bit 权重激活感知量化算法与 vLLM 连续批处理（Continuous Batching）推理框架，服务首字响应延迟降低至 45ms，并发能力提升 2.4 倍。
-                        </li>
-                      </ul>
-                    </div>
-                    <!-- Intern 2 -->
-                    <div class="pt-4 border-t border-gray-50">
-                      <div class="flex items-start justify-between mb-2">
-                        <div>
-                          <div class="flex items-center gap-2">
-                            <span class="text-sm font-bold text-[var(--on-surface)]">字节跳动（ByteDance）</span>
-                            <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-semibold rounded border border-blue-100">后端架构研发实习生</span>
-                          </div>
-                        </div>
-                        <span class="text-xs text-[var(--on-surface-variant)]">2023.07 — 2023.11（北京）</span>
-                      </div>
-                      <ul class="space-y-1.5">
-                        <li class="text-xs text-[var(--on-surface-variant)] flex items-start gap-2">
-                          <span class="w-1 h-1 rounded-full bg-[var(--primary)] mt-1.5 shrink-0"></span>
-                          深度参与高并发信息流推荐服务重构，基于 Go + gRPC 微服务链路设计多级本地缓存架构（LRU + Redis Cluster）。
-                        </li>
-                        <li class="text-xs text-[var(--on-surface-variant)] flex items-start gap-2">
-                          <span class="w-1 h-1 rounded-full bg-[var(--primary)] mt-1.5 shrink-0"></span>
-                          定位并治理网络 IO 阻塞热点，通过协程池精细化调度与内存逃逸优化，使得核心服务 P99 延迟由 120ms 压降至 42ms，保障千万级 QPS 稳定运行。
-                        </li>
-                        <li class="text-xs text-[var(--on-surface-variant)] flex items-start gap-2">
-                          <span class="w-1 h-1 rounded-full bg-[var(--primary)] mt-1.5 shrink-0"></span>
-                          主笔输出《微服务高可用熔断与兜底降级方案白皮书》，荣获实习生最佳工程技术分享奖。
-                        </li>
-                      </ul>
+                      <p v-if="exp.desc" class="text-xs text-[var(--on-surface-variant)] leading-relaxed">{{ exp.desc }}</p>
                     </div>
                   </div>
+                  <p v-else class="text-xs text-[var(--on-surface-variant)]">暂未填写实习/工作经历。</p>
                 </div>
 
                 <!-- Project Experience -->
@@ -296,68 +244,44 @@
                     <span class="w-1 h-4 bg-[var(--primary)] rounded-full"></span>
                     项目经历
                   </h3>
-                  <div class="space-y-6">
-                    <!-- Project 1 -->
-                    <div>
+                  <div v-if="projectExps.length" class="space-y-6">
+                    <div v-for="(proj, i) in projectExps" :key="i" :class="{ 'pt-4 border-t border-gray-50': i > 0 }">
                       <div class="flex items-start justify-between mb-2">
-                        <div>
-                          <span class="text-sm font-bold text-[var(--on-surface)]">"智绘校园"基于大模型的智能问答协同助理（国家级大学生创新创业计划）</span>
-                        </div>
+                        <span class="text-sm font-bold text-[var(--on-surface)]">{{ proj.name || '未命名项目' }}</span>
                         <div class="text-right shrink-0 ml-4">
-                          <span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-semibold rounded border border-amber-100">核心主导</span>
-                          <span class="text-xs text-[var(--on-surface-variant)] ml-2">2023.12 — 2024.05</span>
+                          <span v-if="proj.role" class="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-semibold rounded border border-amber-100">{{ proj.role }}</span>
+                          <span v-if="proj.period" class="text-xs text-[var(--on-surface-variant)] ml-2">{{ proj.period }}</span>
                         </div>
                       </div>
-                      <p class="text-xs text-[var(--on-surface-variant)] leading-relaxed">针对高校庞杂办事指南与校级公文检索痛点，设计多模态 RAG（检索增强生成）检索流水线，构建基于 Milvus 向量库与 BGE-Reranker 的二次重排机制，准确率达 <span class="font-semibold text-[var(--primary)]">94.2%</span>。服务目前已全校试运行，累计解答师生政策咨询超 20 万次。</p>
-                    </div>
-                    <!-- Project 2 -->
-                    <div class="pt-4 border-t border-gray-50">
-                      <div class="flex items-start justify-between mb-2">
-                        <div>
-                          <span class="text-sm font-bold text-[var(--on-surface)]">ACM-ICPC 算法训练平台分布式沙箱评测引擎</span>
-                        </div>
-                        <div class="text-right shrink-0 ml-4">
-                          <span class="px-2 py-0.5 bg-purple-50 text-purple-700 text-[10px] font-semibold rounded border border-purple-100">独立开发者</span>
-                          <span class="text-xs text-[var(--on-surface-variant)] ml-2">2022.10 — 2023.04</span>
-                        </div>
-                      </div>
-                      <p class="text-xs text-[var(--on-surface-variant)] leading-relaxed">使用 Linux cgroups 及 seccomp 构建微秒级安全沙箱隔离环境，支持 C++ / Java / Python 多语言判题与并发资源压制。系统开源至 GitHub 获得 <span class="font-semibold text-[var(--primary)]">1.2k+ Star</span>，被全国多所高校集训队采用。</p>
+                      <p v-if="proj.desc" class="text-xs text-[var(--on-surface-variant)] leading-relaxed">{{ proj.desc }}</p>
                     </div>
                   </div>
+                  <p v-else class="text-xs text-[var(--on-surface-variant)]">暂未填写项目经历。</p>
                 </div>
 
                 <!-- Awards & Certifications -->
+                <div class="mb-8">
+                  <h3 class="text-sm font-bold text-[var(--on-surface)] mb-4 flex items-center gap-2">
+                    <span class="w-1 h-4 bg-[var(--primary)] rounded-full"></span>
+                    荣誉与资质
+                  </h3>
+                  <div v-if="awardItems.length" class="grid grid-cols-2 gap-3">
+                    <div v-for="(a, i) in awardItems" :key="i" class="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
+                      <span class="text-lg">🏆</span>
+                      <p class="text-xs font-semibold text-[var(--on-surface)]">{{ a }}</p>
+                    </div>
+                  </div>
+                  <p v-else class="text-xs text-[var(--on-surface-variant)]">暂未填写荣誉与资质。</p>
+                </div>
+
+                <!-- Self Introduction -->
                 <div>
                   <h3 class="text-sm font-bold text-[var(--on-surface)] mb-4 flex items-center gap-2">
                     <span class="w-1 h-4 bg-[var(--primary)] rounded-full"></span>
-                    重要荣誉与语言资质
+                    自我介绍
                   </h3>
-                  <div class="grid grid-cols-2 gap-3">
-                    <div class="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
-                      <span class="text-lg">🏆</span>
-                      <div>
-                        <p class="text-xs font-semibold text-[var(--on-surface)]">ACM-ICPC 国际大学生程序设计竞赛 亚洲区域赛金牌（2021）</p>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
-                      <span class="text-lg">🏆</span>
-                      <div>
-                        <p class="text-xs font-semibold text-[var(--on-surface)]">全国研究生数学建模竞赛 国家一等奖（2023）</p>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
-                      <span class="text-lg">📝</span>
-                      <div>
-                        <p class="text-xs font-semibold text-[var(--on-surface)]">大学英语六级（CET-6）：612 分（流利查阅外文前沿论文）</p>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
-                      <span class="text-lg">💻</span>
-                      <div>
-                        <p class="text-xs font-semibold text-[var(--on-surface)]">计算机技术与软件专业资格：系统分析师（高级）</p>
-                      </div>
-                    </div>
-                  </div>
+                  <p v-if="d.selfIntroduction" class="text-xs text-[var(--on-surface-variant)] leading-relaxed whitespace-pre-wrap">{{ d.selfIntroduction }}</p>
+                  <p v-else class="text-xs text-[var(--on-surface-variant)]">暂未填写自我介绍。</p>
                 </div>
               </div>
             </div>
@@ -375,17 +299,89 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
-import { getResumeList, getResumeInfo, deleteResume, saveResume, setDefaultResume } from '../api/resume'
+import { getResumeList, getResumeInfo, deleteResume, setDefaultResume } from '../api/resume'
 
 const router = useRouter()
 const store = useAppStore()
 const selectedResume = ref(null)
 const resumes = ref([])
 const loading = ref(false)
+const detailLoading = ref(false)
 const resumeDetail = ref(null)
+
+const workStatusNames = ['在校', '应届生', '往届生']
+
+const d = computed(() => resumeDetail.value || {})
+
+const initialChar = computed(() => (d.value.name || '简').charAt(0))
+
+const educationText = computed(() => {
+  const edu = d.value.education
+  if (!edu) return ''
+  if (typeof edu === 'number') return ['大专', '本科', '硕士', '博士'][edu - 1] || ''
+  return String(edu)
+})
+
+const workStatusText = computed(() => workStatusNames[d.value.workStatus] || '在校')
+
+const schoolLine = computed(() => {
+  const parts = []
+  if (d.value.school) parts.push(d.value.school)
+  if (d.value.major) parts.push(d.value.major)
+  if (d.value.graduationYear) parts.push(d.value.graduationYear + '届')
+  return parts.length ? parts.join(' · ') : '暂未填写教育信息'
+})
+
+function parseJsonArray(field) {
+  if (Array.isArray(field)) return field
+  if (typeof field === 'string') {
+    try {
+      const v = JSON.parse(field)
+      return Array.isArray(v) ? v : []
+    } catch { /* 非JSON字符串按纯文本处理 */ }
+  }
+  return []
+}
+
+function normalizeExp(raw) {
+  if (typeof raw === 'string') return { company: '', position: '', period: '', desc: raw }
+  if (raw && typeof raw === 'object') {
+    return {
+      company: raw.company || raw.companyName || raw.name || '',
+      position: raw.position || raw.title || raw.job || '',
+      period: raw.period || raw.time || raw.duration || (raw.start && raw.end ? raw.start + ' — ' + raw.end : (raw.start || '')),
+      desc: raw.desc || raw.description || raw.content || raw.detail || ''
+    }
+  }
+  return null
+}
+
+const skills = computed(() => {
+  const v = parseJsonArray(d.value.skills)
+  return v.map(s => typeof s === 'string' ? s : (s && s.name ? s.name : String(s))).filter(Boolean)
+})
+
+const workExps = computed(() => parseJsonArray(d.value.experiences).map(normalizeExp).filter(Boolean))
+
+const projectExps = computed(() => parseJsonArray(d.value.projects).map(normalizeExp).map(e => ({
+  name: e.company || e.desc,
+  role: e.position,
+  period: e.period,
+  desc: e.company ? e.desc : ''
+})).filter(e => e.name))
+
+const awardItems = computed(() => parseJsonArray(d.value.awards).map(a =>
+  typeof a === 'string' ? a : (a.name || a.title || String(a))
+).filter(Boolean))
+
+function maskPhone(phone) {
+  const p = String(phone)
+  if (p.length >= 7) return p.slice(0, 3) + '****' + p.slice(-4)
+  return p
+}
 
 onMounted(async () => {
   if (!store.isLoggedIn) return
@@ -421,17 +417,19 @@ function calcCompleteness(r) {
 
 async function selectResume(resume) {
   selectedResume.value = resume
+  resumeDetail.value = null
   if (!resume || !resume.id) return
+  detailLoading.value = true
   try {
     const detail = await getResumeInfo(resume.id)
     resumeDetail.value = detail
   } catch (e) {
     console.error('获取简历详情失败:', e)
     resumeDetail.value = null
+  } finally {
+    detailLoading.value = false
   }
 }
-
-const skills = ref([])
 
 function createResume() {
   router.push('/resume/editor')

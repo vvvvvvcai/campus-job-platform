@@ -62,6 +62,15 @@ public class JobInfoVO {
     @ApiModelProperty("职位状态：0-待审核，1-招聘中，2-已关闭")
     private Integer status;
 
+    @ApiModelProperty("审核状态：0-待审核，1-已通过，2-已拒绝")
+    private Integer auditStatus;
+
+    @ApiModelProperty("审核备注")
+    private String auditRemark;
+
+    @ApiModelProperty("审核时间")
+    private LocalDateTime auditTime;
+
     @ApiModelProperty("浏览次数")
     private Integer viewCount;
 

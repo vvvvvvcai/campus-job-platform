@@ -38,8 +38,8 @@ public class ResumeInfoVO {
     @ApiModelProperty("邮箱")
     private String email;
 
-    @ApiModelProperty("学历：0-大专，1-本科，2-硕士，3-博士")
-    private Integer education;
+    @ApiModelProperty("学历（如：大专、本科、硕士、博士）")
+    private String education;
 
     @ApiModelProperty("毕业院校")
     private String school;

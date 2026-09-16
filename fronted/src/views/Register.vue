@@ -150,29 +150,6 @@
           </div>
 
           <div class="space-y-1.5">
-            <label class="block text-xs text-on-surface font-medium">短信验证码</label>
-            <div class="flex gap-2">
-              <input
-                v-model="form.code"
-                type="text"
-                maxlength="6"
-                placeholder="6位短信验证码"
-                class="flex-1 h-10 px-3 bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm rounded-lg shadow-sm focus:outline-none border-0"
-              />
-              <button
-                type="button"
-                @click="sendSmsCode"
-                :disabled="smsCooldown > 0"
-                class="px-4 h-10 bg-surface-container-low text-primary hover:bg-surface-container text-xs font-semibold rounded-lg transition-colors whitespace-nowrap"
-                :class="smsCooldown > 0 ? 'opacity-50 cursor-not-allowed' : ''"
-              >
-                {{ smsCooldown > 0 ? `${smsCooldown}秒` : '获取验证码' }}
-              </button>
-            </div>
-            <p v-if="errors.code" class="text-error text-xs">{{ errors.code }}</p>
-          </div>
-
-          <div class="space-y-1.5">
             <label class="block text-xs text-on-surface font-medium">设置密码</label>
             <div class="relative">
               <input
@@ -258,7 +235,6 @@ const store = useAppStore()
 const role = ref('student')
 const showPassword = ref(false)
 const loading = ref(false)
-const smsCooldown = ref(0)
 const toast = reactive({ show: false, type: 'success', message: '' })
 
 function showToast(type, message) {
@@ -268,8 +244,8 @@ function showToast(type, message) {
   setTimeout(() => { toast.show = false }, 3000)
 }
 
-const form = reactive({ phone: '', code: '', password: '', confirmPassword: '', agree: false })
-const errors = reactive({ phone: '', code: '', password: '' })
+const form = reactive({ phone: '', password: '', confirmPassword: '', agree: false })
+const errors = reactive({ phone: '', password: '' })
 
 const strengthScore = computed(() => {
   const p = form.password
@@ -306,9 +282,8 @@ function validatePhone(phone) {
 
 function handleRegister() {
   errors.phone = validatePhone(form.phone)
-  errors.code = !form.code ? '请输入验证码' : form.code.length < 6 ? '验证码为6位数字' : ''
   errors.password = !form.password ? '请输入密码' : form.password.length < 8 ? '密码至少8位' : ''
-  if (errors.phone || errors.code || errors.password) return
+  if (errors.phone || errors.password) return
   if (form.password !== form.confirmPassword) { showToast('error', '两次输入的密码不一致'); return }
   if (!form.agree) { showToast('error', '请先阅读并同意用户协议与隐私政策'); return }
   loading.value = true
@@ -332,17 +307,6 @@ function handleRegister() {
     .finally(() => { loading.value = false })
 }
 
-function sendSmsCode() {
-  const phoneError = validatePhone(form.phone)
-  if (phoneError) { errors.phone = phoneError; return }
-  errors.phone = ''
-  smsCooldown.value = 60
-  const timer = setInterval(() => {
-    smsCooldown.value--
-    if (smsCooldown.value <= 0) clearInterval(timer)
-  }, 1000)
-  showToast('success', '验证码已发送')
-}
 </script>
 
 <style scoped>

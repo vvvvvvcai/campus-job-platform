@@ -1,9 +1,11 @@
 package com.campus.job.controller;
 
 import com.campus.common.result.Result;
+import com.campus.job.dto.JobAuditDTO;
 import com.campus.job.dto.JobPublishDTO;
 import com.campus.job.dto.JobSearchDTO;
 import com.campus.job.service.JobService;
+import com.campus.job.vo.JobAdminListVO;
 import com.campus.job.vo.JobInfoVO;
 import com.campus.job.vo.JobListVO;
 import io.swagger.annotations.Api;
@@ -61,5 +63,49 @@ public class JobController {
     @GetMapping("/categories")
     public Result<Map<String, List<String>>> getJobCategories() {
         return jobService.getJobCategories();
+    }
+
+    @ApiOperation("获取企业发布的职位列表")
+    @GetMapping("/company/list")
+    public Result<List<JobInfoVO>> getCompanyJobList(@RequestHeader("X-User-Id") Long userId,
+                                                     @RequestParam Long companyId) {
+        return jobService.getCompanyJobList(companyId);
+    }
+
+    @ApiOperation("管理员获取职位列表")
+    @GetMapping("/admin/list")
+    public Result<JobAdminListVO> getJobAdminList(
+            @RequestHeader("X-User-Id") Long adminId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer auditStatus,
+            @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String city,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        return jobService.getJobAdminList(keyword, auditStatus, status, category, city, page, pageSize);
+    }
+
+    @ApiOperation("管理员获取职位详情")
+    @GetMapping("/admin/detail/{id}")
+    public Result<JobInfoVO> getJobAdminDetail(
+            @RequestHeader("X-User-Id") Long adminId,
+            @PathVariable Long id) {
+        return jobService.getJobAdminDetail(id, adminId);
+    }
+
+    @ApiOperation("管理员审核职位")
+    @PutMapping("/audit/{id}")
+    public Result<Void> auditJob(
+            @RequestHeader("X-User-Id") Long adminId,
+            @PathVariable Long id,
+            @RequestBody @Valid JobAuditDTO dto) {
+        return jobService.auditJob(id, dto);
+    }
+
+    @ApiOperation("管理员获取职位统计数据")
+    @GetMapping("/count")
+    public Result<Object> getJobCount(@RequestHeader("X-User-Id") Long adminId) {
+        return jobService.getJobCount();
     }
 }
