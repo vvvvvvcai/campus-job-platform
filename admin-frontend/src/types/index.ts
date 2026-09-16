@@ -1,9 +1,108 @@
+export interface Result<T> {
+  code: number
+  message: string
+  data: T
+}
+
+export interface PageResult<T> {
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  records: T[]
+}
+
 export interface UserInfo {
   userId: number
   phone: string
   username: string
   role: number
   avatar?: string
+}
+
+export interface LoginParams {
+  phone: string
+  password: string
+}
+
+export interface LoginResult {
+  token: string
+  userId: number
+  phone: string
+  username: string
+  role: number
+  avatar?: string
+}
+
+export interface UserItem {
+  id: number
+  phone: string
+  username: string
+  role: number
+  roleLabel: string
+  avatar?: string
+  email?: string
+  status: number
+  statusLabel: string
+  createTime: string
+}
+
+export interface UserCount {
+  total: number
+  byRole: {
+    student: number
+    hr: number
+    admin: number
+  }
+  byStatus: {
+    active: number
+    disabled: number
+  }
+}
+
+export interface CompanyItem {
+  id: number
+  userId: number
+  companyName: string
+  industry?: string
+  scale?: string
+  licenseUrl?: string
+  auditStatus: number
+  auditStatusLabel: string
+  auditRemark?: string
+  createTime: string
+}
+
+export interface JobAdminItem {
+  id: number
+  title: string
+  category?: string
+  city?: string
+  salaryMin?: number
+  salaryMax?: number
+  education?: string
+  jobType?: number
+  headcount?: number
+  status: number
+  auditStatus: number
+  auditRemark?: string
+  viewCount?: number
+  applyCount?: number
+  createTime: string
+}
+
+export interface JobCount {
+  total: number
+  byStatus: {
+    pending: number
+    recruiting: number
+    closed: number
+  }
+  byAuditStatus: {
+    pending: number
+    approved: number
+    rejected: number
+  }
 }
 
 export interface KpiCard {
@@ -14,95 +113,4 @@ export interface KpiCard {
   icon: string
   iconBg: string
   iconColor: string
-  details?: { label: string; value: string }[]
-  footer?: { label: string; value: string }
-  progress?: number
-  subMetrics?: { label: string; value: string; color: string }[]
-}
-
-export type AuditStatus = 'pending' | 'approved' | 'rejected'
-
-export interface Enterprise {
-  id: number
-  name: string
-  creditCode: string
-  industry: string
-  scale: string
-  legalPerson: string
-  phone: string
-  licenseOcr: 'matched' | 'unverified' | 'expired'
-  licenseTag: string
-  submitTime: string
-  waitTime: string
-  waitUrgent: boolean
-  status: AuditStatus
-  avatarText: string
-  avatarBg: string
-  avatarColor: string
-  tags?: string[]
-  verified?: boolean
-}
-
-export interface EnterpriseDetail {
-  enterprise: Enterprise
-  flowNo: string
-  companyType: string
-  industryCategory: string
-  registeredCapital: string
-  establishedDate: string
-  website: string
-  address: string
-  statusLabel: string
-}
-
-export type JobAuditStatus = 'pending' | 'approved' | 'rejected' | 'offline'
-
-export type JobType = 'intern' | 'campus'
-
-export type RiskLevel = 'safe' | 'low' | 'high'
-
-export interface JobAudit {
-  id: string
-  title: string
-  jobType: JobType
-  recruitCount: number
-  education: string
-  publishTime: string
-  companyName: string
-  companyCert: 'certified' | 'startup' | 'partner'
-  companyCertLabel: string
-  salary: string
-  salaryHighlight: boolean
-  city: string
-  score: number
-  riskLevel: RiskLevel
-  riskLabel: string
-  riskDetail: string
-  status: JobAuditStatus
-  selected?: boolean
-}
-
-export type UserStatus = 'active' | 'disabled'
-
-export type UserRole = 'student' | 'enterprise'
-
-export interface User {
-  uid: string
-  name: string
-  email: string
-  role: UserRole
-  roleLabel: string
-  roleIcon: string
-  affiliation: string
-  maskedPhone: string
-  registerTime: string
-  lastLoginTime: string
-  lastLoginIp: string
-  lastLoginLocation: string
-  status: UserStatus
-  avatarText: string
-  avatarBg: string
-  avatarColor: string
-  passwordResets: number
-  twoFactorActive: boolean
 }

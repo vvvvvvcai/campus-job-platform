@@ -1,18 +1,16 @@
-<script setup lang="ts">
-import AppSidebar from './AppSidebar.vue'
-import AppHeader from './AppHeader.vue'
-</script>
-
 <template>
-  <div class="min-h-screen bg-background">
+  <div class="flex h-screen bg-gray-100">
     <AppSidebar />
-    <div class="pl-64">
+    <div class="flex-1 flex flex-col overflow-hidden">
       <AppHeader />
-      <main class="relative pt-14 w-full px-gutter-lg min-h-screen bg-background">
-        <div class="flex flex-col w-full pb-margin">
-          <router-view />
-        </div>
+      <main class="flex-1 overflow-y-auto p-6">
+        <router-view />
       </main>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import AppSidebar from './AppSidebar.vue'
+import AppHeader from './AppHeader.vue'
+</script>

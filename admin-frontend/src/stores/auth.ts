@@ -1,35 +1,37 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { login as apiLogin, getUserInfo } from '@/api/auth'
 import type { UserInfo } from '@/types'
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref<string | null>(localStorage.getItem('admin_token'))
-  const user = ref<UserInfo | null>(null)
+  const token = ref(localStorage.getItem('admin_token') || '')
+  const user = ref<UserInfo | null>(
+    JSON.parse(localStorage.getItem('admin_user') || 'null')
+  )
 
-  function login(phone: string, _password: string): Promise<boolean> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (phone && _password) {
-          token.value = 'mock_token_' + Date.now()
-          user.value = {
-            userId: 1,
-            phone,
-            username: '超级管理员',
-            role: 2,
-          }
-          localStorage.setItem('admin_token', token.value)
-          resolve(true)
-        } else {
-          resolve(false)
-        }
-      }, 1000)
-    })
+  async function login(phone: string, password: string) {
+    const res = await apiLogin({ phone, password })
+    if (res.code === 200 && res.data) {
+      token.value = res.data.token
+      user.value = {
+        userId: res.data.userId,
+        phone: res.data.phone,
+        username: res.data.username,
+        role: res.data.role,
+        avatar: res.data.avatar
+      }
+      localStorage.setItem('admin_token', res.data.token)
+      localStorage.setItem('admin_user', JSON.stringify(user.value))
+      return true
+    }
+    return false
   }
 
   function logout() {
-    token.value = null
+    token.value = ''
     user.value = null
     localStorage.removeItem('admin_token')
+    localStorage.removeItem('admin_user')
   }
 
   return { token, user, login, logout }

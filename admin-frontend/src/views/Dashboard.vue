@@ -1,142 +1,89 @@
-<script setup lang="ts">
-import { ref } from 'vue'
-import { dashboardKpiData } from '@/mock/dashboard'
-
-const activeTimeRange = ref<'7d' | '30d'>('7d')
-
-function switchTrend(type: '7d' | '30d') {
-  activeTimeRange.value = type
-}
-</script>
-
 <template>
-  <div>
-    <!-- Page header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md py-space-lg">
-      <div>
-        <div class="flex items-center gap-space-xs mb-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed"></span>
-          <span class="font-label-sm text-label-sm text-on-surface-variant">数据中心准实时同步中</span>
+  <div class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">注册用户总数</p>
+            <p class="text-3xl font-bold text-gray-800 mt-1">{{ userCount?.total || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+            <Users :size="24" class="text-blue-600" />
+          </div>
         </div>
-        <div class="flex items-baseline gap-space-md">
-          <h1 class="font-display-lg text-display-lg text-on-surface tracking-tight">数据统计与成功指标总览</h1>
-          <span class="font-body-sm text-body-sm text-outline hidden sm:inline-block">GB/T 综合指标监管看板 · 达成度自动核算</span>
+        <div class="mt-4 flex gap-4 text-sm">
+          <span class="text-gray-500">学生: {{ userCount?.byRole?.student || 0 }}</span>
+          <span class="text-gray-500">企业HR: {{ userCount?.byRole?.hr || 0 }}</span>
         </div>
       </div>
-      <div class="flex items-center gap-space-sm self-start md:self-auto">
-        <div class="flex items-center bg-surface-container-low p-1 rounded-xl shadow-sm">
-          <button
-            class="px-space-md py-1 rounded-lg font-label-md text-label-md transition-all"
-            :class="
-              activeTimeRange === '7d'
-                ? 'bg-surface-container-lowest text-primary shadow-sm'
-                : 'text-on-surface-variant hover:text-on-surface'
-            "
-            @click="switchTrend('7d')"
-          >
-            近 7 天
-          </button>
-          <button
-            class="px-space-md py-1 rounded-lg font-label-md text-label-md transition-all"
-            :class="
-              activeTimeRange === '30d'
-                ? 'bg-surface-container-lowest text-primary shadow-sm'
-                : 'text-on-surface-variant hover:text-on-surface'
-            "
-            @click="switchTrend('30d')"
-          >
-            近 30 天
-          </button>
+
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">活跃职位数</p>
+            <p class="text-3xl font-bold text-gray-800 mt-1">{{ jobCount?.total || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+            <Briefcase :size="24" class="text-green-600" />
+          </div>
         </div>
-        <button class="flex items-center gap-1.5 px-space-md py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md hover:bg-primary/90 transition-all shadow-sm">
-          <span class="material-symbols-outlined text-[18px]">download</span>
-          <span>导出分析报表</span>
-        </button>
+        <div class="mt-4 flex gap-4 text-sm">
+          <span class="text-gray-500">招聘中: {{ jobCount?.byStatus?.recruiting || 0 }}</span>
+          <span class="text-gray-500">待审核: {{ jobCount?.byAuditStatus?.pending || 0 }}</span>
+        </div>
       </div>
-    </div>
 
-    <!-- KPI Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-gutter mb-gutter-lg">
-      <div
-        v-for="(kpi, index) in dashboardKpiData"
-        :key="index"
-        class="relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg shadow-sm hover:shadow-md transition-all group"
-      >
-        <!-- Background glow -->
-        <div class="absolute -top-10 -right-10 w-28 h-28 rounded-full blur-2xl transition-all"
-          :class="[
-            index === 0 ? 'bg-primary/5 group-hover:bg-primary/10' :
-            index === 1 ? 'bg-secondary/5 group-hover:bg-secondary/10' :
-            index === 2 ? 'bg-tertiary-fixed/30 group-hover:bg-tertiary-fixed/50' :
-            index === 3 ? 'bg-tertiary/10 group-hover:bg-tertiary/20' :
-            'bg-primary-container/10 group-hover:bg-primary-container/20'
-          ]"
-        ></div>
-
-        <!-- Header row -->
-        <div class="flex items-center justify-between mb-space-sm">
-          <span class="font-label-sm text-label-sm text-on-surface-variant">{{ kpi.title }}</span>
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center" :class="[kpi.iconBg, kpi.iconColor]">
-            <span class="material-symbols-outlined text-[18px]">{{ kpi.icon }}</span>
-          </span>
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">待审核企业</p>
+            <p class="text-3xl font-bold text-gray-800 mt-1">{{ pendingCompanies }}</p>
+          </div>
+          <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+            <Clock :size="24" class="text-yellow-600" />
+          </div>
         </div>
+      </div>
 
-        <!-- Single value KPI cards -->
-        <template v-if="kpi.value">
-          <div class="flex items-baseline gap-2 mb-1">
-            <span class="font-metric-xl text-metric-xl text-on-surface tracking-tight">{{ kpi.value }}</span>
-            <span class="font-label-sm text-label-sm font-semibold flex items-center" :class="kpi.trendUp ? 'text-tertiary' : 'text-primary'">
-              <span v-if="kpi.trendUp" class="material-symbols-outlined text-[14px]">trending_up</span>
-              {{ kpi.trend }}
-            </span>
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">禁用用户</p>
+            <p class="text-3xl font-bold text-gray-800 mt-1">{{ userCount?.byStatus?.disabled || 0 }}</p>
           </div>
-
-          <!-- Details row -->
-          <div v-if="kpi.details && kpi.details.length > 0" class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant pt-space-xs mt-space-xs">
-            <template v-for="(detail, i) in kpi.details" :key="i">
-              <span v-if="i > 0" class="text-outline-variant">/</span>
-              <span class="w-2 h-2 rounded-full" :class="'bg-' + detail.value" v-if="detail.value"></span>
-              <span>{{ detail.label }}</span>
-            </template>
+          <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+            <ShieldOff :size="24" class="text-red-600" />
           </div>
-
-          <!-- Badge in details -->
-          <div v-if="kpi.details && kpi.details.length === 1 && kpi.details[0].value === ''" class="flex items-center justify-between font-body-sm text-body-sm text-on-surface-variant pt-space-xs mt-space-xs">
-            <span>{{ kpi.details[0].label }}</span>
-            <span v-if="kpi.title === '在线有效岗位数'" class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm">待审核 8</span>
-            <span v-if="kpi.title === '累计投递总量'" class="text-tertiary font-label-sm text-label-sm font-medium">峰值活跃中</span>
-          </div>
-
-          <!-- Footer -->
-          <div v-if="kpi.footer" class="mt-space-sm pt-space-xs bg-surface-container-low px-2 py-1 rounded font-code-xs text-code-xs flex items-center justify-between"
-            :class="kpi.footer.value.includes('达成') || kpi.footer.value.includes('已达标') ? 'text-primary' : 'text-on-surface-variant'"
-          >
-            <span>{{ kpi.footer.label }}</span>
-            <span class="font-bold" :class="kpi.footer.value.includes('达成') || kpi.footer.value.includes('已达标') ? 'text-primary' : 'text-on-surface'">{{ kpi.footer.value }}</span>
-          </div>
-
-          <!-- Progress bar -->
-          <div v-if="kpi.progress" class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden mt-space-sm">
-            <div class="bg-tertiary-container h-full rounded-full" :style="{ width: kpi.progress + '%' }"></div>
-          </div>
-        </template>
-
-        <!-- Multi-metric KPI card (智能推荐) -->
-        <template v-else-if="kpi.subMetrics">
-          <div class="space-y-2">
-            <div v-for="(metric, i) in kpi.subMetrics" :key="i" :class="i > 0 ? 'pt-1' : ''">
-              <div class="flex justify-between items-baseline mb-0.5">
-                <span class="font-body-sm text-body-sm text-on-surface-variant">{{ metric.label }}</span>
-                <span class="font-title-md text-title-md font-bold" :class="metric.color">{{ metric.value }}</span>
-              </div>
-              <div class="flex items-center justify-between font-code-xs text-code-xs text-outline">
-                <span>目标 ≥ {{ i === 0 ? '15%' : '5%' }}</span>
-                <span class="text-tertiary font-medium">超额 {{ i === 0 ? '21.3%' : '28.0%' }}</span>
-              </div>
-            </div>
-          </div>
-        </template>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { Users, Briefcase, Clock, ShieldOff } from 'lucide-vue-next'
+import { getUserCount } from '@/api/user'
+import { getJobCount } from '@/api/job'
+import { getCompanyList } from '@/api/company'
+import type { UserCount, JobCount } from '@/types'
+
+const userCount = ref<UserCount | null>(null)
+const jobCount = ref<JobCount | null>(null)
+const pendingCompanies = ref(0)
+
+onMounted(async () => {
+  try {
+    const [userRes, jobRes, companyRes] = await Promise.all([
+      getUserCount(),
+      getJobCount(),
+      getCompanyList({ auditStatus: 0, pageSize: 1 })
+    ])
+    if (userRes.code === 200) userCount.value = userRes.data
+    if (jobRes.code === 200) jobCount.value = jobRes.data
+    if (companyRes.code === 200) pendingCompanies.value = companyRes.data.total
+  } catch (e) {
+    console.error('加载数据失败', e)
+  }
+})
+</script>
