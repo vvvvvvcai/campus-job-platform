@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type { Result, PageResult, UserItem, UserCount } from '@/types'
+import type { Result, PageResult, UserItem, UserDetail, UserCount } from '@/types'
 
 export function getUserList(params: {
   keyword?: string
@@ -17,4 +17,8 @@ export function updateUserStatus(id: number, status: number) {
 
 export function getUserCount() {
   return request.get<any, Result<UserCount>>('/api/user/count')
+}
+
+export function getUserAdminDetail(id: number) {
+  return request.get<any, Result<UserDetail>>(`/api/user/admin/detail/${id}`)
 }

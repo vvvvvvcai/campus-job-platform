@@ -47,6 +47,23 @@ export interface UserItem {
   createTime: string
 }
 
+export interface UserDetail {
+  id: number
+  phone: string
+  username: string
+  realName?: string
+  gender?: number
+  genderLabel?: string
+  email?: string
+  avatar?: string
+  role: number
+  roleLabel: string
+  status: number
+  statusLabel: string
+  createTime: string
+  updateTime?: string
+}
+
 export interface UserCount {
   total: number
   byRole: {
@@ -89,6 +106,54 @@ export interface JobAdminItem {
   viewCount?: number
   applyCount?: number
   createTime: string
+}
+
+export interface JobDetail {
+  id: number
+  companyId?: number
+  companyName?: string
+  title: string
+  category?: string
+  city?: string
+  salaryMin?: number
+  salaryMax?: number
+  education?: string
+  experience?: string
+  jobType?: number
+  headcount?: number
+  description?: string
+  requirement?: string
+  benefits?: string
+  status: number
+  auditStatus: number
+  auditRemark?: string
+  auditTime?: string
+  viewCount?: number
+  applyCount?: number
+  createTime: string
+  updateTime?: string
+}
+
+export interface CompanyDetail {
+  id: number
+  userId?: number
+  companyName: string
+  industry?: string
+  scale?: string
+  nature?: string
+  address?: string
+  website?: string
+  logo?: string
+  description?: string
+  licenseUrl?: string
+  auditStatus: number
+  auditRemark?: string
+  auditTime?: string
+  createTime: string
+  updateTime?: string
+  hrName?: string
+  hrPhone?: string
+  hrEmail?: string
 }
 
 export interface JobCount {

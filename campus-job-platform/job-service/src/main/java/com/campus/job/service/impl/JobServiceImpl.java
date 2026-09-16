@@ -10,6 +10,7 @@ import com.campus.job.dto.JobAuditDTO;
 import com.campus.job.dto.JobPublishDTO;
 import com.campus.job.dto.JobSearchDTO;
 import com.campus.job.entity.Job;
+import com.campus.job.feign.CompanyFeignClient;
 import com.campus.job.mapper.JobMapper;
 import com.campus.job.service.JobService;
 import com.campus.job.vo.JobAdminListVO;
@@ -38,6 +39,7 @@ public class JobServiceImpl implements JobService {
 
     private final JobMapper jobMapper;
     private final StringRedisTemplate redisTemplate;
+    private final CompanyFeignClient companyFeignClient;
 
     @Override
     public Result<Void> publishJob(JobPublishDTO dto) {
@@ -205,6 +207,33 @@ public class JobServiceImpl implements JobService {
             item.setCreateTime(job.getCreateTime());
             return item;
         }).collect(Collectors.toList()));
+
+        return Result.success(vo);
+    }
+
+    @Override
+    public Result<JobInfoVO> getJobAdminDetail(Long jobId, Long adminId) {
+        Job job = jobMapper.selectById(jobId);
+        if (job == null) {
+            throw new BusinessException(ResultCode.JOB_NOT_FOUND);
+        }
+
+        JobInfoVO vo = new JobInfoVO();
+        BeanUtils.copyProperties(job, vo);
+
+        // 远程查询企业名称（失败时降级为 null，不影响主流程）
+        if (job.getCompanyId() != null) {
+            try {
+                Result<Map<String, Object>> companyResult = companyFeignClient.getCompanyAdminDetail(job.getCompanyId(), adminId);
+                if (companyResult != null && companyResult.getData() != null) {
+                    Object companyName = companyResult.getData().get("companyName");
+                    vo.setCompanyName(companyName != null ? companyName.toString() : null);
+                }
+            } catch (Exception e) {
+                log.warn("查询企业名称失败: jobId={}, companyId={}, error={}",
+                        jobId, job.getCompanyId(), e.getMessage());
+            }
+        }
 
         return Result.success(vo);
     }

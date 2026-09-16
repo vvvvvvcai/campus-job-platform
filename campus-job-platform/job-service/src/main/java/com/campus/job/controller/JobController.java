@@ -71,6 +71,14 @@ public class JobController {
         return jobService.getJobAdminList(keyword, auditStatus, status, category, city, page, pageSize);
     }
 
+    @ApiOperation("管理员获取职位详情")
+    @GetMapping("/admin/detail/{id}")
+    public Result<JobInfoVO> getJobAdminDetail(
+            @RequestHeader("X-User-Id") Long adminId,
+            @PathVariable Long id) {
+        return jobService.getJobAdminDetail(id, adminId);
+    }
+
     @ApiOperation("管理员审核职位")
     @PutMapping("/audit/{id}")
     public Result<Void> auditJob(

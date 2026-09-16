@@ -32,6 +32,11 @@ public interface CompanyService {
     Result<CompanyListVO> getCompanyList(String keyword, Integer auditStatus, String industry, Integer page, Integer pageSize);
 
     /**
+     * 管理员：获取企业详情（含HR信息）
+     */
+    Result<CompanyInfoVO> getCompanyAdminDetail(Long companyId);
+
+    /**
      * 管理员：通过企业审核
      */
     Result<Void> approveCompany(Long companyId);

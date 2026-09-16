@@ -40,6 +40,15 @@ public class UserInfoVO {
     @ApiModelProperty("状态：0-禁用，1-正常")
     private Integer status;
 
+    @ApiModelProperty("角色标签")
+    private String roleLabel;
+
+    @ApiModelProperty("状态标签")
+    private String statusLabel;
+
+    @ApiModelProperty("性别标签")
+    private String genderLabel;
+
     @ApiModelProperty("创建时间")
     private LocalDateTime createTime;
 }

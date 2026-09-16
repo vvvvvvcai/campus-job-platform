@@ -9,6 +9,7 @@ import com.campus.common.result.ResultCode;
 import com.campus.company.dto.CompanyAuditDTO;
 import com.campus.company.dto.CompanyAuditHandleDTO;
 import com.campus.company.entity.Company;
+import com.campus.company.feign.UserFeignClient;
 import com.campus.company.mapper.CompanyMapper;
 import com.campus.company.service.CompanyService;
 import com.campus.company.vo.CompanyInfoVO;
@@ -19,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyMapper companyMapper;
+    private final UserFeignClient userFeignClient;
 
     @Override
     public Result<Void> audit(Long userId, CompanyAuditDTO dto) {
@@ -154,6 +157,36 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    public Result<CompanyInfoVO> getCompanyAdminDetail(Long companyId) {
+        Company company = companyMapper.selectById(companyId);
+        if (company == null) {
+            throw new BusinessException(ResultCode.COMPANY_NOT_FOUND);
+        }
+
+        CompanyInfoVO vo = new CompanyInfoVO();
+        BeanUtils.copyProperties(company, vo);
+
+        // 远程查询 HR 信息（失败时降级为 null，不影响主流程）
+        if (company.getUserId() != null) {
+            try {
+                Result<Map<String, Object>> userResult = userFeignClient.getUserInfo(company.getUserId());
+                if (userResult != null && userResult.getData() != null) {
+                    Map<String, Object> userData = userResult.getData();
+                    vo.setHrName(toStr(userData.get("realName")));
+                    // user-service 返回的手机号已脱敏
+                    vo.setHrPhone(toStr(userData.get("phone")));
+                    vo.setHrEmail(toStr(userData.get("email")));
+                }
+            } catch (Exception e) {
+                log.warn("查询企业HR信息失败: companyId={}, userId={}, error={}",
+                        companyId, company.getUserId(), e.getMessage());
+            }
+        }
+
+        return Result.success(vo);
+    }
+
+    @Override
     public Result<Void> approveCompany(Long companyId) {
         Company company = companyMapper.selectById(companyId);
         if (company == null) {
@@ -192,5 +225,9 @@ public class CompanyServiceImpl implements CompanyService {
             case 2: return "已拒绝";
             default: return "未知";
         }
+    }
+
+    private String toStr(Object value) {
+        return value == null ? null : value.toString();
     }
 }

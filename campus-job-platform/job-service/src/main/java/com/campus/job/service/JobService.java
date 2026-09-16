@@ -44,6 +44,11 @@ public interface JobService {
     Result<JobAdminListVO> getJobAdminList(String keyword, Integer auditStatus, Integer status, String category, String city, Integer page, Integer pageSize);
 
     /**
+     * 管理员：获取职位详情（含企业名称）
+     */
+    Result<JobInfoVO> getJobAdminDetail(Long jobId, Long adminId);
+
+    /**
      * 管理员：审核职位
      */
     Result<Void> auditJob(Long jobId, JobAuditDTO dto);

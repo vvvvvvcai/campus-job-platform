@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type { Result, PageResult, JobAdminItem, JobCount } from '@/types'
+import type { Result, PageResult, JobAdminItem, JobCount, JobDetail } from '@/types'
 
 export function getJobAdminList(params: {
   keyword?: string
@@ -11,6 +11,10 @@ export function getJobAdminList(params: {
   pageSize?: number
 }) {
   return request.get<any, Result<PageResult<JobAdminItem>>>('/api/job/admin/list', { params })
+}
+
+export function getJobAdminDetail(id: number) {
+  return request.get<any, Result<JobDetail>>(`/api/job/admin/detail/${id}`)
 }
 
 export function auditJob(id: number, data: { auditStatus: number; remark?: string }) {

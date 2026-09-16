@@ -65,7 +65,10 @@ public class AuthFilter implements GlobalFilter, Ordered {
             "/api/company/list",
             "/api/company/audit/approve/",
             "/api/company/audit/reject/",
+            "/api/company/admin/detail/",
+            "/api/user/admin/detail/",
             "/api/job/admin/list",
+            "/api/job/admin/detail/",
             "/api/job/audit/",
             "/api/job/count"
     );
