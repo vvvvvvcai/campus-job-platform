@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type { Result, PageResult, CompanyItem } from '@/types'
+import type { Result, PageResult, CompanyItem, CompanyDetail } from '@/types'
 
 export function getCompanyList(params: {
   keyword?: string
@@ -9,6 +9,10 @@ export function getCompanyList(params: {
   pageSize?: number
 }) {
   return request.get<any, Result<PageResult<CompanyItem>>>('/api/company/list', { params })
+}
+
+export function getCompanyAdminDetail(id: number) {
+  return request.get<any, Result<CompanyDetail>>(`/api/company/admin/detail/${id}`)
 }
 
 export function approveCompany(id: number) {

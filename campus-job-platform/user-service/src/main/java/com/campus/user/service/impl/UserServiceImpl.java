@@ -263,12 +263,38 @@ public class UserServiceImpl implements UserService {
         return Result.success(result);
     }
 
+    @Override
+    public Result<UserInfoVO> getUserAdminDetail(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+
+        UserInfoVO vo = new UserInfoVO();
+        BeanUtils.copyProperties(user, vo);
+        vo.setPhone(PhoneUtils.desensitize(user.getPhone()));
+        vo.setRoleLabel(getRoleLabel(user.getRole()));
+        vo.setStatusLabel(user.getStatus() == 1 ? "正常" : "禁用");
+        vo.setGenderLabel(getGenderLabel(user.getGender()));
+
+        return Result.success(vo);
+    }
+
     private String getRoleLabel(Integer role) {
         if (role == null) return "未知";
         switch (role) {
             case 0: return "学生";
             case 1: return "企业HR";
             case 2: return "管理员";
+            default: return "未知";
+        }
+    }
+
+    private String getGenderLabel(Integer gender) {
+        if (gender == null) return "未知";
+        switch (gender) {
+            case 1: return "男";
+            case 2: return "女";
             default: return "未知";
         }
     }

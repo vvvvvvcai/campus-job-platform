@@ -56,9 +56,17 @@ public class CompanyController {
         return companyService.getCompanyList(keyword, auditStatus, industry, page, pageSize);
     }
 
-    @ApiOperation("管理员通过企业审核")
-    @PutMapping("/audit/approve/{id}")
-    public Result<Void> approveCompany(
+    @ApiOperation("管理员获取企业详情")
+    @GetMapping("/admin/detail/{id}")
+    public Result<CompanyInfoVO> getCompanyAdminDetail(
+            @RequestHeader("X-User-Id") Long adminId,
+            @PathVariable Long id) {
+        return companyService.getCompanyAdminDetail(id);
+    }
+
+            @ApiOperation("管理员通过企业审核")
+            @PutMapping("/audit/approve/{id}")
+            public Result<Void> approveCompany(
             @RequestHeader("X-User-Id") Long adminId,
             @PathVariable Long id) {
         return companyService.approveCompany(id);

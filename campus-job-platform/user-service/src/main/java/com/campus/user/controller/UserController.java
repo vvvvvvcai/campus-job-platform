@@ -84,4 +84,12 @@ public class UserController {
     public Result<Object> getUserCount(@RequestHeader("X-User-Id") Long adminId) {
         return userService.getUserCount();
     }
+
+    @ApiOperation("管理员获取用户详情")
+    @GetMapping("/admin/detail/{id}")
+    public Result<UserInfoVO> getUserAdminDetail(
+            @RequestHeader("X-User-Id") Long adminId,
+            @PathVariable Long id) {
+        return userService.getUserAdminDetail(id);
+    }
 }

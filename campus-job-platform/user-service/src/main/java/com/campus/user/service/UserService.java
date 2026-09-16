@@ -51,4 +51,9 @@ public interface UserService {
      * 管理员：获取用户统计数据
      */
     Result<Object> getUserCount();
+
+    /**
+     * 管理员：获取用户详情
+     */
+    Result<UserInfoVO> getUserAdminDetail(Long userId);
 }

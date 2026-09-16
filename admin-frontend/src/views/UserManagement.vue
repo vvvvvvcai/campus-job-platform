@@ -74,6 +74,12 @@
               <td class="py-3 px-4">
                 <div class="flex gap-2">
                   <button
+                    @click="showDetailModal(item.id)"
+                    class="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600"
+                  >
+                    详情
+                  </button>
+                  <button
                     v-if="item.status === 1 && item.role !== 2"
                     @click="handleDisable(item.id)"
                     class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600"
@@ -115,13 +121,112 @@
         </div>
       </div>
     </div>
+
+    <!-- 用户详情弹窗 -->
+    <div v-if="showDetail" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" @click.self="closeDetail">
+      <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+          <h3 class="text-lg font-semibold">用户详情</h3>
+          <button @click="closeDetail" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+        </div>
+        <div v-if="detailLoading" class="p-12 text-center text-gray-400">加载中...</div>
+        <div v-else-if="detail" class="p-6 space-y-6 overflow-y-auto">
+          <!-- 基本信息 -->
+          <div>
+            <h4 class="text-sm font-semibold text-gray-400 mb-3">基本信息</h4>
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+              <div>
+                <div class="text-xs text-gray-400">用户名</div>
+                <div class="mt-1">{{ detail.username }}</div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-400">真实姓名</div>
+                <div class="mt-1">{{ detail.realName || '-' }}</div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-400">性别</div>
+                <div class="mt-1">{{ detail.genderLabel || '未知' }}</div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-400">手机号</div>
+                <div class="mt-1">{{ detail.phone }}</div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-400">邮箱</div>
+                <div class="mt-1">{{ detail.email || '-' }}</div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-400">头像</div>
+                <div class="mt-1">
+                  <img v-if="detail.avatar" :src="detail.avatar" class="w-16 h-16 rounded-full object-cover" />
+                  <div v-else class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-xl">
+                    {{ detail.username?.charAt(0) || 'U' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 账号信息 -->
+          <div>
+            <h4 class="text-sm font-semibold text-gray-400 mb-3">账号信息</h4>
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+              <div>
+                <div class="text-xs text-gray-400">角色</div>
+                <div class="mt-1">
+                  <span
+                    class="px-2 py-1 rounded-full text-xs"
+                    :class="{
+                      'bg-blue-100 text-blue-800': detail.role === 0,
+                      'bg-purple-100 text-purple-800': detail.role === 1,
+                      'bg-orange-100 text-orange-800': detail.role === 2
+                    }"
+                  >
+                    {{ detail.roleLabel }}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-400">状态</div>
+                <div class="mt-1">
+                  <span
+                    class="px-2 py-1 rounded-full text-xs"
+                    :class="{
+                      'bg-green-100 text-green-800': detail.status === 1,
+                      'bg-red-100 text-red-800': detail.status === 0
+                    }"
+                  >
+                    {{ detail.statusLabel }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 时间信息 -->
+          <div>
+            <h4 class="text-sm font-semibold text-gray-400 mb-3">时间信息</h4>
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+              <div>
+                <div class="text-xs text-gray-400">注册时间</div>
+                <div class="mt-1">{{ detail.createTime }}</div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-400">更新时间</div>
+                <div class="mt-1">{{ detail.updateTime || '-' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getUserList, updateUserStatus } from '@/api/user'
-import type { UserItem } from '@/types'
+import { getUserList, updateUserStatus, getUserAdminDetail } from '@/api/user'
+import type { UserItem, UserDetail } from '@/types'
 
 const list = ref<UserItem[]>([])
 const total = ref(0)
@@ -133,6 +238,10 @@ const filters = ref<{
   role?: number
   status?: number
 }>({})
+
+const showDetail = ref(false)
+const detailLoading = ref(false)
+const detail = ref<UserDetail | null>(null)
 
 async function loadData() {
   try {
@@ -172,6 +281,28 @@ async function handleEnable(id: number) {
   } catch (e) {
     console.error('操作失败', e)
   }
+}
+
+async function showDetailModal(id: number) {
+  showDetail.value = true
+  detailLoading.value = true
+  detail.value = null
+  try {
+    const res = await getUserAdminDetail(id)
+    if (res.code === 200) {
+      detail.value = res.data
+    }
+  } catch (e) {
+    console.error('加载用户详情失败', e)
+    showDetail.value = false
+  } finally {
+    detailLoading.value = false
+  }
+}
+
+function closeDetail() {
+  showDetail.value = false
+  detail.value = null
 }
 
 onMounted(loadData)
