@@ -111,11 +111,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useAppStore } from '../stores/app'
+import { getFavoriteList, removeFavorite as apiRemoveFavorite } from '../api/favorite'
 
+const store = useAppStore()
 const activeFilter = ref('all')
 const searchQuery = ref('')
 const selectedIds = ref([])
+const loading = ref(false)
 
 const filterTabs = [
   { key: 'all', label: '全部' },
@@ -123,14 +127,34 @@ const filterTabs = [
   { key: 'full', label: '已招满' }
 ]
 
-const jobs = ref([
-  { id: 1, title: '高级前端开发工程师', company: '字节跳动', logo: '字', logoBg: 'bg-gradient-to-br from-blue-500 to-blue-600', salary: '25k-40k', location: '北京', experience: '3-5年', education: '本科', tags: ['Vue.js', 'TypeScript', 'React'], status: 'open', savedAt: '09-12' },
-  { id: 2, title: 'Java后端开发', company: '阿里巴巴', logo: '阿', logoBg: 'bg-gradient-to-br from-orange-500 to-red-500', salary: '20k-35k', location: '杭州', experience: '1-3年', education: '本科', tags: ['Java', 'Spring', '微服务'], status: 'open', savedAt: '09-10' },
-  { id: 3, title: '产品经理', company: '腾讯', logo: '腾', logoBg: 'bg-gradient-to-br from-emerald-500 to-teal-500', salary: '22k-38k', location: '深圳', experience: '2-4年', education: '本科', tags: ['B端产品', '数据分析', 'Axure'], status: 'open', savedAt: '09-08' },
-  { id: 4, title: '算法工程师', company: '美团', logo: '美', logoBg: 'bg-gradient-to-br from-yellow-500 to-amber-500', salary: '30k-50k', location: '北京', experience: '3-5年', education: '硕士', tags: ['机器学习', 'Python', 'TensorFlow'], status: 'full', savedAt: '09-05' },
-  { id: 5, title: 'UI/UX设计师', company: '网易', logo: '网', logoBg: 'bg-gradient-to-br from-red-500 to-rose-500', salary: '15k-25k', location: '广州', experience: '1-3年', education: '本科', tags: ['Figma', 'Sketch', '设计系统'], status: 'open', savedAt: '09-03' },
-  { id: 6, title: '数据分析师', company: '京东', logo: '京', logoBg: 'bg-gradient-to-br from-red-600 to-red-700', salary: '18k-30k', location: '北京', experience: '1-3年', education: '本科', tags: ['SQL', 'Python', 'Tableau'], status: 'full', savedAt: '09-01' }
-])
+const jobs = ref([])
+
+onMounted(async () => {
+  if (!store.isLoggedIn) return
+  loading.value = true
+  try {
+    const res = await getFavoriteList()
+    if (Array.isArray(res)) {
+      jobs.value = res.map(j => ({
+        id: j.id,
+        title: j.title,
+        company: j.companyName || '未知企业',
+        logo: j.companyName ? j.companyName.charAt(0) : '企',
+        logoBg: 'bg-gradient-to-br from-blue-500 to-blue-600',
+        salary: j.salaryMin && j.salaryMax ? `${j.salaryMin}-${j.salaryMax}` : '面议',
+        location: j.city || '',
+        experience: j.experience || '',
+        education: j.education || '',
+        tags: [],
+        status: j.status === 1 ? 'open' : 'full'
+      }))
+    }
+  } catch (e) {
+    console.error('获取收藏列表失败:', e)
+  } finally {
+    loading.value = false
+  }
+})
 
 const filteredJobs = computed(() => {
   let result = jobs.value
@@ -154,14 +178,19 @@ function toggleSelectAll() {
   else selectedIds.value = filteredJobs.value.map(j => j.id)
 }
 
-function removeFavorite(id) {
-  jobs.value = jobs.value.filter(j => j.id !== id)
-  selectedIds.value = selectedIds.value.filter(i => i !== id)
+async function removeFavorite(id) {
+  try {
+    await apiRemoveFavorite(id)
+    jobs.value = jobs.value.filter(j => j.id !== id)
+    selectedIds.value = selectedIds.value.filter(i => i !== id)
+  } catch (e) {
+    console.error('取消收藏失败:', e)
+  }
 }
 
 function batchApply() { selectedIds.value = [] }
 function batchRemove() {
-  jobs.value = jobs.value.filter(j => !selectedIds.value.includes(j.id))
-  selectedIds.value = []
+  const ids = [...selectedIds.value]
+  ids.forEach(id => removeFavorite(id))
 }
 </script>

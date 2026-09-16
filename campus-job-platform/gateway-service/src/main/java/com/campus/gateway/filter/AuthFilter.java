@@ -46,6 +46,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
             "/api/user/register",
             "/api/user/sms",
             "/api/job/search",
+            "/api/job/categories",
             "/api/job/detail/**",
             "/api/company/detail/**",
             "/doc.html",

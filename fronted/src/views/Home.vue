@@ -45,34 +45,31 @@
           </div>
           <div class="h-11 w-px bg-surface-container-high hidden sm:block"></div>
           <div class="relative hidden sm:block">
-            <select class="h-11 pl-9 pr-8 bg-surface-container-low text-on-surface text-sm rounded-xl appearance-none cursor-pointer focus:outline-none border border-surface-container-high">
-              <option>央企/国企重点单位</option>
-              <option>互联网技术先锋</option>
-              <option>跨国金融科技</option>
+            <select v-model="selectedIndustry" class="h-11 pl-9 pr-8 bg-surface-container-low text-on-surface text-sm rounded-xl appearance-none cursor-pointer focus:outline-none border border-surface-container-high">
+              <option value="">全部行业</option>
+              <option v-for="ind in industryOptions" :key="ind" :value="ind">{{ ind }}</option>
             </select>
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">apartment</span>
             <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">arrow_drop_down</span>
           </div>
           <div class="relative hidden sm:block">
-            <select class="h-11 pl-9 pr-8 bg-surface-container-low text-on-surface text-sm rounded-xl appearance-none cursor-pointer focus:outline-none border border-surface-container-high">
-              <option>北京及周边</option>
-              <option>上海</option>
-              <option>深圳</option>
-              <option>杭州</option>
+            <select v-model="selectedCity" class="h-11 pl-9 pr-8 bg-surface-container-low text-on-surface text-sm rounded-xl appearance-none cursor-pointer focus:outline-none border border-surface-container-high">
+              <option value="">全部城市</option>
+              <option v-for="c in cityOptions" :key="c" :value="c">{{ c }}</option>
             </select>
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">location_on</span>
             <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">arrow_drop_down</span>
           </div>
-          <button class="h-11 px-6 bg-primary text-on-primary font-semibold text-sm rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2 shrink-0">
+          <button @click="handleSearch" class="h-11 px-6 bg-primary text-on-primary font-semibold text-sm rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2 shrink-0">
             <span class="material-symbols-outlined text-[18px]">tune</span>
             精准检索
           </button>
         </div>
         <!-- Hot Tags -->
         <div class="flex items-center gap-2 mt-3 flex-wrap">
-          <span class="text-xs text-on-surface-variant shrink-0">🔥 热门搜索标签：</span>
-          <button v-for="tag in hotTags" :key="tag" class="px-3 py-1 text-xs rounded-full border transition-colors"
-            :class="tag === '央企专招专场' ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-surface-container-high text-on-surface-variant hover:border-primary hover:text-primary'">
+          <span class="text-xs text-on-surface-variant shrink-0">🔥 热门行业：</span>
+          <button v-for="tag in hotIndustryTags" :key="tag" @click="searchByIndustry(tag)"
+            class="px-3 py-1 text-xs rounded-full border border-primary bg-primary/5 text-primary font-semibold hover:bg-primary/10 transition-colors cursor-pointer">
             {{ tag }}
           </button>
         </div>
@@ -90,7 +87,7 @@
           <h2 class="text-2xl font-bold text-on-surface">名企校招与留用实习严选</h2>
         </div>
         <div class="flex gap-1 bg-surface-container-low rounded-lg p-1 overflow-x-auto">
-          <button v-for="tab in jobTabs" :key="tab" @click="activeJobTab = tab"
+          <button v-for="tab in jobTabs" :key="tab" @click="searchByTab(tab)"
             class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-all"
             :class="activeJobTab === tab ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'">
             {{ tab }}
@@ -165,12 +162,34 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
+import { searchJobs, getJobCategories } from '../api/job'
 
+const router = useRouter()
 const store = useAppStore()
 const searchQuery = ref('')
-const activeJobTab = ref('全部推荐 (28)')
+const selectedIndustry = ref('')
+const selectedCity = ref('')
+const industryOptions = ref([])
+const hotIndustryTags = ref([])
+const jobTabs = ref(['全部推荐'])
+const activeJobTab = ref('全部推荐')
+
+const ALL_CITIES = ['北京', '上海', '广州', '深圳', '杭州', '南京', '成都', '武汉', '西安', '苏州', '天津', '重庆', '长沙', '郑州', '青岛', '大连', '宁波', '厦门', '合肥', '佛山', '东莞', '无锡', '昆明', '福州', '济南', '哈尔滨', '沈阳', '长春', '贵阳', '南宁', '太原', '石家庄', '兰州', '海口', '银川', '西宁', '拉萨', '呼和浩特', '乌鲁木齐', '台北', '香港', '澳门']
+const cityOptions = ALL_CITIES
+
+const LOGO_COLORS = ['#1a56db', '#006591', '#0a8754', '#0078d4', '#e74c3c', '#8e44ad', '#e67e22', '#1abc9c', '#2c3e50', '#d35400', '#27ae60', '#c0392b']
+
+function shuffle(arr) {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
 
 function requireAuth() {
   if (!store.isLoggedIn) {
@@ -178,71 +197,65 @@ function requireAuth() {
   }
 }
 
-const hotTags = ['Java实习', '产品经理管培生', '央企专招专场', '留用转正率90%+', '新能源与半导体', '海外留学生回国绿色通道']
+function handleSearch() {
+  const query = {}
+  if (searchQuery.value) query.keyword = searchQuery.value
+  if (selectedIndustry.value) query.industry = selectedIndustry.value
+  if (selectedCity.value) query.city = selectedCity.value
+  router.push({ path: '/jobs', query })
+}
 
-const jobTabs = ['全部推荐 (28)', '央企国企名录', '互联网技术先锋', '跨国金融科技', '应届保研/管培生']
+function searchByIndustry(industry) {
+  router.push({ path: '/jobs', query: { industry } })
+}
 
-const jobs = ref([
-  {
-    id: 1,
-    title: '大模型算法工...',
-    company: '字节跳动 · 基础架构',
-    logoBg: '#1a56db',
-    logoText: '字',
-    badge: '急聘',
-    badgeClass: 'bg-red-50 text-red-600 border border-red-200',
-    salary: '400-500/天',
-    salaryNote: '转正概率 85%',
-    tags: ['北京·海淀', '5天/周', '至少实习4个月', '硕士优先'],
-    desc: '参与海量分布式模型训练优化平台研发，提供行业顶尖导师1对1带教和算力集群支持。',
-    meta: '2小时前更新 · HR在线'
-  },
-  {
-    id: 2,
-    title: '全栈开发工程...',
-    company: '腾讯科技 · IEG互动娱乐',
-    logoBg: '#006591',
-    logoText: '腾',
-    badge: '正式春招',
-    badgeClass: 'bg-emerald-50 text-emerald-600 border border-emerald-200',
-    salary: '18k-28k',
-    salaryNote: '16薪',
-    salaryExtra: '③安居借款50万',
-    tags: ['深圳·南山', '全职校招', '本科及以上', '带薪年假'],
-    desc: '负责全球顶级自研游戏微服务架构搭建与高可用网络服务优化，团队极具极客创新氛...',
-    meta: '昨日发布 · 直通初筛'
-  },
-  {
-    id: 3,
-    title: '电力自动化与...',
-    company: '国家电网 · 全球能源互联网院',
-    logoBg: '#0a8754',
-    logoText: '国',
-    badge: '央企编内',
-    badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200',
-    salary: '22k-32k',
-    salaryNote: '月+京户',
-    salaryExtra: '⑥险二金·全额落户',
-    tags: ['北京·昌平', '应届硕士/博士', '电气/计算机', '国家重点研发'],
-    desc: '承担特高压电网数字孪生仿真国家重点工程研究，享受人才公寓与全额住房公积金补贴。',
-    meta: '已报录 420人 · 统招'
-  },
-  {
-    id: 4,
-    title: 'Azure 云原生...',
-    company: '微软中国 · 亚太研发集团',
-    logoBg: '#0078d4',
-    logoText: 'M',
-    badge: '外企WLB',
-    badgeClass: 'bg-blue-50 text-blue-600 border border-blue-200',
-    salary: '25k-35k',
-    salaryNote: '月+期权',
-    salaryExtra: '弹性混合办公',
-    tags: ['上海·徐汇', '2025/2026届', '远程办公两天', '英语工作流'],
-    desc: '为跨国500强企业提供微服务、容器化与智能云架构赋能，提供全球调动发展通道。',
-    meta: '3小时前更新 · 快速响应'
+function searchByTab(tab) {
+  activeJobTab.value = tab
+  if (tab === '全部推荐') {
+    fetchJobs({ pageNum: 1, pageSize: 4 })
+  } else {
+    router.push({ path: '/jobs', query: { industry: tab } })
   }
-])
+}
+
+const jobs = ref([])
+
+async function fetchJobs(params = { pageNum: 1, pageSize: 4 }) {
+  try {
+    const res = await searchJobs(params)
+    if (res && res.records) {
+      const shuffled = params.pageSize === 4 ? shuffle(res.records).slice(0, 4) : res.records
+      jobs.value = shuffled.map((j, i) => ({
+        id: j.id,
+        title: j.title,
+        company: j.companyName || '未知企业',
+        logoBg: LOGO_COLORS[i % LOGO_COLORS.length],
+        logoText: j.companyName ? j.companyName.charAt(0) : '企',
+        salary: j.salaryMin && j.salaryMax ? `${j.salaryMin}k-${j.salaryMax}k` : '面议',
+        tags: [j.city, j.education, j.experience, j.jobType === 2 ? '实习' : '全职'].filter(Boolean),
+        desc: j.description ? j.description.substring(0, 80) + (j.description.length > 80 ? '...' : '') : '暂无描述',
+        meta: `${j.viewCount || 0}人看过 · ${j.applyCount || 0}人投递`
+      }))
+    }
+  } catch (e) {
+    console.error('获取推荐职位失败:', e)
+  }
+}
+
+onMounted(async () => {
+  try {
+    const res = await getJobCategories()
+    console.log('categories:', res)
+    if (res && res.industries && res.industries.length > 0) {
+      industryOptions.value = res.industries
+      hotIndustryTags.value = shuffle(res.industries).slice(0, 4)
+      jobTabs.value = ['全部推荐', ...shuffle(res.industries).slice(0, 4)]
+    }
+  } catch (e) {
+    console.error('获取行业类别失败:', e)
+  }
+  fetchJobs()
+})
 
 const steps = [
   { title: '在线一键投递', desc: '支持标准求职简历一键投递，直连企业HR后台无信息壁垒。' },

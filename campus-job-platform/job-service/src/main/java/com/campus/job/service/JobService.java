@@ -6,6 +6,9 @@ import com.campus.job.dto.JobSearchDTO;
 import com.campus.job.vo.JobInfoVO;
 import com.campus.job.vo.JobListVO;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * 职位服务接口
  */
@@ -35,4 +38,9 @@ public interface JobService {
      * 更新职位状态
      */
     Result<Void> updateJobStatus(Long id, Integer status);
+
+    /**
+     * 获取所有职位类别和行业
+     */
+    Result<Map<String, List<String>>> getJobCategories();
 }

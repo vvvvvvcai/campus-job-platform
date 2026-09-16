@@ -37,6 +37,11 @@ public class Job {
     private String city;
 
     /**
+     * 所属行业
+     */
+    private String industry;
+
+    /**
      * 最低薪资
      */
     private BigDecimal salaryMin;
@@ -100,6 +105,11 @@ public class Job {
      * 审核备注
      */
     private String auditRemark;
+
+    /**
+     * 发布时间
+     */
+    private LocalDateTime publishTime;
 
     /**
      * 浏览次数

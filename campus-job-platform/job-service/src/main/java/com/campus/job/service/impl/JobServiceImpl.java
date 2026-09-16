@@ -8,7 +8,9 @@ import com.campus.common.result.Result;
 import com.campus.common.result.ResultCode;
 import com.campus.job.dto.JobPublishDTO;
 import com.campus.job.dto.JobSearchDTO;
+import com.campus.job.entity.Company;
 import com.campus.job.entity.Job;
+import com.campus.job.mapper.CompanyMapper;
 import com.campus.job.mapper.JobMapper;
 import com.campus.job.service.JobService;
 import com.campus.job.vo.JobInfoVO;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
 public class JobServiceImpl implements JobService {
 
     private final JobMapper jobMapper;
+    private final CompanyMapper companyMapper;
     private final StringRedisTemplate redisTemplate;
 
     @Override
@@ -76,6 +80,9 @@ public class JobServiceImpl implements JobService {
         if (StringUtils.hasText(dto.getCity())) {
             wrapper.eq(Job::getCity, dto.getCity());
         }
+        if (StringUtils.hasText(dto.getIndustry())) {
+            wrapper.eq(Job::getIndustry, dto.getIndustry());
+        }
         if (StringUtils.hasText(dto.getCategory())) {
             wrapper.eq(Job::getCategory, dto.getCategory());
         }
@@ -89,7 +96,24 @@ public class JobServiceImpl implements JobService {
             wrapper.le(Job::getSalaryMin, dto.getSalaryMax());
         }
 
-        wrapper.orderByDesc(Job::getCreateTime);
+        if (StringUtils.hasText(dto.getSortBy())) {
+            switch (dto.getSortBy()) {
+                case "latest":
+                    wrapper.orderByDesc(Job::getPublishTime, Job::getCreateTime);
+                    break;
+                case "salary":
+                    wrapper.orderByDesc(Job::getSalaryMax);
+                    break;
+                case "response":
+                    wrapper.orderByDesc(Job::getApplyCount);
+                    break;
+                default:
+                    wrapper.orderByDesc(Job::getCreateTime);
+                    break;
+            }
+        } else {
+            wrapper.orderByDesc(Job::getCreateTime);
+        }
 
         Page<Job> page = new Page<>(dto.getPageNum(), dto.getPageSize());
         Page<Job> result = jobMapper.selectPage(page, wrapper);
@@ -97,6 +121,10 @@ public class JobServiceImpl implements JobService {
         List<JobInfoVO> records = result.getRecords().stream().map(job -> {
             JobInfoVO vo = new JobInfoVO();
             BeanUtils.copyProperties(job, vo);
+            Company company = companyMapper.selectById(job.getCompanyId());
+            if (company != null) {
+                vo.setCompanyName(company.getCompanyName());
+            }
             return vo;
         }).collect(Collectors.toList());
 
@@ -123,6 +151,10 @@ public class JobServiceImpl implements JobService {
 
         JobInfoVO vo = new JobInfoVO();
         BeanUtils.copyProperties(job, vo);
+        Company company = companyMapper.selectById(job.getCompanyId());
+        if (company != null) {
+            vo.setCompanyName(company.getCompanyName());
+        }
 
         return Result.success(vo);
     }
@@ -139,5 +171,33 @@ public class JobServiceImpl implements JobService {
         log.info("职位状态更新成功: {} -> {}", id, status);
 
         return Result.success();
+    }
+
+    @Override
+    public Result<Map<String, List<String>>> getJobCategories() {
+        LambdaQueryWrapper<Job> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Job::getStatus, JobEnum.Status.RECRUITING.getCode());
+        wrapper.eq(Job::getDeleted, 0);
+        wrapper.select(Job::getCategory, Job::getIndustry);
+        List<Job> jobs = jobMapper.selectList(wrapper);
+
+        List<String> categories = jobs.stream()
+                .map(Job::getCategory)
+                .filter(StringUtils::hasText)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+
+        List<String> industries = jobs.stream()
+                .map(Job::getIndustry)
+                .filter(StringUtils::hasText)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+
+        Map<String, List<String>> result = new java.util.HashMap<>();
+        result.put("categories", categories);
+        result.put("industries", industries);
+        return Result.success(result);
     }
 }

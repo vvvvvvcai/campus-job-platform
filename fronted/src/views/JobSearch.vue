@@ -9,11 +9,11 @@
             <input v-model="searchQuery" type="text" placeholder="大模型算法工程师"
               class="w-full h-12 pl-12 pr-4 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 border border-surface-container-high" />
           </div>
-          <button class="h-12 px-5 bg-primary text-on-primary font-semibold text-sm rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2 shrink-0">
+          <button @click="handleSearch" class="h-12 px-5 bg-primary text-on-primary font-semibold text-sm rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2 shrink-0">
             <span class="material-symbols-outlined text-[18px]">search</span>
             立即搜索
           </button>
-          <button class="h-12 px-4 text-on-surface-variant hover:text-on-surface text-sm font-medium rounded-xl hover:bg-surface-container-low transition-colors flex items-center gap-1 shrink-0">
+          <button @click="resetFilters" class="h-12 px-4 text-on-surface-variant hover:text-on-surface text-sm font-medium rounded-xl hover:bg-surface-container-low transition-colors flex items-center gap-1 shrink-0">
             <span class="material-symbols-outlined text-[18px]">refresh</span>
             重置
           </button>
@@ -22,24 +22,43 @@
         <!-- City Row -->
         <div class="flex items-center gap-2 mt-4 flex-wrap">
           <span class="text-xs text-on-surface-variant font-medium shrink-0">工作城市：</span>
-          <button v-for="city in cities" :key="city" @click="selectedCity = city"
+          <button v-for="city in cities" :key="city" @click="selectedCity = city; handleSearch()"
             class="px-3 py-1 text-xs rounded-full transition-colors"
             :class="selectedCity === city ? 'bg-primary text-on-primary font-semibold' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'">
             {{ city }}
           </button>
-          <button class="text-xs text-primary hover:underline ml-1">更多海外/省市 ▾</button>
         </div>
       </div>
     </div>
 
     <!-- Filters -->
     <div class="max-w-7xl mx-auto px-6 py-4">
-      <div class="grid grid-cols-5 gap-3">
-        <div v-for="filter in filters" :key="filter.label" class="relative">
-          <select class="w-full h-10 pl-3 pr-8 bg-surface-container-lowest text-on-surface text-xs rounded-lg appearance-none cursor-pointer border border-surface-container-high focus:outline-none focus:border-primary">
-            <option v-for="opt in filter.options" :key="opt">{{ opt }}</option>
+      <div class="grid grid-cols-4 gap-3">
+        <div class="relative">
+          <label class="block text-[11px] text-on-surface-variant mb-1 font-medium">行业类别</label>
+          <select v-model="selectedIndustry" @change="handleSearch()" class="w-full h-10 pl-3 pr-8 bg-surface-container-lowest text-on-surface text-xs rounded-lg appearance-none cursor-pointer border border-surface-container-high focus:outline-none focus:border-primary">
+            <option v-for="opt in industryOptions" :key="opt" :value="opt">{{ opt }}</option>
           </select>
-          <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px]">arrow_drop_down</span>
+          <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 mt-1 text-on-surface-variant text-[16px]">arrow_drop_down</span>
+        </div>
+        <div class="relative">
+          <label class="block text-[11px] text-on-surface-variant mb-1 font-medium">工作类型</label>
+          <select v-model="selectedJobType" @change="handleSearch()" class="w-full h-10 pl-3 pr-8 bg-surface-container-lowest text-on-surface text-xs rounded-lg appearance-none cursor-pointer border border-surface-container-high focus:outline-none focus:border-primary">
+            <option v-for="opt in jobTypeOptions" :key="opt" :value="opt">{{ opt }}</option>
+          </select>
+          <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 mt-1 text-on-surface-variant text-[16px]">arrow_drop_down</span>
+        </div>
+        <div class="relative">
+          <label class="block text-[11px] text-on-surface-variant mb-1 font-medium">学历要求</label>
+          <select v-model="selectedEducation" @change="handleSearch()" class="w-full h-10 pl-3 pr-8 bg-surface-container-lowest text-on-surface text-xs rounded-lg appearance-none cursor-pointer border border-surface-container-high focus:outline-none focus:border-primary">
+            <option v-for="opt in educationOptions" :key="opt" :value="opt">{{ opt }}</option>
+          </select>
+          <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 mt-1 text-on-surface-variant text-[16px]">arrow_drop_down</span>
+        </div>
+        <div class="flex items-end">
+          <button @click="resetFilters" class="w-full h-10 px-4 text-xs font-medium text-on-surface-variant bg-surface-container-low hover:bg-surface-container rounded-lg transition-colors">
+            重置全部筛选
+          </button>
         </div>
       </div>
 
@@ -64,11 +83,11 @@
           <!-- Results Header -->
           <div class="flex items-center justify-between mb-4">
             <div>
-              <span class="text-sm text-on-surface-variant">搜索结果 共为您筛选到 <span class="font-bold text-on-surface">1,286</span> 个应届及带薪实习岗位</span>
+              <span class="text-sm text-on-surface-variant">搜索结果 共为您筛选到 <span class="font-bold text-on-surface">{{ totalJobs }}</span> 个职位</span>
             </div>
             <div class="flex items-center gap-3">
               <div class="flex bg-surface-container-low rounded-lg p-1">
-                <button v-for="tab in sortTabs" :key="tab" @click="activeSort = tab"
+                <button v-for="tab in sortTabs" :key="tab" @click="activeSort = tab; handleSearch()"
                   class="px-3 py-1.5 text-xs font-medium rounded-md transition-all"
                   :class="activeSort === tab ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'">
                   {{ tab }}
@@ -84,6 +103,7 @@
           <!-- Job Cards -->
           <div class="space-y-4">
             <div v-for="job in jobs" :key="job.id"
+              @click="$router.push(`/jobs/${job.id}`)"
               class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-5 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group">
               <div class="flex items-start gap-4">
                 <div class="w-11 h-11 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0" :style="{ background: job.logoBg }">
@@ -114,6 +134,9 @@
                     <span v-for="b in job.benefits" :key="b" class="text-[11px] text-primary">· {{ b }}</span>
                   </div>
 
+                  <!-- Description -->
+                  <p v-if="job.desc" class="text-xs text-on-surface-variant leading-relaxed mt-2 line-clamp-2">{{ job.desc }}</p>
+
                   <!-- Bottom Row -->
                   <div class="flex items-center justify-between mt-3 pt-3 border-t border-surface-container-high">
                     <span class="text-[11px] text-on-surface-variant">{{ job.meta }}</span>
@@ -131,19 +154,13 @@
           </div>
 
           <!-- Pagination -->
-          <div class="flex items-center justify-between mt-8">
-            <span class="text-xs text-on-surface-variant">显示第 1-5 条，共 1,286 个职位</span>
+          <div v-if="totalPages > 1" class="flex items-center justify-between mt-8">
+            <span class="text-xs text-on-surface-variant">第 {{ currentPage }}/{{ totalPages }} 页，共 {{ totalJobs }} 个职位</span>
             <div class="flex items-center gap-1.5">
-              <button class="w-8 h-8 rounded-lg border border-surface-container-high flex items-center justify-center text-on-surface-variant hover:border-primary hover:text-primary"><span class="material-symbols-outlined text-[16px]">chevron_left</span></button>
-              <button v-for="p in 4" :key="p" class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
-                :class="p === 1 ? 'bg-primary text-on-primary' : 'border border-surface-container-high text-on-surface-variant hover:border-primary hover:text-primary'">{{ p }}</button>
-              <span class="text-on-surface-variant text-xs">...</span>
-              <button class="w-8 h-8 rounded-lg border border-surface-container-high flex items-center justify-center text-xs text-on-surface-variant hover:border-primary hover:text-primary">42</button>
-              <button class="w-8 h-8 rounded-lg border border-surface-container-high flex items-center justify-center text-on-surface-variant hover:border-primary hover:text-primary"><span class="material-symbols-outlined text-[16px]">chevron_right</span></button>
-              <span class="text-xs text-on-surface-variant ml-2">到第</span>
-              <input type="text" value="1" class="w-8 h-8 text-center text-xs border border-surface-container-high rounded-lg focus:outline-none focus:border-primary" />
-              <span class="text-xs text-on-surface-variant">页</span>
-              <button class="h-8 px-3 text-xs font-medium text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors">确认</button>
+              <button @click="goToPage(currentPage - 1)" :disabled="currentPage <= 1" class="w-8 h-8 rounded-lg border border-surface-container-high flex items-center justify-center text-on-surface-variant hover:border-primary hover:text-primary disabled:opacity-50"><span class="material-symbols-outlined text-[16px]">chevron_left</span></button>
+              <button v-for="p in Math.min(totalPages, 5)" :key="p" @click="goToPage(p)" class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
+                :class="p === currentPage ? 'bg-primary text-on-primary' : 'border border-surface-container-high text-on-surface-variant hover:border-primary hover:text-primary'">{{ p }}</button>
+              <button @click="goToPage(currentPage + 1)" :disabled="currentPage >= totalPages" class="w-8 h-8 rounded-lg border border-surface-container-high flex items-center justify-center text-on-surface-variant hover:border-primary hover:text-primary disabled:opacity-50"><span class="material-symbols-outlined text-[16px]">chevron_right</span></button>
             </div>
           </div>
         </div>
@@ -227,13 +244,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
+import { searchJobs, getJobCategories } from '../api/job'
 
+const route = useRoute()
+const router = useRouter()
 const store = useAppStore()
 const searchQuery = ref('')
 const selectedCity = ref('全国')
+const selectedIndustry = ref('不限')
+const selectedJobType = ref('不限')
+const selectedEducation = ref('不限')
 const activeSort = ref('综合排序')
+const sortMap = { '综合排序': '', '最新发布': 'latest', '薪资最高': 'salary', '投递响应最快': 'response' }
+const currentPage = ref(1)
+const totalPages = ref(1)
+const totalJobs = ref(0)
+const loading = ref(false)
 
 function requireAuth() {
   if (!store.isLoggedIn) {
@@ -241,93 +270,106 @@ function requireAuth() {
   }
 }
 
-const cities = ['全国', '北京', '上海', '深圳', '杭州', '广州', '成都', '武汉', '南京']
+const ALL_CITIES = ['全国', '北京', '上海', '广州', '深圳', '杭州', '南京', '成都', '武汉', '西安', '苏州', '天津', '重庆', '长沙', '郑州', '青岛', '大连', '宁波', '厦门', '合肥', '佛山', '东莞', '无锡', '昆明', '福州', '济南', '哈尔滨', '沈阳', '长春', '贵阳', '南宁', '太原', '石家庄', '兰州', '海口', '银川', '西宁', '拉萨', '呼和浩特', '乌鲁木齐', '台北', '香港', '澳门']
+const cities = ALL_CITIES
 
-const filters = [
-  { label: '职位职能', options: ['人工智能 / 大模型算法'] },
-  { label: '期望月薪 / 日薪', options: ['15k-25k · 15薪及以上'] },
-  { label: '学历要求', options: ['硕士研究生及以上'] },
-  { label: '毕业身份 / 届别', options: ['2025应届毕业生'] },
-  { label: '企业性质', options: ['不限性质'] },
-]
+const industryOptions = ref(['不限'])
+const jobTypeOptions = ['不限', '全职', '实习', '兼职']
+const educationOptions = ['不限', '大专', '本科', '硕士', '博士']
 
 const specialTags = ['留用转正率 > 80%', '央企国企直属名录', '985/211校友导师通道', '解决户口/提供宿舍', '无需笔试直面业务合伙人']
-
 const sortTabs = ['综合排序', '最新发布', '薪资最高', '投递响应最快']
+const jobs = ref([])
 
-const jobs = ref([
-  {
-    id: 1,
-    title: '大模型算法工程师（2025届校招/带薪实习）',
-    company: '智航未来科技有限公司 · 人工智能独角兽 · 1000-5000人 · 已签约本校学长 14人',
-    logoBg: '#1a56db',
-    logoText: '智',
-    badges: [{ text: '校招直通', class: 'bg-primary/10 text-primary' }, { text: 'HOT 热招', class: 'bg-red-50 text-red-600 border border-red-200' }],
-    salary: '25k-40k · 16薪',
-    salaryNote: '实习补贴：500-800元/天',
-    tags: ['北京·海淀区', '硕士及以上学历', '2025届毕业生', '留用转正率90%+', 'ACM/ICPC竞赛优先', '国家级导师1对1带教'],
-    benefits: ['六险二金', '免息首款购房无息借款', '免费自助三餐+健身房', '重点单位北京落户指标支持'],
-    meta: '10分钟前发布 · HR今日在线 · 简历处理率 98.4%'
-  },
-  {
-    id: 2,
-    title: '前端研发工程师（校招转正 / 核心引擎组）',
-    company: '腾跃互娱软件股份有限公司 · 互联网上市企业 · 5000-10000人',
-    logoBg: '#006591',
-    logoText: 'E',
-    badges: [{ text: '校招快转批', class: 'bg-emerald-50 text-emerald-600 border border-emerald-200' }],
-    salary: '16k-25k · 15薪',
-    salaryNote: '季度绩效奖金 + 项目分红',
-    tags: ['深圳·南山区·科技园', '本科及以上学历', 'Vue3 / React / WebGL / TS', '核心自研业务线', 'T10技术大牛带队', '100%校招实习留用率'],
-    benefits: ['带薪年假12天', '企业顶配MacBook Pro', '年度出国游团建', '打车全额报销'],
-    meta: '1小时前发布 · 招聘负责人 20分钟前在线'
-  },
-  {
-    id: 3,
-    title: '新能源电池电芯研发工程师',
-    company: '华夏绿动动力股份集团 · 高端装备制造 / 新能源 · 10000人以上',
-    logoBg: '#0a8754',
-    logoText: '华',
-    badges: [{ text: '央企直管', class: 'bg-amber-50 text-amber-700 border border-amber-200' }, { text: '安家费15万', class: 'bg-blue-50 text-blue-600 border border-blue-200' }],
-    salary: '18k-28k · 14薪',
-    salaryNote: '+ 专项引才补贴15万元',
-    tags: ['上海·嘉定工业区', '硕士 / 博士', '材料物理 / 化学化工', '国家自然科学基金联合项目', '提供人才公寓单间', '国家重点实验室依托'],
-    benefits: ['事业编制通道', '企业年金', '节日慰问金与健康体检', '公派境外高校交流'],
-    meta: '3小时前更新发布 · 央企直聘绿色通道'
-  },
-  {
-    id: 4,
-    title: '智能制造管培生（青年领航计划2025）',
-    company: '联星智造工业集团 · 工业机器人 / 智造龙头 · 3000-5000人',
-    logoBg: '#6b21a8',
-    logoText: '联',
-    badges: [{ text: '管培体系', class: 'bg-purple-50 text-purple-600 border border-purple-200' }],
-    salary: '12k-18k · 13薪',
-    salaryNote: '快速晋升通道 + 轮岗绩效',
-    tags: ['苏州·工业园区', '本科及以上 (工科/管理优先)', '3年跨部门轮岗实战', '集团VP高管专属带教', '出山定级部门负责人'],
-    benefits: [],
-    meta: '昨天发布 · 已收到本校投递 38 份'
-  },
-  {
-    id: 5,
-    title: '金融量化研究员实习生（秋招留用通道）',
-    company: '泛海远资产管理有限公司 · 百亿量化私募 · 100-499人',
-    logoBg: '#0ea5e9',
-    logoText: '泛',
-    badges: [{ text: '带薪日常实习', class: 'bg-primary/10 text-primary' }, { text: '极高留用率', class: 'bg-emerald-50 text-emerald-600 border border-emerald-200' }],
-    salary: '600 - 1,000元 / 天',
-    salaryNote: '转正全职起薪50万 · 100万+',
-    tags: ['北京·朝阳区·国贸CBD', '硕士 / 博士在读', '数学 / 物理 / 计算机 / 金融工程', '提供留用Offer直通卡', '算力集群全额开放'],
-    benefits: [],
-    meta: '2天前发布 · 合伙人亲自初筛'
+const LOGO_COLORS = ['#1a56db', '#006591', '#0a8754', '#0078d4', '#e74c3c', '#8e44ad', '#e67e22', '#1abc9c', '#2c3e50', '#d35400', '#27ae60', '#c0392b']
+
+function handleSearch() {
+  currentPage.value = 1
+  fetchJobs()
+}
+
+function resetFilters() {
+  searchQuery.value = ''
+  selectedCity.value = '全国'
+  selectedIndustry.value = '不限'
+  selectedJobType.value = '不限'
+  selectedEducation.value = '不限'
+  currentPage.value = 1
+  fetchJobs()
+}
+
+function goToPage(page) {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  fetchJobs()
+}
+
+function selectCity(city) {
+  selectedCity.value = city
+  handleSearch()
+}
+
+async function fetchJobs() {
+  loading.value = true
+  try {
+    const params = {
+      keyword: searchQuery.value || undefined,
+      city: selectedCity.value !== '全国' ? selectedCity.value : undefined,
+      industry: selectedIndustry.value !== '不限' ? selectedIndustry.value : undefined,
+      jobType: selectedJobType.value === '全职' ? 1 : selectedJobType.value === '实习' ? 2 : selectedJobType.value === '兼职' ? 3 : undefined,
+      sortBy: sortMap[activeSort.value] || undefined,
+      pageNum: currentPage.value,
+      pageSize: 10
+    }
+    const res = await searchJobs(params)
+    if (res && res.records) {
+      jobs.value = res.records.map((j, i) => ({
+        id: j.id,
+        title: j.title,
+        company: j.companyName || '未知企业',
+        logoBg: LOGO_COLORS[i % LOGO_COLORS.length],
+        logoText: j.companyName ? j.companyName.charAt(0) : '企',
+        badges: [],
+        salary: j.salaryMin && j.salaryMax ? `${j.salaryMin}k-${j.salaryMax}k` : '面议',
+        tags: [j.city, j.education, j.experience, j.jobType === 1 ? '全职' : j.jobType === 2 ? '实习' : '兼职'].filter(Boolean),
+        benefits: j.benefits ? j.benefits.split(/[,，、]/).filter(Boolean) : [],
+        desc: j.description ? j.description.substring(0, 60) + (j.description.length > 60 ? '...' : '') : '',
+        meta: `${j.viewCount || 0}人看过 · ${j.applyCount || 0}人投递`
+      }))
+      totalJobs.value = res.total || 0
+      totalPages.value = res.totalPages || 1
+    }
+  } catch (e) {
+    console.error('搜索职位失败:', e)
+    jobs.value = []
+    totalJobs.value = 0
+  } finally {
+    loading.value = false
   }
-])
+}
 
-const hotJobs = [
-  { title: '大模型算法与评测实习生', company: '智航未来', city: '北京海淀', score: '99.2 热度', applicants: 320 },
-  { title: '央企国家电力工程研究员', company: '华能新能源装备', city: '上海', score: '96.8 热度', applicants: 285 },
-  { title: '量化高频交易开发（C++）', company: '博远资产', city: '北京', score: '93.4 热度', applicants: 210 },
-  { title: '全栈前端系统工程管培生', company: '腾跃互娱', city: '深圳', score: '88.7 热度', applicants: 176 },
-  { title: '青年领航智造轮岗管培生', company: '联星智造', city: '苏州', score: '85.2 热度', applicants: 142 },
-]
+onMounted(async () => {
+  if (route.query.keyword) searchQuery.value = route.query.keyword
+  if (route.query.city) selectedCity.value = route.query.city
+  if (route.query.industry) selectedIndustry.value = route.query.industry
+
+  try {
+    const res = await getJobCategories()
+    console.log('search categories:', res)
+    if (res && res.industries) {
+      industryOptions.value = ['不限', ...res.industries]
+    }
+  } catch (e) {
+    console.error('获取行业类别失败:', e)
+  }
+  fetchJobs()
+})
+
+watch(() => route.query, (q) => {
+  if (q.keyword !== undefined) searchQuery.value = q.keyword || ''
+  if (q.city !== undefined) selectedCity.value = q.city || '全国'
+  if (q.industry !== undefined) selectedIndustry.value = q.industry || '不限'
+  currentPage.value = 1
+  fetchJobs()
+})
 </script>

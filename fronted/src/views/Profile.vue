@@ -102,7 +102,7 @@
                 <span class="material-symbols-outlined text-[var(--primary)]">person</span>
                 基本信息
               </h3>
-              <button @click="editingBasic = !editingBasic" class="text-sm text-[var(--primary)] hover:underline flex items-center gap-1">
+              <button @click="toggleEditBasic" class="text-sm text-[var(--primary)] hover:underline flex items-center gap-1">
                 <span class="material-symbols-outlined text-base">{{ editingBasic ? 'check' : 'edit' }}</span>
                 {{ editingBasic ? '保存' : '编辑' }}
               </button>
@@ -302,8 +302,9 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useAppStore } from '../stores/app'
+import { getUserInfo, updateUserInfo } from '../api/user'
 
 const store = useAppStore()
 
@@ -311,7 +312,8 @@ const currentStatus = ref('seeking')
 const showStatusMenu = ref(false)
 const editingBasic = ref(false)
 const editingCareer = ref(false)
-const resumeCompleteness = ref(88)
+const resumeCompleteness = ref(0)
+const saving = ref(false)
 
 const jobStatuses = [
   { key: 'seeking', label: '正在找工作' },
@@ -321,58 +323,84 @@ const jobStatuses = [
 ]
 
 const basicFields = [
-  { key: 'name', label: '真实姓名' },
-  { key: 'gender', label: '性别' },
-  { key: 'birth', label: '出生年月' },
+  { key: 'username', label: '用户名' },
+  { key: 'realName', label: '真实姓名' },
   { key: 'phone', label: '联系手机' },
-  { key: 'email', label: '电子邮箱' },
-  { key: 'wechat', label: '微信号' },
-  { key: 'location', label: '所在城市' },
-  { key: 'political', label: '政治面貌' },
-  { key: 'hukou', label: '生源户籍地' }
+  { key: 'email', label: '电子邮箱' }
 ]
 
 const basicInfo = reactive({
-  name: '林晨', gender: '女', birth: '2003年8月（21岁）', phone: '188****6820', email: 'linchen.cs@campus.edu.cn', wechat: 'linchen_dev', location: '北京·海淀区中关村', political: '中共党员', hukou: '浙江省·杭州市'
+  username: '', realName: '', phone: '', email: ''
 })
 
-const jobTypes = ['前端开发', '后端开发', '全栈开发', '算法工程师', '产品经理', 'UI设计', '数据分析', '运维']
-const cities = ['北京', '上海', '广州', '深圳', '杭州', '成都', '南京', '武汉']
-const industries = ['互联网', '金融', '教育', '医疗', '新能源', '游戏', '电商', '企业服务']
+onMounted(async () => {
+  if (store.isLoggedIn) {
+    try {
+      const info = await getUserInfo()
+      basicInfo.username = info.username || ''
+      basicInfo.realName = info.realName || ''
+      basicInfo.phone = info.phone || ''
+      basicInfo.email = info.email || ''
+      const filled = [info.username, info.realName, info.phone, info.email].filter(Boolean).length
+      resumeCompleteness.value = Math.round(filled / 4 * 60)
+    } catch (e) {
+      console.error('获取用户信息失败:', e)
+      basicInfo.username = store.user?.name || '用户'
+    }
+  }
+})
+
+async function toggleEditBasic() {
+  if (editingBasic.value) {
+    await saveBasicInfo()
+  } else {
+    editingBasic.value = true
+  }
+}
+
+async function saveBasicInfo() {
+  try {
+    await updateUserInfo({
+      username: basicInfo.username,
+      realName: basicInfo.realName,
+      email: basicInfo.email,
+      phone: basicInfo.phone
+    })
+    editingBasic.value = false
+    const filled = [basicInfo.username, basicInfo.realName, basicInfo.phone, basicInfo.email].filter(Boolean).length
+    resumeCompleteness.value = Math.round(filled / 4 * 60)
+  } catch (e) {
+    console.error('更新用户信息失败:', e)
+    alert(e.message || '保存失败，请重试')
+  }
+}
 
 const career = reactive({
   jobTypes: ['全职应届 / 实习（可提供转正）'],
-  salary: '15k - 25k/月（或 350-500元/天实习）',
-  cities: ['北京（海淀/朝阳）', '上海（浦东/徐汇）', '深圳（南山）', '杭州'],
-  industries: ['互联网 / 大模型与生成式AI', '高端智能制造与工业互联', '金融科技（量化开发）'],
-  targetJobs: ['前端开发工程师 (React/Vue/Web3D)', '全栈研发工程师 (Node.js/Go)', '大模型应用开发 / Prompt Engineer'],
-  availableDate: '1周内到岗：每周可全勤实习5天 · 可持续实习6个月'
+  salary: '面议',
+  cities: ['北京', '上海', '深圳', '杭州'],
+  industries: ['互联网', '金融科技'],
+  targetJobs: ['前端开发工程师', '全栈研发工程师'],
+  availableDate: '随时到岗'
 })
 
-function toggleCareer(field, value) {
-  const arr = career[field]
-  const idx = arr.indexOf(value)
-  if (idx >= 0) arr.splice(idx, 1)
-  else arr.push(value)
-}
-
 const education = reactive([
-  { school: '北京科技大学', major: '计算机科学与技术', degree: '本科 · 工学学士（卓越工程师重点培养班）', period: '2021.09 — 2025.06（2025届）', gpa: '3.82 / 4.0（专业前 5%）', honors: ['国家励志奖学金（连续两年获得，各项综合测评第一名）', 'ACM-ICPC 大学生程序设计竞赛 · 省级一等奖（主力算法与动态规划手）', '全国大学生数学建模竞赛（仿赛社）· 全国二等奖'], tags: ['985/双一流高校', '教育部直属'], english: 'CET-6 612分 | 托福 104' }
+  { school: '待填写', major: '待填写', degree: '待填写', period: '待填写', gpa: '待填写', honors: [], tags: [], english: '待填写' }
 ])
 
 const completenessItems = [
   { label: '基本信息', done: true },
-  { label: '教育经历', done: true },
-  { label: '项目经历', done: true },
-  { label: '技能证书', done: true },
+  { label: '教育经历', done: false },
+  { label: '项目经历', done: false },
+  { label: '技能证书', done: false },
   { label: '自我评价', done: false },
-  { label: '期望岗位', done: true }
+  { label: '期望岗位', done: false }
 ]
 
 const stats = [
-  { label: '投递简历', value: '23' },
-  { label: '被查看', value: '18' },
-  { label: '面试邀约', value: '6' },
-  { label: '收到Offer', value: '2' }
+  { label: '投递简历', value: '0' },
+  { label: '被查看', value: '0' },
+  { label: '面试邀约', value: '0' },
+  { label: '收到Offer', value: '0' }
 ]
 </script>

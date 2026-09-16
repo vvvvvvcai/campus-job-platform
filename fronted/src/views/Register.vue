@@ -250,6 +250,7 @@
 import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
+import { register as apiRegister, login as apiLogin } from '../api/user'
 
 const router = useRouter()
 const store = useAppStore()
@@ -311,12 +312,24 @@ function handleRegister() {
   if (form.password !== form.confirmPassword) { showToast('error', '两次输入的密码不一致'); return }
   if (!form.agree) { showToast('error', '请先阅读并同意用户协议与隐私政策'); return }
   loading.value = true
-  setTimeout(() => {
-    loading.value = false
-    store.login({ phone: form.phone, name: '新用户' }, role.value)
-    showToast('success', '注册成功，正在跳转...')
-    setTimeout(() => router.push('/'), 800)
-  }, 1200)
+  const roleNum = role.value === 'hr' ? 1 : 0
+  apiRegister({ phone: form.phone, password: form.password, username: form.phone, role: roleNum })
+    .then(() => apiLogin({ phone: form.phone, password: form.password }))
+    .then(data => {
+      const roleStr = data.role === 1 ? 'hr' : 'student'
+      store.login(
+        { name: data.username, phone: form.phone, avatar: data.avatar },
+        roleStr,
+        data.token,
+        data.userId
+      )
+      showToast('success', '注册成功，正在跳转...')
+      setTimeout(() => router.push('/'), 800)
+    })
+    .catch(err => {
+      showToast('error', err.message || '注册失败，请稍后重试')
+    })
+    .finally(() => { loading.value = false })
 }
 
 function sendSmsCode() {

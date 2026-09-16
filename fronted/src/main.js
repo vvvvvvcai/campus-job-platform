@@ -6,6 +6,8 @@ import './style.css'
 
 const routes = [
   { path: '/', name: 'Home', component: () => import('./views/Home.vue') },
+  { path: '/login', name: 'Login', component: () => import('./views/Login.vue') },
+  { path: '/register', name: 'Register', component: () => import('./views/Register.vue') },
   { path: '/profile', name: 'Profile', component: () => import('./views/Profile.vue'), meta: { requiresAuth: true } },
   { path: '/change-password', name: 'ChangePassword', component: () => import('./views/ChangePassword.vue'), meta: { requiresAuth: true } },
   { path: '/jobs', name: 'JobSearch', component: () => import('./views/JobSearch.vue'), meta: { requiresAuth: true } },

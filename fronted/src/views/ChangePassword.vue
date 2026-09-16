@@ -203,6 +203,7 @@
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
+import { updatePassword } from '../api/user'
 
 const showCurrent = ref(false)
 const showNew = ref(false)
@@ -242,13 +243,23 @@ const securityTips = [
   { icon: 'verified_user', iconColor: 'text-primary', title: '保障网签法律效力', desc: '修改密码后，与用人单位签署的三方就业协议和电子用工存证将自动关联最新的安全密钥保护。' }
 ]
 
-function handleSubmit() {
+async function handleSubmit() {
   errors.current = !form.current ? '请输入当前密码' : ''
   errors.newPassword = !form.newPassword ? '请输入新密码' : form.newPassword.length < 8 ? '密码至少8位' : form.newPassword === form.current ? '新密码不能与当前密码相同' : ''
   errors.confirm = form.newPassword !== form.confirm ? '两次密码输入不一致' : ''
   if (errors.current || errors.newPassword || errors.confirm) return
   loading.value = true
-  setTimeout(() => { loading.value = false; showToast('success', '密码修改成功！') }, 1500)
+  try {
+    await updatePassword(form.current, form.newPassword)
+    loading.value = false
+    showToast('success', '密码修改成功！')
+    form.current = ''
+    form.newPassword = ''
+    form.confirm = ''
+  } catch (e) {
+    loading.value = false
+    showToast('error', e.message || '密码修改失败')
+  }
 }
 </script>
 

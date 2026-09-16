@@ -1,5 +1,22 @@
 <template>
   <div class="min-h-screen bg-background">
+    <!-- Loading State -->
+    <div v-if="loading" class="max-w-6xl mx-auto px-6 pt-12 flex flex-col items-center justify-center min-h-[50vh]">
+      <span class="material-symbols-outlined text-4xl text-primary animate-spin mb-4">progress_activity</span>
+      <p class="text-on-surface-variant text-sm">加载职位详情中...</p>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error" class="max-w-6xl mx-auto px-6 pt-12 flex flex-col items-center justify-center min-h-[50vh]">
+      <span class="material-symbols-outlined text-4xl text-error mb-4">error</span>
+      <p class="text-on-surface-variant text-sm mb-4">{{ error }}</p>
+      <button @click="fetchJobDetail" class="px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors">
+        重试
+      </button>
+    </div>
+
+    <!-- Job Detail Content -->
+    <template v-else-if="jobData">
     <!-- Hero Card -->
     <section class="max-w-6xl mx-auto px-6 pt-6">
       <div class="bg-gradient-to-br from-surface-container-lowest via-surface-container-lowest to-primary/5 rounded-3xl border border-surface-container-high p-6 lg:p-8">
@@ -93,7 +110,7 @@
                 <span class="material-symbols-outlined text-base">chat</span>
                 与HR直聊
               </button>
-              <button @click="isFavorited = !isFavorited"
+              <button @click="toggleFavorite"
                 class="w-full py-1.5 text-on-surface-variant text-xs flex items-center justify-center gap-1.5 hover:text-primary transition-colors">
                 <span class="material-symbols-outlined text-sm">{{ isFavorited ? 'bookmark' : 'bookmark_border' }}</span>
                 {{ isFavorited ? '已收藏' : '收藏职位' }}
@@ -186,7 +203,7 @@
             </div>
 
             <div class="grid grid-cols-2 gap-4">
-              <div v-for="(benefit, index) in benefits" :key="index"
+              <div v-for="(benefit, index) in benefitList" :key="index"
                 class="p-4 bg-surface-container-low rounded-xl border border-surface-container-high hover:border-primary/30 transition-colors">
                 <div class="flex items-center gap-2.5 mb-2.5">
                   <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -195,7 +212,7 @@
                   <h4 class="text-sm font-bold text-on-surface">{{ benefit.title }}</h4>
                 </div>
                 <p class="text-xs text-on-surface-variant leading-relaxed mb-3">{{ benefit.desc }}</p>
-                <button class="text-xs text-primary font-medium flex items-center gap-1 hover:underline">
+                <button v-if="benefit.link" class="text-xs text-primary font-medium flex items-center gap-1 hover:underline">
                   {{ benefit.link }}
                   <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </button>
@@ -285,7 +302,7 @@
 
     <!-- Mobile Sticky Bottom Bar -->
     <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-surface-container-lowest border-t border-surface-container-high px-6 py-3 flex items-center gap-3 z-40">
-      <button @click="isFavorited = !isFavorited"
+      <button @click="toggleFavorite"
         :class="['w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 transition-colors',
           isFavorited ? 'border-red-200 bg-red-50 text-red-500' : 'border-surface-container-high text-on-surface-variant']">
         <span class="material-symbols-outlined">{{ isFavorited ? 'favorite' : 'favorite_border' }}</span>
@@ -308,8 +325,8 @@
               </button>
             </div>
             <div class="bg-surface-container-low rounded-xl p-4 mb-5">
-              <p class="text-sm font-medium text-on-surface">大模型算法工程师</p>
-              <p class="text-xs text-on-surface-variant mt-0.5">智航未来科技 · 北京</p>
+              <p class="text-sm font-medium text-on-surface">{{ job.title }}</p>
+              <p class="text-xs text-on-surface-variant mt-0.5">{{ jobData.companyName }} · {{ job.location }}</p>
             </div>
             <div class="space-y-3 mb-5">
               <div class="flex items-center gap-3">
@@ -338,64 +355,160 @@
         </div>
       </Transition>
     </Teleport>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getJobDetail } from '../api/job'
+import { addFavorite, removeFavorite } from '../api/favorite'
 
+const route = useRoute()
 const router = useRouter()
+
+const loading = ref(true)
+const error = ref('')
+const jobData = ref(null)
 const isFavorited = ref(false)
 const showApplyModal = ref(false)
 const applying = ref(false)
 
-const job = {
-  title: '大模型算法工程师（2025届校招/可转正实习）',
-  salary: '25k - 40k',
-  salaryPeriod: '16薪',
-  internSalary: '600-800元/天（实习期）',
-  location: '北京·中关村清华科技园',
-  education: '硕士及以上',
-  headcount: 3,
-  type: '全职 / 实习均可',
-  audience: '2025届应届 / 2026届实习',
-  badges: [
-    { text: '校企联合育人基地', icon: 'emoji_events', class: 'border-surface-container-high text-on-surface-variant bg-surface-container-low/50' },
-    { text: '重点高校直聘通道', icon: 'diamond', class: 'border-surface-container-high text-on-surface-variant bg-surface-container-low/50' },
-    { text: '实习转正率 92%', icon: 'trending_up', class: 'border-surface-container-high text-on-surface-variant bg-surface-container-low/50' },
-    { text: '支持网签三方协议', icon: 'description', class: 'border-surface-container-high text-on-surface-variant bg-surface-container-low/50' }
-  ],
-  intro: '你将加入智航未来基础大模型实验室（LLM Research Lab），同顶级科学家和工程架构师共事，主导从基座模型训练室至千亿级参数多模态部署落地全链。具体职责涵盖：'
+const JOB_TYPE_MAP = { 1: '全职', 2: '实习', 3: '兼职' }
+
+const job = computed(() => {
+  const d = jobData.value
+  if (!d) return {}
+  return {
+    title: d.title || '',
+    salary: `${d.salaryMin}k - ${d.salaryMax}k`,
+    salaryPeriod: '月',
+    location: d.city || '',
+    education: d.education || '',
+    headcount: d.headcount || 0,
+    type: JOB_TYPE_MAP[d.jobType] || '全职',
+    intro: d.description || ''
+  }
+})
+
+const responsibilities = computed(() => {
+  const desc = jobData.value?.description || ''
+  if (!desc) return []
+  const items = []
+  const lines = desc.split(/\n/).filter(l => l.trim())
+  let current = null
+  for (const line of lines) {
+    const trimmed = line.replace(/^[\d\.\、\-\*]+\s*/, '').trim()
+    if (!trimmed) continue
+    if (/^[\d一二三四五六七八九十]+$/.test(trimmed) || /^第[一二三四五六七八九十]+[步条项]/.test(trimmed)) {
+      if (current) items.push(current)
+      current = { title: trimmed, desc: '' }
+    } else if (/^[（(]/.test(trimmed) || (current && !current.desc)) {
+      if (current) {
+        current.desc = current.desc ? current.desc + ' ' + trimmed : trimmed
+      } else {
+        items.push({ title: '职责描述', desc: trimmed })
+      }
+    } else {
+      if (current) {
+        current.desc = current.desc ? current.desc + ' ' + trimmed : trimmed
+      } else {
+        items.push({ title: '职责描述', desc: trimmed })
+      }
+    }
+  }
+  if (current) items.push(current)
+  if (items.length === 0 && desc) {
+    return [{ title: '职位描述', desc }]
+  }
+  return items
+})
+
+const requirements = computed(() => {
+  const req = jobData.value?.requirement || ''
+  if (!req) return []
+  const items = []
+  const lines = req.split(/\n/).filter(l => l.trim())
+  let current = null
+  for (const line of lines) {
+    const trimmed = line.replace(/^[\d\.\、\-\*]+\s*/, '').trim()
+    if (!trimmed) continue
+    if (/^[\d一二三四五六七八九十]+$/.test(trimmed) || /^第[一二三四五六七八九十]+[步条项]/.test(trimmed)) {
+      if (current) items.push(current)
+      current = { label: trimmed, desc: '' }
+    } else if (current) {
+      current.desc = current.desc ? current.desc + ' ' + trimmed : trimmed
+    } else {
+      items.push({ label: '要求', desc: trimmed })
+    }
+  }
+  if (current) items.push(current)
+  if (items.length === 0 && req) {
+    return [{ label: '任职要求', desc: req }]
+  }
+  return items
+})
+
+const benefitList = computed(() => {
+  const b = jobData.value?.benefits || ''
+  if (!b) return []
+  const icons = ['account_balance_wallet', 'school', 'apartment', 'handshake', 'health_and_safety', 'work', 'card_giftcard', 'local_fire_department']
+  const items = []
+  const lines = b.split(/\n/).filter(l => l.trim())
+  let current = null
+  for (const line of lines) {
+    const trimmed = line.replace(/^[\d\.\、\-\*]+\s*/, '').trim()
+    if (!trimmed) continue
+    if (/^[\d一二三四五六七八九十]+$/.test(trimmed) || /^第[一二三四五六七八九十]+[步条项]/.test(trimmed)) {
+      if (current) items.push(current)
+      current = { icon: icons[items.length % icons.length], title: trimmed, desc: '', link: '' }
+    } else if (current) {
+      current.desc = current.desc ? current.desc + ' ' + trimmed : trimmed
+    } else {
+      items.push({ icon: icons[items.length % icons.length], title: '福利待遇', desc: trimmed, link: '' })
+    }
+  }
+  if (current) items.push(current)
+  if (items.length === 0 && b) {
+    return [{ icon: 'card_giftcard', title: '福利待遇', desc: b, link: '' }]
+  }
+  return items
+})
+
+const similarJobs = ref([])
+const techTags = ref([])
+
+async function fetchJobDetail() {
+  const id = route.params.id
+  if (!id) return
+  loading.value = true
+  error.value = ''
+  try {
+    const data = await getJobDetail(id)
+    jobData.value = data
+    isFavorited.value = !!data.isFavorite
+  } catch (e) {
+    error.value = e.message || '加载职位详情失败'
+  } finally {
+    loading.value = false
+  }
 }
 
-const responsibilities = [
-  { title: '千亿级大模型预训练与优化', desc: '深入参与千亿级多模态大语言模型（LLM）的预训练数据飞轮构建、高质量合成数据清洗、指令微调（SFT）与基于人类反馈的强化学习（RLHF / DPO）算法迭代。' },
-  { title: '垂直行业 Agent 与 RAG 体系构建', desc: '负责各类业务场景落地下的多 Agent 工作流编排、工具调用推理（Tool Use / Function Calling）以及基于语义向量的高精度 RAG 知识库检索引擎技术攻坚。' },
-  { title: '前沿学术突破与论文发表', desc: '持续追踪国际前沿学术动态（涵盖长上下文建模、思维链 CoT、多模态对齐等），协助发表顶级人工智能学术会议论文（NeurIPS、ICML、ICLR、CVPR、ACL 等）并申请核心技术专利。' }
-]
-
-const requirements = [
-  { label: '学历与专业背景', desc: '2025届应届毕业生或2026届在读研究生，计算机科学、人工智能、自动化、应用数学、软件工程或电子信得等相关专业硕士或博士学历。' },
-  { label: '技术栈掌握深度', desc: '熟练掌握 Python 与现代 C++ 语言，对数据结构与算法设计有扎实体会；深入理解 PyTorch 框架，熟悉 Megatron-LM、DeepSpeed、vLLM 或 TensorRT-LLM 等主流大模型分布式训练与推理优化框架。' },
-  { label: '竞赛与顶会优先（加分项）', desc: '在 ACM-ICPC、CCPC、Kaggle、天池或国内外知名顶级算法竞赛中取得过优异成绩的候选人优先；有以第一作者身份在 NeurIPS、ICML、CVPR、ACL 等顶级会议发表过学术论文者优先。' },
-  { label: '自我驱动与协同', desc: '对模型与通用人工智能（AGI）保有强烈的好奇心与技术激情，具备纯熟的英文文献检索能力与科技论文快速阅读写作能力；有严谨的代码工程习惯与跨学科协同作战素养。' }
-]
-
-const techTags = ['Python', 'PyTorch', 'DeepSpeed', 'Megatron-LM', 'RLHF / PPO', 'RAG 检索增强', 'Agent 开发']
-
-const benefits = [
-  { icon: 'account_balance_wallet', title: '丰厚薪资与安居支持', desc: '年度目标奖金（3-6 个月），高额六险二金（公积金全额顶格缴纳）；正式员工入职即可享受最高购房 50 万元免息安居购房借款计划。', link: '六险二金标准明细' },
-  { icon: 'school', title: '一对一顶级专家导师', desc: '应届生与实习生全员配备 Staff / Principal Engineer 级别技术专家，全程定制成长路径，从工程落地到学术论文全链路带教。', link: '专属智航成长路径' },
-  { icon: 'apartment', title: '生活全方位关怀', desc: '北京户口择业重点申报指标；提供青年专属品质公寓或每月 2,500 元租房补贴，三餐自助免费， envelope 下午茶、团建假期与家属关怀体检。', link: '应届新户特有政策详情' },
-  { icon: 'handshake', title: '转正保障与三方签订', desc: '实习期满考核合格直接转正，历史转正率高达 92%；通过全国高校就业平台直接网签《全国普通高等学校毕业生就业协议书》，毕业无级入职。', link: '快速办理三方' }
-]
-
-const similarJobs = [
-  { id: 101, title: '具身智能算法工程师（实习）', company: '影元机器人', salary: '20k-35k', location: '北京 / 上海·硕士' },
-  { id: 102, title: 'AIGC多模态研发实习生', company: '讯星智研研发中心', salary: '400-600元/天', location: '北京·本科起投' },
-  { id: 103, title: '深度学习平台开发工程师', company: '华域中央研究院', salary: '22k-38k', location: '北京·2025届' }
-]
+async function toggleFavorite() {
+  const id = route.params.id
+  try {
+    if (isFavorited.value) {
+      await removeFavorite(id)
+      isFavorited.value = false
+    } else {
+      await addFavorite(id)
+      isFavorited.value = true
+    }
+  } catch (e) {
+    console.error('收藏操作失败:', e)
+  }
+}
 
 function handleApply() {
   applying.value = true
@@ -408,6 +521,12 @@ function handleApply() {
 function goToJob(id) {
   router.push({ name: 'JobDetail', params: { id } })
 }
+
+onMounted(fetchJobDetail)
+
+watch(() => route.params.id, (newId) => {
+  if (newId) fetchJobDetail()
+})
 </script>
 
 <style scoped>

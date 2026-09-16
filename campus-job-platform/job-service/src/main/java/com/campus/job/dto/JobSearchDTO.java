@@ -19,6 +19,9 @@ public class JobSearchDTO {
     @ApiModelProperty("工作城市")
     private String city;
 
+    @ApiModelProperty("所属行业")
+    private String industry;
+
     @ApiModelProperty("职位类别")
     private String category;
 
@@ -36,4 +39,7 @@ public class JobSearchDTO {
 
     @ApiModelProperty(value = "每页大小", example = "10")
     private Integer pageSize = 10;
+
+    @ApiModelProperty("排序方式：latest-最新发布，salary-薪资最高，response-投递响应最快，不传则综合排序")
+    private String sortBy;
 }

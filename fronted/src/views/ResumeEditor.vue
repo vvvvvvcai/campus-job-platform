@@ -15,9 +15,9 @@
             <span class="material-symbols-outlined text-[16px]">visibility</span>
             预览效果
           </button>
-          <button class="px-5 py-2 bg-[var(--primary)] text-white rounded-xl text-sm font-semibold hover:bg-[var(--primary-container)] transition-colors flex items-center gap-2 shadow-sm">
-            <span class="material-symbols-outlined text-[16px]">check_circle</span>
-            完成并保存简历
+          <button @click="handleSave" :disabled="saving" class="px-5 py-2 bg-[var(--primary)] text-white rounded-xl text-sm font-semibold hover:bg-[var(--primary-container)] transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50">
+            <span class="material-symbols-outlined text-[16px]">{{ saving ? 'hourglass_top' : 'check_circle' }}</span>
+            {{ saving ? '保存中...' : '完成并保存简历' }}
           </button>
         </div>
       </div>
@@ -93,15 +93,15 @@
               <div class="grid grid-cols-3 gap-4">
                 <div>
                   <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">手机号码</label>
-                  <input v-model="basicInfo.phone" type="tel" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
+                  <input v-model="form.phone" type="tel" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
                 </div>
                 <div>
                   <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">教育邮箱 (Edu Mail)</label>
-                  <input v-model="basicInfo.email" type="email" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
+                  <input v-model="form.email" type="email" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
                 </div>
                 <div>
                   <label class="block text-xs text-[var(--on-surface-variant)] mb-1.5">出生年月 / 政治面貌</label>
-                  <input v-model="basicInfo.birth" type="text" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
+                  <input v-model="form.birthDate" type="text" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10" />
                 </div>
               </div>
             </div>
@@ -451,9 +451,18 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useAppStore } from '../stores/app'
+import { getResumeInfo, saveResume, updateResume } from '../api/resume'
 
-const activeStep = ref(4)
+const router = useRouter()
+const route = useRoute()
+const store = useAppStore()
+const saving = ref(false)
+const resumeId = computed(() => route.query.id ? Number(route.query.id) : null)
+
+const activeStep = ref(0)
 
 const steps = [
   { key: 'basic', label: '基本信息' },
@@ -464,46 +473,74 @@ const steps = [
   { key: 'project', label: '项目经历' }
 ]
 
-const basicInfo = reactive({
-  phone: '138-8800-2025',
-  email: 'linchen_ai@pku.edu.cn',
-  birth: '2000.11 / 中共党员'
+const form = reactive({
+  title: '我的简历',
+  name: '',
+  gender: 0,
+  birthDate: '',
+  phone: '',
+  email: '',
+  education: 1,
+  school: '',
+  major: '',
+  graduationYear: 2025,
+  workStatus: 1,
+  expectCity: '',
+  expectIndustry: '',
+  expectJobType: '',
+  expectSalary: '',
+  selfIntroduction: '',
+  skills: '[]',
+  experiences: '[]',
+  projects: '[]',
+  awards: '[]',
+  attachments: '[]'
 })
 
-const educations = reactive([
-  {
-    school: '北京大学',
-    tags: ['985', '双一流'],
-    major: '计算机软件与理论 · 硕士研究生',
-    gpa: '综合绩点：GPA 3.82 / 4.0（专业前 5%）· 国家奖学金获得者 · 研究方向为大规模型语言模型与高效微调',
-    period: '2022.09 — 2025.06（预计）'
-  },
-  {
-    school: '哈尔滨工业大学',
-    tags: ['C9 联盟'],
-    major: '计算机科学与技术 · 工学学士',
-    gpa: '综合绩点：GPA 3.78 / 4.0 · 校级一等奖学术奖学金 · ACM-ICPC 区域赛银奖',
-    period: '2018.09 — 2022.06'
+onMounted(async () => {
+  if (resumeId.value) {
+    try {
+      const data = await getResumeInfo(resumeId.value)
+      Object.keys(form).forEach(key => {
+        if (data[key] !== null && data[key] !== undefined) form[key] = data[key]
+      })
+    } catch (e) {
+      console.error('加载简历失败:', e)
+    }
+  } else if (store.user) {
+    form.name = store.user.name || ''
+    form.phone = store.user.phone || ''
   }
-])
+})
 
-const skills = reactive([
-  'Python / C++',
-  'PyTorch & DeepSpeed',
-  'Transformer 架构',
-  'LangChain & RAG',
-  'vLLM / TensorRT-LLM',
-  '知识图谱与向量数据库',
-  'Linux / Docker / K8s'
+const skills = computed(() => {
+  try { return JSON.parse(form.skills || '[]') } catch { return [] }
+})
+
+async function handleSave() {
+  saving.value = true
+  try {
+    if (resumeId.value) {
+      await updateResume(resumeId.value, form)
+    } else {
+      const newId = await saveResume(form)
+      router.replace({ query: { id: newId } })
+    }
+    alert('保存成功')
+  } catch (e) {
+    console.error('保存简历失败:', e)
+    alert(e.message || '保存失败，请重试')
+  } finally {
+    saving.value = false
+  }
+}
+
+const educations = reactive([
+  { school: '', tags: [], major: '', gpa: '', period: '' }
 ])
 
 const workExp1 = reactive({
-  company: '智维未来人工智能研究院（北京）有限公司',
-  position: '大模型算法实习生 (LLM Algorithm Intern)',
-  start: '2024年06月',
-  end: '至今（在职）',
-  team: '通用生成智能实验室 · 导师：张教授',
-  desc: '1. 【高效微调架构】负责 70B 参数量开源基座模型的 LoRA 与 QLoRA 参数高效微调管线搭建，针对多轮垂直领域代码问答任务构建高质量合成数据集（20万条）。\n\n2. 【吞吐与显存优化】基于 vLLM 实现 PagedAttention 算子级推理优化，重构 KV Cache 缓存淘汰机制；在单机 8×A800 集群上使高并发首字时延（TTFT）降低 42%，单卡并发吞吐提升 35%。\n\n3. 【模型评估体系】联合算法导师研发自动化评测 Benchmark，覆盖逻辑推理、指令遵循与长上下文检索三十余维度，输出专利 1 篇（第二学生发明人）。'
+  company: '', position: '', start: '', end: '', team: '', desc: ''
 })
 
 const modules = reactive([

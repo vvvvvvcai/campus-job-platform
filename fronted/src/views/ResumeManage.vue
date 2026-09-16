@@ -375,58 +375,87 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAppStore } from '../stores/app'
+import { getResumeList, getResumeInfo, deleteResume, saveResume, setDefaultResume } from '../api/resume'
 
+const router = useRouter()
+const store = useAppStore()
 const selectedResume = ref(null)
+const resumes = ref([])
+const loading = ref(false)
+const resumeDetail = ref(null)
 
-const resumes = ref([
-  {
-    id: 1,
-    title: '2025届计算机研发与算法专向简历',
-    updatedAt: '2025-03-08 14:20',
-    completeness: 95,
-    isDefault: true,
-    tags: [{ label: '默认投递', class: 'bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/20' }]
-  },
-  {
-    id: 2,
-    title: '互联网全栈 / 前端开发通用简历',
-    updatedAt: '2025-03-02 09:15',
-    completeness: 88,
-    isDefault: false,
-    tags: [{ label: '研发岗专用', class: 'bg-emerald-50 text-emerald-700 border-emerald-200' }]
-  },
-  {
-    id: 3,
-    title: '央国企及科研院所投递专版（附政审与成绩单）',
-    updatedAt: '2025-02-25 18:40',
-    completeness: 90,
-    isDefault: false,
-    tags: [{ label: '院所专版', class: 'bg-amber-50 text-amber-700 border-amber-200' }, { label: '央国企及科研院所投递专版', class: 'bg-purple-50 text-purple-700 border-purple-200' }]
+onMounted(async () => {
+  if (!store.isLoggedIn) return
+  loading.value = true
+  try {
+    const res = await getResumeList()
+    if (Array.isArray(res)) {
+      resumes.value = res.map(r => ({
+        id: r.id,
+        title: r.title || '未命名简历',
+        updatedAt: r.updateTime ? r.updateTime.substring(0, 10) : (r.createTime ? r.createTime.substring(0, 10) : ''),
+        completeness: calcCompleteness(r),
+        isDefault: r.isDefault === 1,
+        tags: r.isDefault === 1
+          ? [{ label: '默认投递', class: 'bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/20' }]
+          : [{ label: r.status === 1 ? '已完成' : '草稿', class: 'bg-gray-100 text-gray-500 border-gray-200' }]
+      }))
+      if (resumes.value.length > 0) await selectResume(resumes.value[0])
+    }
+  } catch (e) {
+    console.error('获取简历列表失败:', e)
+  } finally {
+    loading.value = false
   }
-])
+})
 
-const skills = [
-  'Python（熟练 / 核心研发语言）',
-  'PyTorch & DeepSpeed',
-  'C++ 17（高并发与底层系统）',
-  '大语言模型微调（SFT / LoRA / RLHF）',
-  'vLLM / TensorRT-LLM 加速推理',
-  'Linux 内核优化 & Docker / K8s',
-  '分布式通信 NCCL & Ray',
-  'Gitflow / CI·CD Pipeline'
-]
+function calcCompleteness(r) {
+  let filled = 0
+  const fields = [r.title, r.name, r.phone, r.email, r.school, r.major, r.selfIntroduction, r.skills, r.experiences, r.projects]
+  fields.forEach(f => { if (f) filled++ })
+  return Math.round(filled / fields.length * 100)
+}
+
+async function selectResume(resume) {
+  selectedResume.value = resume
+  if (!resume || !resume.id) return
+  try {
+    const detail = await getResumeInfo(resume.id)
+    resumeDetail.value = detail
+  } catch (e) {
+    console.error('获取简历详情失败:', e)
+    resumeDetail.value = null
+  }
+}
+
+const skills = ref([])
 
 function createResume() {
-  const newResume = {
-    id: Date.now(),
-    title: '新简历版本',
-    updatedAt: '刚刚',
-    completeness: 10,
-    isDefault: false,
-    tags: [{ label: '新建', class: 'bg-gray-100 text-gray-500 border-gray-200' }]
+  router.push('/resume/editor')
+}
+
+async function removeResume(id) {
+  try {
+    await deleteResume(id)
+    resumes.value = resumes.value.filter(r => r.id !== id)
+    if (selectedResume.value?.id === id) {
+      selectedResume.value = resumes.value[0] || null
+      if (selectedResume.value) await selectResume(selectedResume.value)
+    }
+  } catch (e) {
+    console.error('删除简历失败:', e)
   }
-  resumes.value.unshift(newResume)
-  selectedResume.value = newResume
+}
+
+async function setDefault(id) {
+  try {
+    await setDefaultResume(id)
+    resumes.value.forEach(r => r.isDefault = r.id === id)
+  } catch (e) {
+    console.error('设置默认简历失败:', e)
+  }
 }
 </script>

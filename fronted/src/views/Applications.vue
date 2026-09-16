@@ -180,155 +180,82 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAppStore } from '../stores/app'
+import { getApplicationList } from '../api/application'
 
 const router = useRouter()
+const store = useAppStore()
 const activeFilter = ref('all')
 const searchQuery = ref('')
 const currentPage = ref(1)
-const totalPages = ref(3)
-const totalApplications = ref(12)
+const totalPages = ref(1)
+const totalApplications = ref(0)
+const loading = ref(false)
 
 const filterTabs = [
-  { key: 'all', label: '全部', count: 12 },
-  { key: 'pending', label: '待查看', count: 3 },
-  { key: 'viewed', label: '已查看', count: 2 },
-  { key: 'interview', label: '面试邀请', count: 4, dot: true },
-  { key: 'offer', label: '已录用', count: 1 },
-  { key: 'rejected', label: '不合适', count: 2 }
+  { key: 'all', label: '全部', count: 0 },
+  { key: '0', label: '待查看', count: 0 },
+  { key: '1', label: '已查看', count: 0 },
+  { key: '2', label: '面试邀请', count: 0, dot: true },
+  { key: '4', label: '已录用', count: 0 },
+  { key: '3', label: '不合适', count: 0 }
 ]
 
 const statCards = [
-  {
-    label: '全部投递记录',
-    value: 12,
-    unit: '份职位',
-    sub: '+ 2 本周新投递',
-    icon: 'description',
-    iconColor: 'text-primary',
-    valueColor: 'text-on-surface',
-    subColor: 'text-on-surface-variant',
-    borderClass: 'border-b-2 border-b-primary'
-  },
-  {
-    label: '待HR查阅',
-    value: 3,
-    unit: '份排队中',
-    sub: '平均响应 24-48 小时',
-    icon: 'schedule',
-    iconColor: 'text-amber-500',
-    valueColor: 'text-amber-600',
-    subColor: 'text-on-surface-variant',
-    borderClass: 'border-b-2 border-b-amber-400'
-  },
-  {
-    label: '面试与沟通中',
-    value: 4,
-    unit: '场推进',
-    sub: '近期有 1 场待参加',
-    icon: 'chat_bubble',
-    iconColor: 'text-emerald-500',
-    valueColor: 'text-emerald-600',
-    subColor: 'text-on-surface-variant',
-    borderClass: 'border-b-2 border-b-emerald-400',
-    highlight: '近期有 1 场待参加',
-    highlightColor: 'text-amber-600',
-    dotColor: 'bg-amber-500'
-  },
-  {
-    label: '已获Offer / 录用',
-    value: 1,
-    unit: '份录用意向',
-    sub: '',
-    icon: 'check_circle',
-    iconColor: 'text-blue-500',
-    valueColor: 'text-blue-600',
-    subColor: 'text-on-surface-variant',
-    borderClass: 'border-b-2 border-b-primary',
-    highlight: '待三方网签',
-    highlightColor: 'text-primary',
-    dotColor: 'bg-primary'
-  }
+  { label: '全部投递记录', value: 0, unit: '份职位', sub: '', icon: 'description', iconColor: 'text-primary', valueColor: 'text-on-surface', subColor: 'text-on-surface-variant', borderClass: 'border-b-2 border-b-primary' },
+  { label: '待HR查阅', value: 0, unit: '份排队中', sub: '平均响应 24-48 小时', icon: 'schedule', iconColor: 'text-amber-500', valueColor: 'text-amber-600', subColor: 'text-on-surface-variant', borderClass: 'border-b-2 border-b-amber-400' },
+  { label: '面试与沟通中', value: 0, unit: '场推进', sub: '', icon: 'chat_bubble', iconColor: 'text-emerald-500', valueColor: 'text-emerald-600', subColor: 'text-on-surface-variant', borderClass: 'border-b-2 border-b-emerald-400' },
+  { label: '已获Offer / 录用', value: 0, unit: '份录用意向', sub: '', icon: 'check_circle', iconColor: 'text-blue-500', valueColor: 'text-blue-600', subColor: 'text-on-surface-variant', borderClass: 'border-b-2 border-b-primary' }
 ]
 
-const applications = ref([
-  {
-    id: 1,
-    position: '大模型算法工程师 (2025届校招)',
-    company: '智维未来科技有限公司',
-    companyTag: '高新技术企业',
-    location: '北京 · 海淀区',
-    salary: '25k-40k · 16薪',
-    appliedAt: '2025-03-08 10:15',
-    resume: '2025届计算机研发与算法专向简历.pdf',
-    tags: [{ label: '算法研发专项', class: 'bg-amber-50 text-amber-700 border border-amber-200' }],
-    status: 'interview'
-  },
-  {
-    id: 2,
-    position: '全栈开发工程师（管培生计划）',
-    company: '字节跳动互联网研发中心',
-    companyTag: '独角兽平台',
-    location: '北京 · 朝阳区',
-    salary: '18k-28k · 15薪',
-    appliedAt: '2025-02-28 16:30',
-    resume: '林晨_2025届全栈开发通用简历.pdf',
-    tags: [{ label: '管培生计划', class: 'bg-blue-50 text-blue-700 border border-blue-200' }],
-    status: 'viewed'
-  },
-  {
-    id: 3,
-    position: '电网自动化与新能源系统工程师',
-    company: '国家电网 · 全球能源互联网研究院',
-    companyTag: '重点科研院所',
-    location: '北京 · 昌平区',
-    salary: '22k-32k/月',
-    appliedAt: '2025-03-05 09:20',
-    resume: '林晨_嵌入式系统与智能电气方向.pdf',
-    tags: [{ label: '央企专项校招', class: 'bg-purple-50 text-purple-700 border border-purple-200' }],
-    status: 'interview'
-  },
-  {
-    id: 4,
-    position: 'Azure 云原生开发实习生',
-    company: '微软中国 · 亚太研发集团',
-    companyTag: '外资研发中心',
-    location: '上海 · 徐汇区',
-    salary: '25k-35k/月',
-    appliedAt: '2025-03-07 14:10',
-    resume: '林晨_Cloud_Native_EN_CN.pdf',
-    tags: [{ label: '春季日常实习', class: 'bg-emerald-50 text-emerald-700 border border-emerald-200' }],
-    status: 'pending'
-  },
-  {
-    id: 5,
-    position: '量化策略研究员',
-    company: '幻方量化投资中心',
-    location: '杭州 · 西湖区',
-    salary: '40k-60k',
-    appliedAt: '2025-02-15 11:05',
-    resume: '林晨_量化策略_幻方专向.pdf',
-    tags: [{ label: '校招已归档', class: 'bg-gray-100 text-gray-500 border border-gray-200' }],
-    status: 'rejected'
-  }
-])
+const applications = ref([])
 
 const filteredApplications = computed(() => {
   if (activeFilter.value === 'all') return applications.value
-  return applications.value.filter(a => a.status === activeFilter.value)
+  return applications.value.filter(a => String(a.statusRaw) === activeFilter.value)
 })
+
+async function fetchApplications() {
+  if (!store.isLoggedIn) return
+  loading.value = true
+  try {
+    const res = await getApplicationList({ page: currentPage.value, size: 10 })
+    if (res && res.records) {
+      applications.value = res.records.map(a => ({
+        id: a.id,
+        position: a.jobName || '未知职位',
+        company: a.companyName || '未知企业',
+        location: '',
+        salary: '',
+        appliedAt: a.createTime || '',
+        resume: a.resumeTitle || '在线简历',
+        tags: [],
+        status: ['pending', 'viewed', 'interview', 'rejected', 'offer'][a.status] || 'pending',
+        statusRaw: a.status
+      }))
+      totalApplications.value = res.total || 0
+      totalPages.value = res.pages || 1
+    }
+  } catch (e) {
+    console.error('获取投递列表失败:', e)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => fetchApplications())
 
 function removeApplication(id) {
   applications.value = applications.value.filter(a => a.id !== id)
 }
 
 const progressSteps = [
-  { title: '投递成功', date: '2025-03-08 10:15', desc: '投递《算法专向简历》，系统校验学籍档案无误，直通核心库。', badge: '已完成', done: true, icon: 'check' },
-  { title: 'HR 初筛通过', date: '2025-03-08 16:30', desc: '张经理查阅，评语："专业对口，具备高质量顶会成果与实习经历"。', badge: '匹配度 96%', done: true, icon: 'check' },
-  { title: '技术一面通过', date: '2025-03-10 15:00', desc: '李博士评定："算法功底敏捷，分布式工程视野宽广，推荐进入二面"。', badge: '技术评分 A+', done: true, icon: 'check' },
-  { title: '技术二面邀约', date: '2025-03-11 09:30', desc: '邀约确认已送达，定于03月12日15:30进行，首席科学家主持。', badge: '进行中', current: true, icon: 'pending' },
-  { title: 'HR 综合面谈', date: '预计 03-14 开展', desc: '文化契合度综合考察及期望薪酬、福利保障意向沟通。', badge: '待解锁', done: false, icon: 'hourglass_empty' },
-  { title: 'Offer 与网签', date: '待推进', desc: '生成正式录用函并直联教育部全国高校毕业去向登记系统。', badge: '最终环节', done: false, icon: 'school' }
+  { title: '投递成功', date: '', desc: '简历已投递，等待HR查阅。', badge: '已完成', done: true, icon: 'check' },
+  { title: 'HR 初筛', date: '', desc: 'HR查阅简历并评估匹配度。', badge: '进行中', current: true, icon: 'pending' },
+  { title: '技术面试', date: '', desc: '技术能力评估。', badge: '待解锁', done: false, icon: 'hourglass_empty' },
+  { title: '综合面谈', date: '', desc: '文化契合度考察。', badge: '待解锁', done: false, icon: 'hourglass_empty' },
+  { title: 'Offer 与网签', date: '', desc: '生成录用函并办理网签。', badge: '最终环节', done: false, icon: 'school' }
 ]
 </script>

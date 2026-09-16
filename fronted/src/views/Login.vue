@@ -294,10 +294,12 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAppStore } from '../stores/app'
+import { login as apiLogin } from '../api/user'
 
 const router = useRouter()
+const route = useRoute()
 const store = useAppStore()
 
 const activeTab = ref('password')
@@ -330,12 +332,23 @@ function handlePasswordLogin() {
   if (errors.phone || errors.password) return
   if (!form.agree) { showToast('error', '请先阅读并勾选用户服务与隐私协议'); return }
   loading.value = true
-  setTimeout(() => {
-    loading.value = false
-    store.login({ phone: form.phone, name: '林晨' }, 'student')
-    showToast('success', '登录成功，正在跳转...')
-    setTimeout(() => router.push('/'), 800)
-  }, 1200)
+  apiLogin({ phone: form.phone, password: form.password })
+    .then(data => {
+      const roleStr = data.role === 1 ? 'hr' : 'student'
+      store.login(
+        { name: data.username, phone: form.phone, avatar: data.avatar },
+        roleStr,
+        data.token,
+        data.userId
+      )
+      showToast('success', '登录成功，正在跳转...')
+      const redirect = route.query.redirect || '/'
+      setTimeout(() => router.push(redirect), 800)
+    })
+    .catch(err => {
+      showToast('error', err.message || '登录失败，请检查手机号和密码')
+    })
+    .finally(() => { loading.value = false })
 }
 
 function handleSmsLogin() {
@@ -344,12 +357,23 @@ function handleSmsLogin() {
   if (smsErrors.phone || smsErrors.code) return
   if (!smsForm.agree) { showToast('error', '请先阅读并勾选用户服务与隐私协议'); return }
   loading.value = true
-  setTimeout(() => {
-    loading.value = false
-    store.login({ phone: smsForm.phone, name: '林晨' }, 'student')
-    showToast('success', '登录成功，正在跳转...')
-    setTimeout(() => router.push('/'), 800)
-  }, 1200)
+  apiLogin({ phone: smsForm.phone, password: smsForm.code })
+    .then(data => {
+      const roleStr = data.role === 1 ? 'hr' : 'student'
+      store.login(
+        { name: data.username, phone: smsForm.phone, avatar: data.avatar },
+        roleStr,
+        data.token,
+        data.userId
+      )
+      showToast('success', '登录成功，正在跳转...')
+      const redirect = route.query.redirect || '/'
+      setTimeout(() => router.push(redirect), 800)
+    })
+    .catch(err => {
+      showToast('error', err.message || '登录失败，请检查手机号和验证码')
+    })
+    .finally(() => { loading.value = false })
 }
 
 function sendSmsCode() {

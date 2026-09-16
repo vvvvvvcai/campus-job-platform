@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 职位控制器
@@ -53,5 +55,11 @@ public class JobController {
     @PutMapping("/status/{id}")
     public Result<Void> updateJobStatus(@PathVariable Long id, @RequestParam Integer status) {
         return jobService.updateJobStatus(id, status);
+    }
+
+    @ApiOperation("获取所有职位类别和行业")
+    @GetMapping("/categories")
+    public Result<Map<String, List<String>>> getJobCategories() {
+        return jobService.getJobCategories();
     }
 }

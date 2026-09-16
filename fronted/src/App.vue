@@ -584,6 +584,7 @@
 import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from './stores/app'
+import { login as apiLogin, register as apiRegister } from './api/user'
 
 const router = useRouter()
 const store = useAppStore()
@@ -665,20 +666,26 @@ function validatePhone(phone) {
   return ''
 }
 
-function handleLogin() {
+async function handleLogin() {
   loginErrors.phone = validatePhone(loginForm.phone)
   loginErrors.password = !loginForm.password ? '请输入密码' : loginForm.password.length < 6 ? '密码至少6位' : ''
   if (loginErrors.phone || loginErrors.password) return
   if (!loginForm.agree) { showToast('error', '请先阅读并同意用户协议与隐私政策'); return }
-  const userRole = loginMode.value === 'hr' ? 'hr' : 'student'
-  store.login({ phone: loginForm.phone, name: userRole === 'hr' ? '张经理' : '林晨' }, userRole)
-  showLoginModal.value = false
-  showToast('success', '登录成功')
-  if (userRole === 'hr') {
-    router.push('/enterprise/dashboard')
-  } else {
-    const redirect = router.currentRoute.value.query.redirect
-    if (redirect) router.push(redirect)
+  try {
+    const res = await apiLogin({ phone: loginForm.phone, password: loginForm.password })
+    const userRole = res.role === 1 ? 'hr' : 'student'
+    store.login({ phone: loginForm.phone, name: res.username, avatar: res.avatar }, userRole, res.token, res.userId)
+    showLoginModal.value = false
+    showToast('success', '登录成功')
+    if (userRole === 'hr') {
+      router.push('/enterprise/dashboard')
+    } else {
+      const redirect = router.currentRoute.value.query.redirect
+      if (redirect) router.push(redirect)
+    }
+  } catch (e) {
+    console.error('登录失败:', e)
+    showToast('error', e.message || '登录失败，请检查手机号和密码')
   }
 }
 
@@ -687,25 +694,14 @@ function handleSmsLogin() {
   smsErrors.code = !smsForm.code ? '请输入验证码' : smsForm.code.length < 6 ? '验证码为6位' : ''
   if (smsErrors.phone || smsErrors.code) return
   if (!smsForm.agree) { showToast('error', '请先阅读并同意用户协议与隐私政策'); return }
-  const userRole = loginMode.value === 'hr' ? 'hr' : 'student'
-  store.login({ phone: smsForm.phone, name: userRole === 'hr' ? '张经理' : '林晨' }, userRole)
-  showLoginModal.value = false
-  showToast('success', '登录成功')
-  if (userRole === 'hr') {
-    router.push('/enterprise/dashboard')
-  } else {
-    const redirect = router.currentRoute.value.query.redirect
-    if (redirect) router.push(redirect)
-  }
+  showToast('error', '后端暂未实现短信登录，请使用密码登录')
 }
 
 function sendSmsCode() {
   const phoneError = validatePhone(smsForm.phone)
   if (phoneError) { smsErrors.phone = phoneError; return }
   smsErrors.phone = ''
-  smsCooldown.value = 60
-  const timer = setInterval(() => { smsCooldown.value--; if (smsCooldown.value <= 0) clearInterval(timer) }, 1000)
-  showToast('success', '验证码已发送')
+  showToast('error', '后端暂未实现短信发送功能')
 }
 
 // ─── Register ───
@@ -742,7 +738,7 @@ const regPassColor = computed(() => {
   return 'bg-primary'
 })
 
-function handleRegister() {
+async function handleRegister() {
   regErrors.name = !regForm.name ? '请输入真实姓名' : ''
   regErrors.phone = validatePhone(regForm.phone)
   regErrors.code = !regForm.code ? '请输入验证码' : regForm.code.length < 6 ? '验证码为6位' : ''
@@ -750,18 +746,28 @@ function handleRegister() {
   if (regErrors.name || regErrors.phone || regErrors.code || regErrors.password) return
   if (regForm.password !== regForm.confirmPassword) { showToast('error', '两次输入的密码不一致'); return }
   if (!regForm.agree) { showToast('error', '请先阅读并同意用户协议与隐私政策'); return }
-  store.login({ phone: regForm.phone, name: regForm.name }, regRole.value)
-  showRegisterModal.value = false
-  showToast('success', '注册成功')
+  try {
+    const roleNum = regRole.value === 'hr' ? 1 : 0
+    await apiRegister({
+      phone: regForm.phone,
+      password: regForm.password,
+      username: regForm.name,
+      role: roleNum
+    })
+    showRegisterModal.value = false
+    showToast('success', '注册成功，请登录')
+    showLoginModal.value = true
+  } catch (e) {
+    console.error('注册失败:', e)
+    showToast('error', e.message || '注册失败，请稍后重试')
+  }
 }
 
 function sendRegSmsCode() {
   const phoneError = validatePhone(regForm.phone)
   if (phoneError) { regErrors.phone = phoneError; return }
   regErrors.phone = ''
-  regSmsCooldown.value = 60
-  const timer = setInterval(() => { regSmsCooldown.value--; if (regSmsCooldown.value <= 0) clearInterval(timer) }, 1000)
-  showToast('success', '验证码已发送')
+  showToast('error', '后端暂未实现短信发送功能')
 }
 </script>
 
