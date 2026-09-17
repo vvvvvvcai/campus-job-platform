@@ -87,13 +87,7 @@
           </div>
           <h2 class="text-2xl font-bold text-on-surface">{{ useAi ? '为您个性化推荐的职位' : '名企校招与留用实习严选' }}</h2>
         </div>
-        <div class="flex gap-1 bg-surface-container-low rounded-lg p-1 overflow-x-auto">
-          <button v-for="tab in jobTabs" :key="tab" @click="searchByTab(tab)"
-            class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-all"
-            :class="activeJobTab === tab ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'">
-            {{ tab }}
-          </button>
-        </div>
+
       </div>
 
       <!-- Loading skeleton -->
@@ -293,7 +287,7 @@ async function fetchJobs(params = { pageNum: 1, pageSize: 4 }) {
             logoBg: LOGO_COLORS[i % LOGO_COLORS.length],
             logoText: j.companyName ? j.companyName.charAt(0) : '企',
             salary: formatSalary(j.salaryMin, j.salaryMax),
-            tags: [j.city].filter(Boolean),
+            tags: [j.industry, j.city].filter(Boolean),
             desc: '',
             meta: '',
             aiScore: j.recommendScore,
@@ -316,7 +310,7 @@ async function fetchJobs(params = { pageNum: 1, pageSize: 4 }) {
         logoBg: LOGO_COLORS[i % LOGO_COLORS.length],
         logoText: j.companyName ? j.companyName.charAt(0) : '企',
         salary: formatSalary(j.salaryMin, j.salaryMax),
-        tags: [j.city, j.education, j.experience, j.jobType === 2 ? '实习' : '全职'].filter(Boolean),
+        tags: [j.industry, j.city, j.education].filter(Boolean),
         desc: j.description ? j.description.substring(0, 80) + (j.description.length > 80 ? '...' : '') : '暂无描述',
         meta: `${j.viewCount || 0}人看过 · ${j.applyCount || 0}人投递`
       }))

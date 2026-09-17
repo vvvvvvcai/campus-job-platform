@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `t_job` (
   `title` VARCHAR(100) NOT NULL COMMENT '职位名称',
   `category` VARCHAR(50) DEFAULT NULL COMMENT '岗位类型',
   `city` VARCHAR(50) DEFAULT NULL COMMENT '城市',
+  `industry` VARCHAR(50) DEFAULT NULL COMMENT '所属行业',
   `salary_min` INT DEFAULT NULL COMMENT '最低薪资（元/月）',
   `salary_max` INT DEFAULT NULL COMMENT '最高薪资（元/月）',
   `education` VARCHAR(20) DEFAULT NULL COMMENT '学历要求',

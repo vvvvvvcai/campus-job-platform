@@ -244,6 +244,10 @@ public class RecommendServiceImpl implements RecommendService {
                         : "AI智能推荐";
                 vo.setRecommendReason(reason);
 
+                vo.setCategory((String) jobData.get("category"));
+                vo.setIndustry((String) jobData.get("industry"));
+                vo.setJobType(toInteger(jobData.get("jobType")));
+
                 result.add(vo);
             }
 
@@ -472,6 +476,9 @@ public class RecommendServiceImpl implements RecommendService {
 
             vo.setRecommendScore(score.setScale(2, RoundingMode.HALF_UP));
             vo.setRecommendReason(reason.length() > 0 ? reason.substring(0, reason.length() - 1) : "系统推荐");
+            vo.setCategory(jobCategory);
+            vo.setIndustry((String) job.get("industry"));
+            vo.setJobType(jobType);
 
             recommendJobs.add(vo);
         }

@@ -36,4 +36,13 @@ public class RecommendJobVO {
 
     @ApiModelProperty("推荐理由")
     private String recommendReason;
+
+    @ApiModelProperty("职位类别/行业")
+    private String category;
+
+    @ApiModelProperty("所属行业")
+    private String industry;
+
+    @ApiModelProperty("职位类型：1-全职 2-实习 3-兼职")
+    private Integer jobType;
 }

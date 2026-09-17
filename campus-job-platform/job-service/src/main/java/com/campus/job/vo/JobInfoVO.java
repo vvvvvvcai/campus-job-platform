@@ -32,6 +32,9 @@ public class JobInfoVO {
     @ApiModelProperty("工作城市")
     private String city;
 
+    @ApiModelProperty("所属行业")
+    private String industry;
+
     @ApiModelProperty("最低薪资")
     private BigDecimal salaryMin;
 
