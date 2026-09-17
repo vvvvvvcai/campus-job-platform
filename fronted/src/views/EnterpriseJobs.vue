@@ -32,6 +32,9 @@
         <button @click="loadJobs" class="h-10 px-4 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface-variant text-sm hover:bg-surface-container transition-colors flex items-center gap-1">
           <span class="material-symbols-outlined text-base">refresh</span>刷新
         </button>
+        <router-link to="/enterprise/candidates" class="h-10 px-4 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-primary-container transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-base">inbox</span>查看投递
+        </router-link>
       </div>
 
       <!-- 职位卡片 -->
@@ -82,9 +85,6 @@
             <span v-else-if="job.status === 3" class="flex-1 py-2 bg-red-50 text-red-600 text-xs font-semibold rounded-xl text-center flex items-center justify-center">
               已被拒绝
             </span>
-            <router-link :to="{ path: '/enterprise/candidates' }" class="flex-1 py-2 bg-primary text-on-primary text-xs font-semibold text-center rounded-xl hover:bg-primary-container transition-colors">
-              查看投递
-            </router-link>
           </div>
         </div>
       </div>
