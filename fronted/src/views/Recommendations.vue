@@ -70,11 +70,16 @@
       <!-- Empty State -->
       <div v-else-if="jobs.length === 0" class="text-center py-20">
         <span class="material-symbols-outlined text-6xl text-on-surface-variant/40 mb-4 block">search_off</span>
-        <h3 class="text-lg font-semibold text-on-surface mb-2">暂无推荐职位</h3>
-        <p class="text-sm text-on-surface-variant mb-6">系统正在学习您的求职偏好，请稍后再试</p>
-        <button @click="handleRefresh" class="px-6 py-2.5 bg-primary text-on-primary text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors">
-          重新获取推荐
-        </button>
+        <h3 class="text-lg font-semibold text-on-surface mb-2">暂无符合条件的职位</h3>
+        <p class="text-sm text-on-surface-variant mb-6">当前筛选条件下没有推荐职位，您可以尝试调整筛选条件或重新获取推荐</p>
+        <div class="flex justify-center gap-3">
+          <button @click="clearFilters" class="px-6 py-2.5 border border-primary text-primary text-sm font-semibold rounded-xl hover:bg-primary/5 transition-colors">
+            清除筛选
+          </button>
+          <button @click="handleRefresh" class="px-6 py-2.5 bg-primary text-on-primary text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors">
+            按当前条件重新推荐
+          </button>
+        </div>
       </div>
 
       <!-- Job Cards -->
@@ -101,8 +106,10 @@
             <span class="text-xl font-bold text-primary">{{ formatSalary(job.salaryMin, job.salaryMax) }}</span>
           </div>
 
-          <!-- City Tag -->
+          <!-- Tags -->
           <div class="flex flex-wrap gap-1.5 mb-3">
+            <span v-if="job.industry" class="px-2 py-0.5 bg-primary/10 text-primary text-[11px] rounded font-medium">{{ job.industry }}</span>
+            <span v-if="job.jobType" class="px-2 py-0.5 bg-surface-container-low text-on-surface-variant text-[11px] rounded">{{ {1:'全职',2:'实习',3:'兼职'}[job.jobType] }}</span>
             <span v-if="job.city" class="px-2 py-0.5 bg-surface-container-low text-on-surface-variant text-[11px] rounded">{{ job.city }}</span>
           </div>
 
@@ -132,7 +139,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
 import { getRecommendJobs, refreshRecommend } from '../api/recommend'
@@ -143,6 +150,8 @@ const router = useRouter()
 const store = useAppStore()
 
 const jobs = ref([])
+const originalJobs = ref([])
+const isFiltering = ref(false)
 const loading = ref(true)
 const refreshing = ref(false)
 const filterCity = ref('')
@@ -176,13 +185,20 @@ async function loadJobs() {
   loading.value = true
   try {
     const res = await getRecommendJobs()
+    console.log('推荐返回数据:', res)
+    if (Array.isArray(res) && res.length > 0) {
+      console.log('第一条职位完整数据:', JSON.stringify(res[0]))
+    }
     if (Array.isArray(res)) {
-      jobs.value = res
+      originalJobs.value = res
+      filterJobs()
     } else {
+      originalJobs.value = []
       jobs.value = []
     }
   } catch (e) {
     console.error('获取AI推荐失败:', e)
+    originalJobs.value = []
     jobs.value = []
   } finally {
     loading.value = false
@@ -199,7 +215,8 @@ async function handleRefresh() {
 
     const res = await refreshRecommend(data)
     if (Array.isArray(res)) {
-      jobs.value = res
+      originalJobs.value = res
+      filterJobs()
     }
   } catch (e) {
     console.error('刷新推荐失败:', e)
@@ -218,6 +235,32 @@ async function loadIndustries() {
     console.error('获取行业类别失败:', e)
   }
 }
+
+function filterJobs() {
+  let filtered = [...originalJobs.value]
+  if (filterCity.value) {
+    filtered = filtered.filter(j => j.city === filterCity.value)
+  }
+  if (filterIndustry.value) {
+    filtered = filtered.filter(j => j.industry === filterIndustry.value)
+  }
+  if (filterJobType.value) {
+    const typeMap = { '全职': 1, '实习': 2, '兼职': 3 }
+    const targetJobType = typeMap[filterJobType.value]
+    filtered = filtered.filter(j => j.jobType === targetJobType)
+  }
+  jobs.value = filtered
+}
+
+function clearFilters() {
+  filterCity.value = ''
+  filterIndustry.value = ''
+  filterJobType.value = ''
+}
+
+watch([filterCity, filterIndustry, filterJobType], () => {
+  filterJobs()
+})
 
 onMounted(() => {
   loadJobs()

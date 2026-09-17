@@ -26,7 +26,8 @@
             <!-- Top Tags -->
             <div class="flex flex-wrap items-center gap-2 mb-4">
               <span class="px-3 py-1 rounded-full text-xs font-semibold bg-primary text-on-primary">{{ job.type }}</span>
-              <span class="px-3 py-1 rounded-full text-xs font-medium border border-primary/30 text-primary">{{ job.city }} · 校招</span>
+              <span v-if="job.industry" class="px-3 py-1 rounded-full text-xs font-medium border border-primary/30 text-primary">{{ job.industry }}</span>
+              <span class="px-3 py-1 rounded-full text-xs font-medium border border-surface-container-high text-on-surface-variant">{{ job.city }} · 校招</span>
               <span v-if="job.education" class="px-3 py-1 rounded-full text-xs font-medium border border-surface-container-high text-on-surface-variant flex items-center gap-1">
                 <span class="material-symbols-outlined text-sm">school</span>
                 {{ job.education }}及以上
@@ -282,6 +283,7 @@ const job = computed(() => {
     education: d.education || '',
     headcount: d.headcount || 0,
     type: JOB_TYPE_MAP[d.jobType] || '全职',
+    industry: d.industry || '',
     experience: d.experience || '',
     viewCount: d.viewCount || 0,
     applyCount: d.applyCount || 0
