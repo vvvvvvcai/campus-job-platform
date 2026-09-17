@@ -4,8 +4,8 @@ import com.campus.common.result.Result;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,8 +21,11 @@ public interface JobFeignClient {
     Result<Map<String, Object>> getJobDetail(@PathVariable("jobId") Long jobId);
 
     /**
-     * 获取职位列表（分页）
+     * 搜索职位列表（分页）
+     * job-service内部自动过滤status=招聘中、deleted=0
      */
-    @GetMapping("/api/job/list")
-    Result<Map<String, Object>> getJobList(Map<String, Object> params);
+    @GetMapping("/api/job/search")
+    Result<Map<String, Object>> searchJobs(
+            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "50") Integer pageSize);
 }

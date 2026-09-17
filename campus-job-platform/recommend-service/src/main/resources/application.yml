@@ -35,6 +35,17 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
+recommend:
+  ai:
+    enabled: true
+    api-key: 2e35954a5e5646b4b91299f378b7a6b3.fLxDRoRuCXTkxHz8
+    base-url: https://open.bigmodel.cn/api/paas/v4
+    model: glm-4-flash
+    connect-timeout: 5000
+    read-timeout: 30000
+    max-jobs: 30
+    cache-minutes: 30
+
 knife4j:
   enable: true
   openapi:

@@ -99,10 +99,11 @@
               </div>
             </div>
             <div class="flex flex-col items-end gap-2 shrink-0 ml-4">
-              <button v-if="app.status !== 'rejected'" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm">
-                <span class="material-symbols-outlined text-[16px]">visibility</span>
-                查看进度
-              </button>
+              <div v-if="app.status !== 'rejected'" class="flex items-center gap-1">
+                <span class="px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold shadow-sm">
+                  {{ progressTabs.find(s => s.key === app.statusRaw)?.label || '待查看' }}
+                </span>
+              </div>
               <button v-if="app.status !== 'rejected'" @click="router.push({ name: 'JobDetail', params: { id: app.jobId } })"
                 class="text-xs text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors">
                 查看原招聘职位
@@ -201,6 +202,13 @@ const filterTabs = [
   { key: '2', label: '面试邀请', count: 0, dot: true },
   { key: '4', label: '已录用', count: 0 },
   { key: '3', label: '不合适', count: 0 }
+]
+
+const progressTabs = [
+  { key: 0, label: '待查看' },
+  { key: 1, label: '已查看' },
+  { key: 2, label: '面试邀请' },
+  { key: 4, label: '已录用' }
 ]
 
 const statCards = [

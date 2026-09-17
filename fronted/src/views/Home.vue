@@ -83,9 +83,9 @@
         <div>
           <div class="flex items-center gap-2 mb-1">
             <span class="w-2 h-2 rounded-full bg-primary"></span>
-            <span class="text-xs text-on-surface-variant font-medium">精准人岗匹配算法推荐</span>
+            <span class="text-xs text-on-surface-variant font-medium">{{ useAi ? 'AI智能推荐 · 智谱GLM大模型' : '精准人岗匹配算法推荐' }}</span>
           </div>
-          <h2 class="text-2xl font-bold text-on-surface">名企校招与留用实习严选</h2>
+          <h2 class="text-2xl font-bold text-on-surface">{{ useAi ? '为您个性化推荐的职位' : '名企校招与留用实习严选' }}</h2>
         </div>
         <div class="flex gap-1 bg-surface-container-low rounded-lg p-1 overflow-x-auto">
           <button v-for="tab in jobTabs" :key="tab" @click="searchByTab(tab)"
@@ -96,9 +96,31 @@
         </div>
       </div>
 
-      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Loading skeleton -->
+      <div v-if="jobsLoading" class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div v-for="i in 4" :key="i" class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-5 animate-pulse">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg bg-surface-container-low"></div>
+            <div class="flex-1"><div class="h-4 bg-surface-container-low rounded w-3/4 mb-1"></div><div class="h-3 bg-surface-container-low rounded w-1/2"></div></div>
+          </div>
+          <div class="h-6 bg-surface-container-low rounded w-1/3 mb-3"></div>
+          <div class="h-3 bg-surface-container-low rounded w-full mb-2"></div>
+          <div class="h-3 bg-surface-container-low rounded w-2/3"></div>
+        </div>
+      </div>
+
+      <!-- Job cards -->
+      <div v-else class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         <router-link v-for="job in jobs" :key="job.id" :to="`/jobs/${job.id}`"
           class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-5 hover:shadow-lg hover:border-primary/30 transition-all group flex flex-col">
+          <!-- AI Score badge -->
+          <div v-if="job.aiScore" class="flex items-center justify-between mb-2">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-semibold rounded-full">
+              <span class="material-symbols-outlined text-[12px]">auto_awesome</span>
+              匹配度 {{ job.aiScore }}%
+            </span>
+          </div>
+
           <div class="flex items-start justify-between mb-3">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0" :style="{ background: job.logoBg }">
@@ -123,10 +145,14 @@
             <span v-for="tag in job.tags" :key="tag" class="px-2 py-0.5 bg-surface-container-low text-on-surface-variant text-[11px] rounded">{{ tag }}</span>
           </div>
 
-          <p class="text-xs text-on-surface-variant leading-relaxed mb-4 flex-1 line-clamp-3">{{ job.desc }}</p>
+          <!-- AI Reason -->
+          <p v-if="job.aiReason" class="text-xs text-primary/80 leading-relaxed mb-4 flex-1 line-clamp-2 italic">
+            "{{ job.aiReason }}"
+          </p>
+          <p v-else class="text-xs text-on-surface-variant leading-relaxed mb-4 flex-1 line-clamp-3">{{ job.desc }}</p>
 
           <div class="flex items-center justify-between pt-3 border-t border-surface-container-high">
-            <span class="text-[11px] text-on-surface-variant">{{ job.meta }}</span>
+            <span class="text-[11px] text-on-surface-variant">{{ job.meta || 'AI智能推荐' }}</span>
             <button @click.prevent="applyJob(job)" class="px-4 py-1.5 bg-primary text-on-primary text-xs font-semibold rounded-lg hover:bg-primary/90 transition-colors">投递简历</button>
           </div>
         </router-link>
@@ -168,6 +194,7 @@ import { useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
 import { searchJobs, getJobCategories } from '../api/job'
 import { getResumeList } from '../api/resume'
+import { getRecommendJobs } from '../api/recommend'
 import { formatSalary } from '../utils/format'
 
 const router = useRouter()
@@ -248,9 +275,37 @@ function searchByTab(tab) {
 }
 
 const jobs = ref([])
+const jobsLoading = ref(false)
+const useAi = ref(false)
 
 async function fetchJobs(params = { pageNum: 1, pageSize: 4 }) {
+  jobsLoading.value = true
   try {
+    if (store.isLoggedIn && !params.industry && !params.keyword && !params.city) {
+      try {
+        const aiRes = await getRecommendJobs()
+        if (Array.isArray(aiRes) && aiRes.length > 0) {
+          useAi.value = true
+          jobs.value = aiRes.slice(0, 4).map((j, i) => ({
+            id: j.jobId,
+            title: j.title,
+            company: j.companyName || '未知企业',
+            logoBg: LOGO_COLORS[i % LOGO_COLORS.length],
+            logoText: j.companyName ? j.companyName.charAt(0) : '企',
+            salary: formatSalary(j.salaryMin, j.salaryMax),
+            tags: [j.city].filter(Boolean),
+            desc: '',
+            meta: '',
+            aiScore: j.recommendScore,
+            aiReason: j.recommendReason
+          }))
+          return
+        }
+      } catch (e) {
+        console.warn('AI推荐不可用，回退到通用搜索:', e)
+      }
+    }
+    useAi.value = false
     const res = await searchJobs(params)
     if (res && res.records) {
       const shuffled = params.pageSize === 4 ? shuffle(res.records).slice(0, 4) : res.records
@@ -268,6 +323,8 @@ async function fetchJobs(params = { pageNum: 1, pageSize: 4 }) {
     }
   } catch (e) {
     console.error('获取推荐职位失败:', e)
+  } finally {
+    jobsLoading.value = false
   }
 }
 

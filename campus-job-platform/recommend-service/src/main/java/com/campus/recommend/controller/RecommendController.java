@@ -1,6 +1,7 @@
 package com.campus.recommend.controller;
 
 import com.campus.common.result.Result;
+import com.campus.recommend.config.ZhipuAiProperties;
 import com.campus.recommend.dto.RecommendRefreshDTO;
 import com.campus.recommend.service.RecommendService;
 import com.campus.recommend.vo.RecommendJobVO;
@@ -9,7 +10,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 推荐控制器
@@ -21,6 +24,17 @@ import java.util.List;
 public class RecommendController {
 
     private final RecommendService recommendService;
+    private final ZhipuAiProperties aiProperties;
+
+    @ApiOperation("获取推荐模式状态")
+    @GetMapping("/status")
+    public Result<Map<String, Object>> getRecommendStatus() {
+        Map<String, Object> status = new HashMap<>();
+        status.put("aiEnabled", aiProperties.isEnabled());
+        status.put("model", aiProperties.getModel());
+        status.put("mode", aiProperties.isEnabled() ? "AI智能推荐" : "本地规则推荐");
+        return Result.success(status);
+    }
 
     @ApiOperation("获取推荐职位列表")
     @GetMapping("/jobs")

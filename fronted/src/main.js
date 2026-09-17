@@ -11,6 +11,7 @@ const routes = [
   { path: '/profile', name: 'Profile', component: () => import('./views/Profile.vue'), meta: { requiresAuth: true } },
   { path: '/change-password', name: 'ChangePassword', component: () => import('./views/ChangePassword.vue'), meta: { requiresAuth: true } },
   { path: '/jobs', name: 'JobSearch', component: () => import('./views/JobSearch.vue'), meta: { requiresAuth: true } },
+  { path: '/ai-recommend', name: 'AiRecommend', component: () => import('./views/Recommendations.vue'), meta: { requiresAuth: true } },
   { path: '/jobs/:id', name: 'JobDetail', component: () => import('./views/JobDetail.vue'), meta: { requiresAuth: true } },
   { path: '/resume/editor', name: 'ResumeEditor', component: () => import('./views/ResumeEditor.vue'), meta: { requiresAuth: true } },
   { path: '/resume/manage', name: 'ResumeManage', component: () => import('./views/ResumeManage.vue'), meta: { requiresAuth: true } },

@@ -602,6 +602,7 @@ onUnmounted(() => {
 const navItems = [
   { path: '/', label: '首页' },
   { path: '/jobs', label: '职位搜索' },
+  { path: '/ai-recommend', label: 'AI推荐' },
   { path: '/favorites', label: '我的收藏' },
 ]
 

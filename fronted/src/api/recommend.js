@@ -11,3 +11,7 @@ export function refreshRecommend(data) {
 export function recordClick(jobId) {
   return request.post('/recommend/click', null, { params: { jobId } })
 }
+
+export function getRecommendStatus() {
+  return request.get('/recommend/status')
+}

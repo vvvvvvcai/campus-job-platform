@@ -11,9 +11,11 @@
           <p class="text-sm text-[var(--on-surface-variant)] mt-1">支持维护多份针对性简历，根据算法、前端或央国企企精准投递，告别「千人一面」，有效提升面试邀约率。</p>
         </div>
         <div class="flex items-center gap-3">
-          <button class="px-4 py-2.5 bg-white text-[var(--on-surface)] rounded-xl text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm">
-            <span class="material-symbols-outlined text-[18px]">download</span>
-            一键导出 PDF
+          <button @click="exportToPDF" :disabled="exporting || !selectedResume" class="px-4 py-2.5 bg-white text-[var(--on-surface)] rounded-xl text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+            <span class="material-symbols-outlined text-[18px]" :class="exporting ? 'animate-spin' : ''">
+              {{ exporting ? 'sync' : 'download' }}
+            </span>
+            {{ exporting ? '导出中...' : '一键导出 PDF' }}
           </button>
           <button @click="createResume" class="px-5 py-2.5 bg-[var(--primary)] text-white rounded-xl text-sm font-semibold hover:bg-[var(--primary-container)] transition-colors flex items-center gap-2 shadow-sm">
             <span class="material-symbols-outlined text-[18px]">add</span>
@@ -126,7 +128,7 @@
             </div>
 
             <!-- Resume Content -->
-            <div class="p-8 max-h-[700px] overflow-y-auto">
+            <div ref="resumePreview" class="p-8 max-h-[700px] overflow-y-auto">
               <div v-if="detailLoading" class="py-20 text-center text-sm text-[var(--on-surface-variant)]">
                 <span class="material-symbols-outlined text-4xl text-gray-200 mb-3 block">hourglass_top</span>
                 正在加载简历内容…
@@ -303,6 +305,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
 import { getResumeList, getResumeInfo, deleteResume, setDefaultResume } from '../api/resume'
+import html2pdf from 'html2pdf.js'
 
 const router = useRouter()
 const store = useAppStore()
@@ -311,6 +314,8 @@ const resumes = ref([])
 const loading = ref(false)
 const detailLoading = ref(false)
 const resumeDetail = ref(null)
+const exporting = ref(false)
+const resumePreview = ref(null)
 
 const workStatusNames = ['在校', '应届生', '往届生']
 
@@ -454,6 +459,45 @@ async function setDefault(id) {
     resumes.value.forEach(r => r.isDefault = r.id === id)
   } catch (e) {
     console.error('设置默认简历失败:', e)
+  }
+}
+
+async function exportToPDF() {
+  if (!resumePreview.value || exporting.value) return
+
+  exporting.value = true
+  try {
+    const fileName = `${d.value.name || '简历'}_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`
+
+    await html2pdf()
+      .set({
+        margin: [10, 10, 10, 10],
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          letterRendering: true,
+          allowTaint: false,
+          backgroundColor: '#ffffff',
+          logging: false,
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait',
+        },
+        pagebreak: {
+          mode: ['css', 'legacy'],
+        },
+      })
+      .from(resumePreview.value)
+      .save()
+  } catch (error) {
+    console.error('PDF导出失败:', error)
+    alert('导出失败，请重试')
+  } finally {
+    exporting.value = false
   }
 }
 </script>
