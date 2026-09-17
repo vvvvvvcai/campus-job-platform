@@ -30,7 +30,8 @@ public class JobEnum {
     public enum Status {
         PENDING(0, "待审核"),
         RECRUITING(1, "招聘中"),
-        CLOSED(2, "已关闭");
+        CLOSED(2, "已关闭"),
+        REJECTED(3, "已拒绝");
 
         private final Integer code;
         private final String message;

@@ -327,9 +327,10 @@ public class JobServiceImpl implements JobService {
         job.setAuditTime(LocalDateTime.now());
         job.setAuditRemark(dto.getRemark());
 
-        // 审核通过时，将职位状态设置为招聘中
         if (dto.getAuditStatus() == JobEnum.AuditStatus.APPROVED.getCode()) {
             job.setStatus(JobEnum.Status.RECRUITING.getCode());
+        } else if (dto.getAuditStatus() == JobEnum.AuditStatus.REJECTED.getCode()) {
+            job.setStatus(JobEnum.Status.REJECTED.getCode());
         }
 
         jobMapper.updateById(job);

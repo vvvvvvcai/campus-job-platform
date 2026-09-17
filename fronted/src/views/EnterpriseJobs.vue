@@ -27,6 +27,7 @@
           <option value="1">招聘中</option>
           <option value="0">待审核</option>
           <option value="2">已关闭</option>
+          <option value="3">已拒绝</option>
         </select>
         <button @click="loadJobs" class="h-10 px-4 rounded-xl border border-surface-container-high bg-surface-container-lowest text-on-surface-variant text-sm hover:bg-surface-container transition-colors flex items-center gap-1">
           <span class="material-symbols-outlined text-base">refresh</span>刷新
@@ -63,6 +64,11 @@
               <p class="text-[10px] text-on-surface-variant">招聘人数</p>
             </div>
           </div>
+          <div v-if="job.status === 3 && job.auditRemark" class="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p class="text-xs text-red-700 font-medium mb-1">拒绝原因：</p>
+            <p class="text-xs text-red-600">{{ job.auditRemark }}</p>
+            <p v-if="job.auditTime" class="text-[10px] text-red-500 mt-1">审核时间：{{ job.auditTime }}</p>
+          </div>
           <div class="mt-auto flex gap-2">
             <router-link :to="{ path: '/enterprise/post-job', query: { id: job.id } }" class="flex-1 py-2 border border-surface-container-high text-on-surface text-xs font-semibold text-center rounded-xl hover:bg-surface-container transition-colors">
               编辑
@@ -73,6 +79,9 @@
             <button v-else-if="job.status === 2" @click="changeStatus(job, 1)" class="flex-1 py-2 border border-emerald-200 text-emerald-600 text-xs font-semibold rounded-xl hover:bg-emerald-50 transition-colors">
               重新上架
             </button>
+            <span v-else-if="job.status === 3" class="flex-1 py-2 bg-red-50 text-red-600 text-xs font-semibold rounded-xl text-center flex items-center justify-center">
+              已被拒绝
+            </span>
             <router-link :to="{ path: '/enterprise/candidates' }" class="flex-1 py-2 bg-primary text-on-primary text-xs font-semibold text-center rounded-xl hover:bg-primary-container transition-colors">
               查看投递
             </router-link>
@@ -113,7 +122,8 @@ const toast = ref('')
 const STATUS_MAP = {
   0: { label: '待审核', class: 'bg-amber-50 text-amber-600' },
   1: { label: '招聘中', class: 'bg-emerald-50 text-emerald-600' },
-  2: { label: '已关闭', class: 'bg-gray-100 text-gray-500' }
+  2: { label: '已关闭', class: 'bg-gray-100 text-gray-500' },
+  3: { label: '已拒绝', class: 'bg-red-50 text-red-600' }
 }
 
 const filteredJobs = computed(() => {
@@ -169,7 +179,9 @@ async function loadJobs() {
         headcount: j.headcount || 1,
         status: j.status,
         statusLabel: st.label,
-        statusClass: st.class
+        statusClass: st.class,
+        auditRemark: j.auditRemark,
+        auditTime: j.auditTime
       }
     })
   } catch (e) {
