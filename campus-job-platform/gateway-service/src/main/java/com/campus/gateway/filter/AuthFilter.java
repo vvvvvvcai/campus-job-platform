@@ -54,7 +54,8 @@ public class AuthFilter implements GlobalFilter, Ordered {
             "/doc.html",
             "/webjars/**",
             "/swagger-resources/**",
-            "/v2/api-docs/**"
+            "/v2/api-docs/**",
+            "/ws/**"
     );
 
     /**
@@ -64,6 +65,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
             "/api/user/list",
             "/api/user/status/",
             "/api/user/count",
+            "/api/user/count/trend",
             "/api/user/admin/detail/",
             "/api/company/list",
             "/api/company/audit/approve/",
@@ -72,7 +74,8 @@ public class AuthFilter implements GlobalFilter, Ordered {
             "/api/job/admin/list",
             "/api/job/admin/detail/",
             "/api/job/audit/",
-            "/api/job/count"
+            "/api/job/count",
+            "/api/job/count/trend"
     );
 
     @Override

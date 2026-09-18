@@ -56,4 +56,9 @@ public interface UserService {
      * 管理员：获取用户详情
      */
     Result<UserInfoVO> getUserAdminDetail(Long userId);
+
+    /**
+     * 管理员：获取近7天用户注册趋势
+     */
+    Result<Object> getUserTrend();
 }

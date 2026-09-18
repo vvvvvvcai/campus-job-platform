@@ -30,9 +30,10 @@
           <div class="flex items-center gap-3">
             <template v-if="store.isLoggedIn">
               <!-- Bell Icon -->
-              <button @click="notificationUnavailable" class="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors">
+              <router-link to="/messages" class="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors">
                 <span class="material-symbols-outlined text-on-surface-variant text-[22px]">notifications</span>
-              </button>
+                <span v-if="totalUnread > 0" class="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none px-1">{{ totalUnread > 99 ? '99+' : totalUnread }}</span>
+              </router-link>
               <!-- User Avatar & Dropdown -->
               <div class="relative" ref="userDropdownRef">
                 <button @click="showUserDropdown = !showUserDropdown" class="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full hover:bg-surface-container-low transition-colors">
@@ -572,16 +573,31 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
+import { reactive, ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from './stores/app'
 import { login as apiLogin, register as apiRegister } from './api/user'
+import { getUnreadCount, getNotificationUnreadCount } from './api/message'
 
 const router = useRouter()
 const store = useAppStore()
 
 const showUserDropdown = ref(false)
 const userDropdownRef = ref(null)
+const totalUnread = ref(0)
+
+async function loadUnreadCount() {
+  if (!store.isLoggedIn) { totalUnread.value = 0; return }
+  try {
+    const [msgCount, notiCount] = await Promise.all([
+      getUnreadCount().catch(() => 0),
+      getNotificationUnreadCount().catch(() => 0)
+    ])
+    totalUnread.value = (msgCount || 0) + (notiCount || 0)
+  } catch (e) {
+    totalUnread.value = 0
+  }
+}
 
 function handleClickOutside(e) {
   if (userDropdownRef.value && !userDropdownRef.value.contains(e.target)) {
@@ -593,6 +609,8 @@ onMounted(() => {
   store.restoreLogin()
   window.addEventListener('open-login-modal', openLogin)
   document.addEventListener('click', handleClickOutside)
+  loadUnreadCount()
+  setInterval(loadUnreadCount, 60000)
 })
 onUnmounted(() => {
   window.removeEventListener('open-login-modal', openLogin)
@@ -615,10 +633,6 @@ const enterpriseNavItems = [
 ]
 
 const displayName = computed(() => (store.user && store.user.name) || '用户')
-
-function notificationUnavailable() {
-  showToast('error', '消息中心接口暂未开放')
-}
 
 function handleLogout() { store.logout(); router.push('/') }
 

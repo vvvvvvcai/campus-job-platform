@@ -119,13 +119,12 @@
                   <p v-if="job.desc" class="text-xs text-on-surface-variant leading-relaxed mt-2 line-clamp-2">{{ job.desc }}</p>
 
                   <!-- Bottom Row -->
-                  <div class="flex items-center justify-between mt-3 pt-3 border-t border-surface-container-high">
-                    <span class="text-[11px] text-on-surface-variant">{{ job.meta }}</span>
+                  <div class="flex items-center justify-end mt-3 pt-3 border-t border-surface-container-high">
                     <div class="flex items-center gap-2">
                       <button @click.stop="toggleFavorite(job)" :class="['w-8 h-8 rounded-lg flex items-center justify-center transition-colors', job.isFav ? 'text-red-500 hover:bg-red-50' : 'text-on-surface-variant hover:text-primary hover:bg-primary/5']">
                         <span class="material-symbols-outlined text-[18px]">{{ job.isFav ? 'favorite' : 'favorite_border' }}</span>
                       </button>
-                      <button @click.stop="chatUnavailable" class="h-8 px-3 rounded-lg text-xs font-medium border border-surface-container-high text-on-surface-variant hover:border-primary hover:text-primary transition-colors">在线沟通</button>
+                      <button @click.stop="goChat(job)" class="h-8 px-3 rounded-lg text-xs font-medium border border-surface-container-high text-on-surface-variant hover:border-primary hover:text-primary transition-colors">在线沟通</button>
                       <button @click.stop="applyJob(job)" class="h-8 px-4 rounded-lg text-xs font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors">立即投递</button>
                     </div>
                   </div>
@@ -271,8 +270,13 @@ function applyJob(job) {
   router.push(`/jobs/${job.id}`)
 }
 
-function chatUnavailable() {
-  showToast('在线沟通功能暂未开放')
+function goChat(job) {
+  if (!store.isLoggedIn) {
+    window.dispatchEvent(new CustomEvent('open-login-modal'))
+    return
+  }
+  const hrUserId = job.publisherId || job.companyId || job.id
+  router.push({ name: 'ChatRoom', params: { toUserId: hrUserId }, query: { jobId: job.id, name: job.company || '企业', jobTitle: job.title || '' } })
 }
 
 async function toggleFavorite(job) {
@@ -382,6 +386,8 @@ async function fetchJobs() {
         id: j.id,
         title: j.title,
         company: j.companyName || '未知企业',
+        companyId: j.companyId,
+        publisherId: j.publisherId,
         logoBg: LOGO_COLORS[i % LOGO_COLORS.length],
         logoText: j.companyName ? j.companyName.charAt(0) : '企',
         badges: [],
@@ -389,7 +395,6 @@ async function fetchJobs() {
         tags: [j.city, j.education, j.experience, j.jobType === 1 ? '全职' : j.jobType === 2 ? '实习' : '兼职'].filter(Boolean),
         benefits: j.benefits ? j.benefits.split(/[,，、]/).filter(Boolean) : [],
         desc: j.description ? j.description.substring(0, 60) + (j.description.length > 60 ? '...' : '') : '',
-        meta: `${j.viewCount || 0}人看过 · ${j.applyCount || 0}人投递`,
         isFav: favoriteIds.value.has(j.id)
       }))
       totalJobs.value = res.total || 0

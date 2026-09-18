@@ -23,6 +23,9 @@ public class JobInfoVO {
     @ApiModelProperty("企业名称")
     private String companyName;
 
+    @ApiModelProperty("企业HR用户ID（用于聊天）")
+    private Long publisherId;
+
     @ApiModelProperty("职位标题")
     private String title;
 

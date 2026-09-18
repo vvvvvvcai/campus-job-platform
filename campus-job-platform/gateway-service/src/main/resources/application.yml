@@ -67,3 +67,13 @@ spring:
             - Path=/api/recommend/**
           filters:
             - StripPrefix=0
+        - id: message-service
+          uri: lb://application-service
+          predicates:
+            - Path=/api/message/**
+          filters:
+            - StripPrefix=0
+        - id: websocket-route
+          uri: lb:ws://application-service
+          predicates:
+            - Path=/ws/**

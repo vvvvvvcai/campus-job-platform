@@ -10,6 +10,7 @@ import com.campus.application.entity.Resume;
 import com.campus.application.mapper.ApplicationMapper;
 import com.campus.application.mapper.ResumeMapper;
 import com.campus.application.service.ApplicationService;
+import com.campus.application.service.NotificationService;
 import com.campus.application.vo.ApplicationInfoVO;
 import com.campus.application.vo.ApplicationListVO;
 import com.campus.application.vo.ResumeInfoVO;
@@ -34,6 +35,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationMapper applicationMapper;
     private final ResumeMapper resumeMapper;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -119,7 +121,74 @@ public class ApplicationServiceImpl implements ApplicationService {
         applicationMapper.updateById(application);
         log.info("投递处理成功: applicationId={}, status={}", id, dto.getStatus());
 
+        // 根据状态变更创建通知
+        createNotificationByStatus(application, dto);
+
         return Result.success();
+    }
+
+    /**
+     * 根据投递状态变更创建通知
+     */
+    private void createNotificationByStatus(Application application, ApplicationHandleDTO dto) {
+        Long studentId = application.getUserId();
+        Integer newStatus = dto.getStatus();
+
+        if (newStatus == null) return;
+
+        switch (newStatus) {
+            case 2: // 面试邀请
+                String interviewInfo = buildInterviewInfo(dto);
+                notificationService.createNotification(
+                        studentId,
+                        "面试邀请",
+                        "恭喜！您投递的职位已收到面试邀请。" + interviewInfo,
+                        2, // 面试通知
+                        application.getId()
+                );
+                break;
+            case 3: // 不合适
+                String rejectReason = dto.getHrRemark() != null ? "，原因：" + dto.getHrRemark() : "";
+                notificationService.createNotification(
+                        studentId,
+                        "投递结果通知",
+                        "很抱歉，您投递的职位暂未通过筛选" + rejectReason,
+                        1, // 投递通知
+                        application.getId()
+                );
+                break;
+            case 4: // 已录用
+                notificationService.createNotification(
+                        studentId,
+                        "录用通知",
+                        "恭喜！您投递的职位已被录用，请留意后续入职安排。",
+                        1, // 投递通知
+                        application.getId()
+                );
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 构建面试信息字符串
+     */
+    private String buildInterviewInfo(ApplicationHandleDTO dto) {
+        StringBuilder sb = new StringBuilder();
+        if (dto.getInterviewTime() != null) {
+            sb.append("面试时间：").append(dto.getInterviewTime());
+        }
+        if (dto.getInterviewAddress() != null && !dto.getInterviewAddress().isEmpty()) {
+            sb.append("，面试地点：").append(dto.getInterviewAddress());
+        }
+        if (dto.getInterviewContact() != null && !dto.getInterviewContact().isEmpty()) {
+            sb.append("，联系人：").append(dto.getInterviewContact());
+        }
+        if (dto.getInterviewContactPhone() != null && !dto.getInterviewContactPhone().isEmpty()) {
+            sb.append("（").append(dto.getInterviewContactPhone()).append("）");
+        }
+        return sb.toString();
     }
 
     @Override

@@ -8,6 +8,7 @@ import lombok.Data;
 @TableName("t_company")
 public class Company {
     private Long id;
+    private Long userId;
     private String companyName;
     @TableLogic
     private Integer deleted;

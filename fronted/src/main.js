@@ -23,6 +23,8 @@ const routes = [
   { path: '/enterprise/post-job', name: 'PostJob', component: () => import('./views/PostJob.vue'), meta: { requiresAuth: true, roles: ['hr'] } },
   { path: '/enterprise/candidates', name: 'Candidates', component: () => import('./views/Candidates.vue'), meta: { requiresAuth: true, roles: ['hr'] } },
   { path: '/enterprise/applications', name: 'ApplicationProcess', component: () => import('./views/ApplicationProcess.vue'), meta: { requiresAuth: true, roles: ['hr'] } },
+  { path: '/chat/:toUserId', name: 'ChatRoom', component: () => import('./views/ChatRoom.vue'), meta: { requiresAuth: true } },
+  { path: '/messages', name: 'MessageCenter', component: () => import('./views/MessageCenter.vue'), meta: { requiresAuth: true } },
 ]
 
 const router = createRouter({

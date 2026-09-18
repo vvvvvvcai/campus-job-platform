@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.campus.common.exception.BusinessException;
 import com.campus.common.result.Result;
 import com.campus.common.result.ResultCode;
+import com.campus.job.entity.Company;
 import com.campus.job.entity.Favorite;
 import com.campus.job.entity.Job;
+import com.campus.job.mapper.CompanyMapper;
 import com.campus.job.mapper.FavoriteMapper;
 import com.campus.job.mapper.JobMapper;
 import com.campus.job.service.FavoriteService;
@@ -28,6 +30,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     private final FavoriteMapper favoriteMapper;
     private final JobMapper jobMapper;
+    private final CompanyMapper companyMapper;
 
     @Override
     public Result<Void> addFavorite(Long userId, Long jobId) {
@@ -83,6 +86,11 @@ public class FavoriteServiceImpl implements FavoriteService {
                 JobInfoVO vo = new JobInfoVO();
                 BeanUtils.copyProperties(job, vo);
                 vo.setIsFavorite(true);
+                Company company = companyMapper.selectById(job.getCompanyId());
+                if (company != null) {
+                    vo.setCompanyName(company.getCompanyName());
+                    vo.setPublisherId(company.getUserId());
+                }
                 return vo;
             }
             return null;

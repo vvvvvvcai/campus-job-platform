@@ -70,4 +70,9 @@ public interface JobService {
      * 管理员：获取职位统计数据
      */
     Result<Object> getJobCount();
+
+    /**
+     * 管理员：获取近7天职位发布趋势
+     */
+    Result<Object> getJobTrend();
 }

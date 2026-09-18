@@ -108,4 +108,10 @@ public class JobController {
     public Result<Object> getJobCount(@RequestHeader("X-User-Id") Long adminId) {
         return jobService.getJobCount();
     }
+
+    @ApiOperation("管理员获取近7天职位发布趋势")
+    @GetMapping("/count/trend")
+    public Result<Object> getJobTrend(@RequestHeader("X-User-Id") Long adminId) {
+        return jobService.getJobTrend();
+    }
 }

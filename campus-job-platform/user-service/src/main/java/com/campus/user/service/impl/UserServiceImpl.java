@@ -23,8 +23,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -297,5 +299,33 @@ public class UserServiceImpl implements UserService {
             case 2: return "女";
             default: return "未知";
         }
+    }
+
+    @Override
+    public Result<Object> getUserTrend() {
+        // 查询近7天（含当天）的注册用户
+        LocalDateTime startTime = LocalDate.now().minusDays(6).atStartOfDay();
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getDeleted, 0)
+               .ge(User::getCreateTime, startTime);
+        List<User> users = userMapper.selectList(wrapper);
+
+        // 按日期分组统计
+        Map<String, Long> countByDate = users.stream()
+            .collect(Collectors.groupingBy(
+                u -> u.getCreateTime().format(DateTimeFormatter.ofPattern("MM-dd")),
+                LinkedHashMap::new,
+                Collectors.counting()
+            ));
+
+        // 补全7天数据（没有数据的日期填0）
+        List<Map<String, Object>> result = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
+        for (int i = 6; i >= 0; i--) {
+            String date = LocalDate.now().minusDays(i).format(formatter);
+            result.add(Map.of("date", date, "count", countByDate.getOrDefault(date, 0L)));
+        }
+
+        return Result.success(result);
     }
 }

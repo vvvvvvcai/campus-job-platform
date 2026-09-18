@@ -179,3 +179,8 @@ export interface KpiCard {
   iconBg: string
   iconColor: string
 }
+
+export interface TrendItem {
+  date: string
+  count: number
+}

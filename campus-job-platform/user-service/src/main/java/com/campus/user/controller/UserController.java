@@ -92,4 +92,10 @@ public class UserController {
             @PathVariable Long id) {
         return userService.getUserAdminDetail(id);
     }
+
+    @ApiOperation("管理员获取近7天用户注册趋势")
+    @GetMapping("/count/trend")
+    public Result<Object> getUserTrend(@RequestHeader("X-User-Id") Long adminId) {
+        return userService.getUserTrend();
+    }
 }

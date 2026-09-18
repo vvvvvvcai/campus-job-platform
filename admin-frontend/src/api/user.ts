@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type { Result, PageResult, UserItem, UserDetail, UserCount } from '@/types'
+import type { Result, PageResult, UserItem, UserDetail, UserCount, TrendItem } from '@/types'
 
 export function getUserList(params: {
   keyword?: string
@@ -21,4 +21,8 @@ export function getUserCount() {
 
 export function getUserAdminDetail(id: number) {
   return request.get<any, Result<UserDetail>>(`/api/user/admin/detail/${id}`)
+}
+
+export function getUserTrend() {
+  return request.get<any, Result<TrendItem[]>>('/api/user/count/trend')
 }

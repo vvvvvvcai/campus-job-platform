@@ -24,10 +24,10 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -128,6 +128,7 @@ public class JobServiceImpl implements JobService {
             Company company = companyMapper.selectById(job.getCompanyId());
             if (company != null) {
                 vo.setCompanyName(company.getCompanyName());
+                vo.setPublisherId(company.getUserId());
             }
             return vo;
         }).collect(Collectors.toList());
@@ -158,6 +159,7 @@ public class JobServiceImpl implements JobService {
         Company company = companyMapper.selectById(job.getCompanyId());
         if (company != null) {
             vo.setCompanyName(company.getCompanyName());
+            vo.setPublisherId(company.getUserId());
         }
 
         return Result.success(vo);
@@ -366,6 +368,34 @@ public class JobServiceImpl implements JobService {
             byAuditStatus.put(auditStatus.name().toLowerCase(), jobMapper.selectCount(auditWrapper));
         }
         result.put("byAuditStatus", byAuditStatus);
+
+        return Result.success(result);
+    }
+
+    @Override
+    public Result<Object> getJobTrend() {
+        // 查询近7天（含当天）发布的职位
+        LocalDateTime startTime = LocalDate.now().minusDays(6).atStartOfDay();
+        LambdaQueryWrapper<Job> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Job::getDeleted, 0)
+               .ge(Job::getCreateTime, startTime);
+        List<Job> jobs = jobMapper.selectList(wrapper);
+
+        // 按日期分组统计
+        Map<String, Long> countByDate = jobs.stream()
+            .collect(Collectors.groupingBy(
+                j -> j.getCreateTime().format(DateTimeFormatter.ofPattern("MM-dd")),
+                LinkedHashMap::new,
+                Collectors.counting()
+            ));
+
+        // 补全7天数据（没有数据的日期填0）
+        List<Map<String, Object>> result = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
+        for (int i = 6; i >= 0; i--) {
+            String date = LocalDate.now().minusDays(i).format(formatter);
+            result.add(Map.of("date", date, "count", countByDate.getOrDefault(date, 0L)));
+        }
 
         return Result.success(result);
     }

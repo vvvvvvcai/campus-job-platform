@@ -97,7 +97,7 @@
                 <span class="material-symbols-outlined text-base">send</span>
                 {{ applied ? '已投递' : '立即投递简历' }}
               </button>
-              <button @click="chatUnavailable" class="w-full py-2.5 border border-primary text-primary rounded-xl text-sm font-semibold hover:bg-primary/5 transition-colors flex items-center justify-center gap-2 mb-3">
+              <button @click="goChat" class="w-full py-2.5 border border-primary text-primary rounded-xl text-sm font-semibold hover:bg-primary/5 transition-colors flex items-center justify-center gap-2 mb-3">
                 <span class="material-symbols-outlined text-base">chat</span>
                 与HR直聊
               </button>
@@ -249,6 +249,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAppStore } from '../stores/app'
 import { getJobDetail, searchJobs } from '../api/job'
 import { addFavorite, removeFavorite } from '../api/favorite'
 import { getResumeList } from '../api/resume'
@@ -257,6 +258,7 @@ import { formatSalary, formatDateTime, maskPhone } from '../utils/format'
 
 const route = useRoute()
 const router = useRouter()
+const store = useAppStore()
 
 const loading = ref(true)
 const error = ref('')
@@ -417,8 +419,15 @@ async function handleApply() {
   }
 }
 
-function chatUnavailable() {
-  showToast('在线沟通功能暂未开放')
+function goChat() {
+  const d = jobData.value
+  if (!d) return
+  if (!store.isLoggedIn) {
+    window.dispatchEvent(new CustomEvent('open-login-modal'))
+    return
+  }
+  const hrUserId = d.publisherId || d.companyId
+  router.push({ name: 'ChatRoom', params: { toUserId: hrUserId }, query: { jobId: d.id, name: d.companyName || '企业', jobTitle: d.title || '' } })
 }
 
 function goToJob(id) {

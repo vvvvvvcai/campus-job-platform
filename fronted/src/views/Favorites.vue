@@ -90,7 +90,7 @@
                 <span class="mx-1">·</span>{{ job.city }}
               </p>
               <div class="flex items-center gap-2 md:justify-end">
-                <button @click="chatUnavailable" class="px-3 py-1.5 text-[var(--on-surface-variant)] hover:text-[var(--primary)] text-xs font-medium flex items-center gap-1 rounded-lg hover:bg-[var(--surface-container-low)] transition-colors">
+                <button @click="goChat(job)" class="px-3 py-1.5 text-[var(--on-surface-variant)] hover:text-[var(--primary)] text-xs font-medium flex items-center gap-1 rounded-lg hover:bg-[var(--surface-container-low)] transition-colors">
                   <span class="material-symbols-outlined text-[16px]">chat</span>
                   在线沟通
                 </button>
@@ -170,8 +170,13 @@ function showToast(msg) {
   setTimeout(() => { toast.value = '' }, 3000)
 }
 
-function chatUnavailable() {
-  showToast('在线沟通功能暂未开放')
+function goChat(job) {
+  if (!store.isLoggedIn) {
+    window.dispatchEvent(new CustomEvent('open-login-modal'))
+    return
+  }
+  const hrUserId = job.publisherId || job.companyId || job.id
+  router.push({ name: 'ChatRoom', params: { toUserId: hrUserId }, query: { jobId: job.id, name: job.company || '企业', jobTitle: job.title || '' } })
 }
 
 onMounted(async () => {
@@ -183,6 +188,7 @@ onMounted(async () => {
       jobs.value = res.map(j => ({
         id: j.id,
         companyId: j.companyId,
+        publisherId: j.publisherId,
         title: j.title,
         company: j.companyName || '未知企业',
         logo: j.companyName ? j.companyName.charAt(0) : '企',
